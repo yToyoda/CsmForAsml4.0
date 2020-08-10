@@ -311,60 +311,7 @@ $(function () {  //main of slickgrid
         updateFilter();
     });
 
-    $.get(host + "/MaterialNeedCals/GetData").then(
-        function (ans) {
-            console.log("Data received ");
-            let length = ans.length;
-            let index;
-
-            data = ans;
-            for (index = 0; index < length; index += 1) {
-                let d = data[index];
-                d.id = "id_" + index;
-            }
-            // end get data from host
-
-
-            dataView = new Slick.Data.DataView({ inlineFilters: true });
-            grid = new Slick.Grid("#myGrid", dataView, columns, options);
-            grid.setSelectionModel(new Slick.RowSelectionModel());
-
-            pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
-            columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
-
-            /*
-            // move the filter panel defined in a hidden div into grid top panel
-            $("#inlineFilterPanel")
-                .appendTo(grid.getTopPanel())
-                .show();
-           */
-
-
-
-            // execute following code after setup
-            // initialize the model after all the events have been hooked up
-            dataView.beginUpdate();
-            dataView.setItems(data);
-            dataView.setFilterArgs(filterValues);
-            dataView.setFilter(myFilter);
-            dataView.endUpdate();
-
-            // if you don"t want the items that are not visible (due to being filtered out
-            // or being on a different page) to stay selected, pass "false" to the second arg
-            dataView.syncGridSelection(grid, true);
-
-            // $("#gridContainer").resizable();
-        },
-
-        function (jqXHR, textStatus, err) {
-            console.error("Error Hapened");
-        }
-    );
-
-    // events from fnkey area
-
-
-
+ 
     // main routine execution start from here
 
     checkboxSelector = new Slick.CheckboxSelectColumn({
@@ -372,48 +319,22 @@ $(function () {  //main of slickgrid
     });
 
     columns.push(checkboxSelector.getColumnDefinition());
-    //'Material','Material_Description','Cal_Place','Cal_Vendor','Cal_Interval','Instruction'
-    //,'ChangeDate','NeedCal','NeedSafety','Safety_Interval','P_Maker','P_Name','P_Model','AddRemove']
-    //columns.push({ id: "id", name: "ID", field: "cid", width: 40, sortable: true, editor: Slick.Editors.Text });
-    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
-    columns.push({ id: "Description", name: "Description", field: "Description", width: 260, sortable: true });
-    columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
-    columns.push({ id: "CalVendor", name: "Cal Vendor", field: "CalVendor", sortable: true });
-    columns.push({ id: "Instruction", name: "Instruction", field: "Instruction", sortable: true });
-    columns.push({ id: "ChangeDate", name: "ChangeDate", field: "ChangeDate", sortable: true });
-    columns.push({ id: "NeedCal", name: "NeedCal", field: "NeedCal", sortable: true });
-    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "NeedSafety", sortable: true });
-    columns.push({ id: "CalInt", name: "Cal Interval", field: "CalInt", sortable: true });
-    columns.push({ id: "SafetyInt", name: "Safety Interval", field: "SafetyInt", sortable: true });
-    columns.push({ id: "PMaker", name: "P.Maker", field: "PMaker", sortable: true });
-    columns.push({ id: "PName", name: "P.Name", field: "PName", sortable: true });
-    columns.push({ id: "PModel", name: "P.Model", field: "PModel", sortable: true });
-    columns.push({ id: "Status", name: "Status", field: "Status", sortable: true });
-
-
-    let adata = [
-        // ["Material", "Material_Description", "Cal_Place", "Cal_Vendor", "Cal_Interval", "Instruction", "ChangeDate", "NeedCal", "NeedSafety", "Safety_Interval", "P_Maker", "P_Name", "P_Model", "AddRemove"],
-        ["4022.489.50260", 'MUTIMETER DIG FLUKE DIG 177', "TOKYO (KT)", "NEC MP", 12, "", "2018/11/08", "TRUE", "FALSE", "", "FLUKE", "Multimeter", "177", ""],
-        ["4022.502.15302", 'TESA SENSOR GT 21', "MIYAGI (KT)", "Sunsea", 12, "表示機とセット校正", "2017/04/17", "TRUE", "FALSE", "", "TESA", "Probes", "GT21(32.10904）", ""],
-        ["4022.502.15429", 'HELIUM LEAKAGE DETECTOR', "TOKYO (KT)", "エドワーズ㈱", 12, "", "2017/04/17", "TRUE", "FALSE", "", "", "", "", ""],
-        ["4022.502.15487", 'BUBBLE LEVEL 200MM 0.02/M', "MIYAGI (KT)", "Sunsea", 12, "", "2017/04/17", "TRUE", "FALSE", "", "E.D.A", "Clinometer", "0.2mm/m 4sec", ""],
-        ["4022.502.15499", 'TESA PROBE GT31 032.10802', "MIYAGI (KT)", "Sunsea", 12, "表示機とセット校正", "2017/04/17", "TRUE", "FALSE", "", "TESA", "Probes", "GT31D(32.10802)", ""],
-        ["4022.502.15605", 'TORQUE WRENCH 3/8" 6-60 NM', "MIYAGI (KT)", "Sunsea", 12, "", "2018/11/08", "TRUE", "FALSE", "", "", "", "", ""],
-        ["4022.502.16143", 'TESA DISPLAY UNIT TT10', "MIYAGI (KT)", "Sunsea", 12, "プローブとセット校正", "2017/04/17", "TRUE", "FALSE", "", "TESA", "Electrical　Comparator", "TT10（44.30008）", ""],
-        ["4022.632.87685", 'VHX-700FE', "MIYAGI (KT)", "Sunsea", 12, "ソフト一式要", "2016/07/08", "TRUE", "FALSE", "", "", "", "", ""],
- 
-    ];
-
-    for (let i = 0; i < adata.length; i++) {
-        data[i] = {
-            sid: i,
-            Material: adata[i][0], Description: adata[i][1], CalPlace: adata[i][2], CalVendor: adata[i][3],
-            CalInt: adata[i][4], Instruction: adata[i][5], ChangeDate: adata[i][6],
-            NeedCal: adata[i][7], NeedSafety: adata[i][8], SafetyInt: adata[i][9],
-            PMaker: adata[i][10], PName: adata[i][11], Pmodel: adata[i][12], Status: adata[i][13],
-        };
-    }
-
+    /
+    columns.push({ id: "Material", name: "Material", field: "material", width: 120, sortable: true });
+    columns.push({ id: "Description", name: "Description", field: "materialDescription", width: 260, sortable: true });
+    columns.push({ id: "CalPlace", name: "Cal Place", field: "calPlace", sortable: true });
+    columns.push({ id: "CalVendor", name: "Cal Vendor", field: "calVendor", sortable: true });
+    columns.push({ id: "Instruction", name: "Instruction", field: "instruction", sortable: true });
+    columns.push({ id: "NeedCal", name: "NeedCal", field: "needCal", sortable: true });
+    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "needSafety", sortable: true });
+    columns.push({ id: "CalInt", name: "Cal Interval", field: "calInterval", sortable: true });
+    columns.push({ id: "SafetyInt", name: "Safety Interval", field: "safetyInterval", sortable: true });
+    columns.push({ id: "PMaker", name: "P.Maker", field: "pMaker", sortable: true });
+    columns.push({ id: "PName", name: "P.Name", field: "pName", sortable: true });
+    columns.push({ id: "PModel", name: "P.Model", field: "pModel", sortable: true });
+    columns.push({ id: "Status", name: "Status", field: "status", sortable: true });
+    columns.push({ id: "ChangeDate", name: "ChangeDate", field: "changeDate", sortable: true });
+   
     options = {
         columnPicker: {
             columnTitle: "Columns",
@@ -433,9 +354,6 @@ $(function () {  //main of slickgrid
         headerRowHeight: 30,
         explicitInitialization: true
     };
-
-
-
 
 
     dataView = new Slick.Data.DataView({ inlineFilters: true });
@@ -530,12 +448,47 @@ $(function () {  //main of slickgrid
     });
 
     
+    $.get(host + "/MaterialNeedCals/GetData").then(
+        function (ans) {
+            console.log("Data received ");
+            let length = ans.length;            
 
+            data = ans;
+            //add :id to each row
+            for (let index = 0; index < length; index += 1) {
+                let d = data[index];
+                d['id'] =  index;
+            }
+
+
+
+            // execute following code after setup
+            // initialize the model after all the events have been hooked up
+            dataView.beginUpdate();
+            dataView.setItems(data,"id");
+            dataView.setFilterArgs(filterValues);
+            dataView.setFilter(myFilter);
+            dataView.endUpdate();
+
+            dataView.syncGridSelection(grid, true);
+            showNumber();
+            updateDropdownList();
+
+            // $("#gridContainer").resizable();
+        },
+
+        function (jqXHR, textStatus, err) {
+            console.error("Error Hapened");
+            $('#NumShowing').text("Error");
+            $('#NumTotal').text(textStatus);
+        }
+    );
     // grid.onClick.subscribe(function (e, cell) {
     //     let x = e;
     //     let y = cell;
     // })
 
+    /*
     dataView.beginUpdate();
     dataView.setItems(data, "sid");
     dataView.setFilterArgs(filterValues);
@@ -544,7 +497,7 @@ $(function () {  //main of slickgrid
     dataView.syncGridSelection(grid, true);
 
     showNumber();
-    updateDropdownList();
+    updateDropdownList();*/
 
     
 });

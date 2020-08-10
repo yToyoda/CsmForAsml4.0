@@ -7,22 +7,27 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+
 namespace CsmForAsml.Controllers
 {
     public class MaterialNeedCalsController : Controller
     {
         private readonly CsmForAsml2Context _context;
+        private readonly MaterialNeedCalRepository _mncRepo;
 
         public MaterialNeedCalsController(CsmForAsml2Context context)
         {
             _context = context;
+            _mncRepo = context.MaterialNeedCalRepository;
         }
 
         // GET: MaterialNeedCals
         public async Task<IActionResult> Index()
         {
-            MaterialNeedCalRepository _mncRep = _context.MaterialNeedCalRepository;
-            IEnumerable<MaterialNeedCal> list = await _mncRep.GetAllRecordsAsync();
+            //MaterialNeedCalRepository _mncRep = _context.MaterialNeedCalRepository;
+            IEnumerable<MaterialNeedCal> list = await _mncRepo.GetAllRecordsAsync();
             /*
             List<Tat> TatList = _context.Tat.ToList();
             foreach (MaterialNeedCal mncal in list) {
@@ -167,73 +172,26 @@ namespace CsmForAsml.Controllers
         /// </summary>
         /// <returns>Json フォーマットでシリアライズされた全Equipment の情報</returns>
         [HttpGet]
-        public ActionResult GetData() {
-            var equipments = _equipmentRepo.GetAllRecords();
-            List<EquipmentDispModel> equip = new List<EquipmentDispModel>();
-            CopyEq(equipments, equip);
-
-            return Json(equip, JsonRequestBehavior.AllowGet);
+        public async Task<IActionResult> GetData() {
+            var equipments = await _mncRepo.GetAllRecordsAsync();
+            
+            CopyEq(equipments);
+            
+            return Json(equipments);
         }
         /// <summary>
         /// CSM_Context の Equipmentのリストを、　EquipmentDispModelのリストに変換する
         /// </summary>
         /// <param name="equips">IEnumerable &lt;Equipment&gt; 型のEquipment の情報 (ソース) </param>
         /// <param name="equipt">変換された List &lt;EquipmentDispModel&gt; 型のEquipment の情報 (デスティネーション) </param>
-        private void CopyEq(IEnumerable<Equipment> equips, List<EquipmentDispModel> equipt) {
-            DateTime today = DateTime.Now.Date;
-            DateTime firstNM = App_Utility.FirstDayOfNMonth(today, 1);
-            DateTime first2M = App_Utility.FirstDayOfNMonth(today, 2);
-            bool inCal = false;
+        private void CopyEq(IEnumerable<MaterialNeedCal> equips) {
 
             foreach (var eqs in equips) {
-                EquipmentDispModel eqt = new EquipmentDispModel();
-                eqt.EquipNo = eqs.EquipNo;
-                eqt.User_Department = eqs.User_Department ?? "";
-                eqt.User_Location1 = eqs.User_Location1 ?? "";
-                eqt.User_Location2 = eqs.User_Location2 ?? "";
-                eqt.User_Individual = eqs.User_Individual ?? "";
-                eqt.User_Administrator = eqs.User_Administrator ?? "";
 
-                eqt.Manufacturer = eqs.Manufacturer ?? "";
-                eqt.ModelNumber = eqs.ModelNumber ?? "";
-                eqt.ProductName = eqs.ProductName ?? "";
-                eqt.Serial = eqs.Serial ?? "";
-                eqt.InitialRegistoredDate = ToShortDate(eqs.InitialRegistoredDate);
-                eqt.Status = eqs.Status ?? "";
-                eqt.StatusChangeDate = ToShortDate(eqs.StatusChangeDate);
-                eqt.CalInterval = eqs.CalInterval?.ToString() ?? "";
-                eqt.LatestCalDate = ToShortDate(eqs.LatestCalDate);
-                eqt.CalResult = eqs.CalResult ?? "";
-                eqt.CalDueStatus = "";
-
-                if (eqt.Status.Contains("校正対象")) {
-
-                    eqt.CalDue = ToShortDate(eqs.CalDue);
-                    if (eqs.CalDue == null) {
-                        eqt.CalDueStatus = "NO CalDue";
-                    } else {
-                        inCal = (eqs.StopUsingDate != null);
-                        if (inCal) {
-                            eqt.CalDueStatus = "In Cal";
-                        } else if (eqs.CalDue < today) {
-                            eqt.CalDueStatus = "OverDue";
-                        } else if (eqs.CalDue >= today && eqs.CalDue < firstNM) {
-                            eqt.CalDueStatus = "Due-TM";
-                        } else if (eqs.CalDue < first2M) {
-                            eqt.CalDueStatus = "Due-NM";
-                        }
-                    }
-                } else {
-                    eqt.CalDue = "";
-                }
-                eqt.StopUsingDate = ToShortDate(eqs.StopUsingDate);
-                eqt.Notes = eqs.Notes ?? "";
-                eqt.RelatedCustomer = eqs.RelatedCustomer ?? "";
-                eqt.UseForYakki = (eqs.UseForYakki == null) ? "" : eqs.UseForYakki.Value.ToString();
-                eqt.StopStatus = eqs.StopStatus ?? "";
-                eqt.User_Memo = eqs.User_Memo ?? "";
-                equipt.Add(eqt);
+                eqs.NeedCal = eqs.NeedCal ?? false;
+                eqs.NeedSafety = eqs.NeedSafety ?? false;
             }
+
         }
 
         private string ToShortDate(DateTime? date) {
