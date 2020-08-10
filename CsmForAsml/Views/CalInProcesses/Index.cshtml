@@ -1,0 +1,306 @@
+﻿@model IEnumerable<CsmForAsml.Models.CalInProcess>
+
+@{
+    ViewData["Title"] = "Cals in Process";
+}
+
+<h1>Cals in Process</h1>
+
+<div class="filterPannel">
+    <div class="flex">
+        <div id="b1">
+
+            <div class="row" id="filter-row1">
+                <div class="col-md-3">
+                    <label>Plant</label>
+                </div>
+                <div class="col-md-3">
+                    <label>CalPlaace</label>
+                </div>
+                <div class="col-md-3">
+                    <label>Material</label>
+                </div>
+                <div class="col-md-3">
+                    <label>Serial</label>
+                </div>
+            </div>
+
+            <div class="row" id="filter-row2">
+                <div class="col-md-3">
+
+                    <select id="selectPlant" name="Plant">
+                        <option value="sample">Plant</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+
+                    <select id="selectCalPlace" name="CalPlace">
+                        <option value="sample">CalPlace</option>
+                    </select>
+
+                </div>
+                <div class="col-md-3">
+                    <select id="selectMaterial" name="MaterialPd">
+                        <option value="sample">Material</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="selectSerial" name="SerisePd">
+                        <option value="sample">Serial</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="row" id="checkfilter" style="align-items: center;">
+                <div class="col-md-1">
+                    <button id="clrSelBtn">Clr</button>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-left">Filter by Selection</p>
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" id="rd00" name="filBySel" value="0" checked="checked">Off
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" id="rd01" name="filBySel" value="1">Selected
+                </div>
+                <div class="col-md-3">
+                    <input type="radio" id="rd02" name="filBySel" value="2">Unselected
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="tabs" id="b2" style="font-size: xx-small">
+            <div class="row" style="margin-left: 0; align-items: baseline;">
+                <div class="col-md-3" style="padding:2px 2px 2px 0px">
+                    <button id="clrAllFil" style="float: left;">全フィルタクリア</button>
+                </div>
+                <div class="col-md-offset-1  col-md-3" style="padding:2px 2px 2px 0px">
+                    <button id="clrDateFil">日付フィルタクリア</button>
+                </div>
+            </div>
+
+            <input id="input1" type="radio" name="tab_item" value="1" checked>
+            <label class="tab_item" for="input1">ASML発送日</label>
+            <input id="input2" type="radio" name="tab_item" value="2">
+            <label class="tab_item" for="input2">受領日</label>
+            <input id="input3" type="radio" name="tab_item" value="3">
+            <label class="tab_item" for="input3">校正実施日</label>
+            <input id="input4" type="radio" name="tab_item" value="4">
+            <label class="tab_item" for="input4">予定出荷日</label>
+            <input id="input5" type="radio" name="tab_item" value="5">
+            <label class="tab_item" for="input5">返送出荷日</label>
+            <input id="input6" type="radio" name="tab_item" value="6">
+            <label class="tab_item" for="input6">ASML受領日</label>
+            <input id="input7" type="radio" name="tab_item" value="7">
+            <label class="tab_item" for="input7">CC受領日</label>
+            <input id="input8" type="radio" name="tab_item" value="8">
+            <label class="tab_item" for="input8">CC登録日</label>
+
+            <div class="tab_content" id="content0" style="font-size:xx-small; padding: 0; margin: 0">
+                <div class="row">
+                    <!-- <div class="col-md-1 text-right">
+                        <label>ASML出荷日</label>
+                      </div> -->
+                    <div class="col-md-2">
+                        <input type="radio" id="cdr0" name="date1Radio" value="0" checked="checked">Off
+                    </div>
+                    <div class="col-md-1">
+                        <input type="radio" id="cdr1" name="date1Radio" value="1">末
+                    </div>
+                    <div class="col-md-2">
+                        <input type="radio" id="cdr2" name="date1Radio" value="2">今月
+                    </div>
+                    <div class="col-md-2">
+                        <input type="radio" id="cdr3" name="date1Radio" value="3">先月
+                    </div>
+                    <!-- 　次のボタンは非表示 -->
+                    <div style="display: none;">
+                        <input type="radio" id="cdr4" name="date1Radio" value="4">From-TO
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="row">
+                            <label>From</label>
+                            <input type="text" name="from" id="date1From" class="datepicker" />
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row">
+                            <label>To</label>
+                            <input type="text" name="To" id="date1To" class="datepicker" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end of <div class="tabs"> -->
+</div> <!-- end of class="filterPannelInner" -->
+
+
+<div class="grid-area" id="myGrid">
+</div>
+
+
+<div class="fnkey-area">
+    <div class="row">
+        <div class="col-md-6 fsm">
+            Showing
+            <label id="NumShowing" class="fsm"> nnn </label>
+            of Total
+            <label id="NumTotal" class="fsm"> mmm </label>
+            rows data.
+        </div>
+    </div>
+    <div class="row" style="margin-left: 20px;">
+        <div class="col-md-2 pad2">
+            <button id="button1">Download</button>
+        </div>
+        <div class="col-md-2 pad2">
+            <button id="button2">Cal History</button>
+        </div>
+        <div class="col-md-2 pad2">
+            <button id="button3">P.Info</button>
+        </div>
+        <div class="col-md-offset-2 col-md-2 pad2">
+            <button id="button4">Set Event Dates</button>
+        </div>
+        <div class="col-md-2 pad2">
+            <button id="button5">完了設定</button>
+        </div>
+
+    </div>
+</div>
+<!--  modal input pannel for event and date  from here -->
+<div id="dialog-pannel" title="日付・結果入力" style="display:none">
+    <br>
+    <p id="d-message" class="dialog-panel__message fsm" role="document">
+        イベントを選んでください
+    </p>
+
+    <div class="fsm mglw">
+        <input type="radio" id="r0" name="dlprd1" value="1" checked="checked">ASML発送日<br>
+        <input type="radio" id="r1" name="dlprd1" value="2">受領日<br>
+        <input type="radio" id="r2" name="dlprd1" value="3">校正実施日<br>
+        <input type="radio" id="r3" name="dlprd1" value="5">返送出荷日<br>
+        <input type="radio" id="r4" name="dlprd1" value="6">ASML受領日<br>
+        <input type="radio" id="r5" name="dlprd1" value="7">CC受領日<br>
+    </div>
+    <br>
+    <p id="d-message2" class="dialog-panel__message fsm" role="document">
+        上のイベントの日付を選んでください
+    </p>
+
+    <label>日付</label>
+    <input type="text" id="dlpdi1" class="datepicker" />
+
+    <br>
+    <div class="calResultBlock" style="font-size: medium;">
+        <div class="row">
+            校正結果
+            <select id="dlpCalResult1">
+                <option value="GD">合格</option>
+                <option value="NG">不合格</option>
+                <option value="NOCAL">校正対象外</option>
+                <option value="none">未実施</option>
+            </select>
+        </div>
+        <p>コメント</p>
+        <textarea name="comments" id="dlpcci1" cols="38" rows="4"></textarea>
+    </div>
+</div>
+
+<!--  end of modal input pannel for event and date  from here -->
+<!--  modal input pannel for event and date  from here -->
+<div id="dialog-pannel2" title="日付・結果入力" style="display:none">
+    <br>
+    <p id="dlpSerial" class="fsl"></p>
+    <p class="dialog-panel__message fsm" role="document">
+        イベントを選んでください
+    </p>
+
+    <div class="row">
+        <div class="col-md-6 fsm">
+            <input type="radio" id="rr0" name="dlprd2" value="1" checked="checked">ASML発送日
+        </div>
+        <label class="col-md-6 fsm" id="dlpdl1"></label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 fsm">
+            <input type="radio" id="rr1" name="dlprd2" value="2">受領日<br>
+        </div>
+        <label class="col-md-6 fsm" id="dlpdl2"></label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 fsm">
+            <input type="radio" id="rr2" name="dlprd2" value="3">校正実施日<br>
+        </div>
+        <label class="col-md-6 fsm" id="dlpdl3"></label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 fsm">
+            <input type="radio" id="rr3" name="dlprd2" value="5">返送出荷日<br>
+        </div>
+        <label class="col-md-6 fsm" id="dlpdl4"></label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 fsm">
+            <input type="radio" id="rr4" name="dlprd2" value="6">ASML受領日<br>
+        </div>
+        <label class="col-md-6 fsm" id="dlpdl5"></label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 fsm">
+            <input type="radio" id="rr5" name="dlprd2" value="7">CC受領日<br>
+        </div>
+        <label class="col-md-6 fsm" id="dlpdl6"></label>
+    </div>
+
+    <p id="d-message22" class="dialog-panel__message fsm" role="document">
+        上のイベントの日付を選んでください
+    </p>
+
+    <label>日付</label>
+    <input type="text" id="dlpdi2" class="datepicker" />
+
+    <br>
+    <div class="calResultBlock" style="font-size: medium;">
+        <div class="row">
+            校正結果
+            <select id="dlpCalResult2">
+                <option value="GD">合格</option>
+                <option value="NG">不合格</option>
+                <option value="NOCAL">校正対象外</option>
+                <option value="none">未実施</option>
+            </select>
+        </div>
+        <p>コメント</p>
+        <textarea name="comments" id="dlpcci2" cols="38" rows="4"></textarea>
+    </div>
+</div>
+<!--  end of modal input pannel for event and date  from here -->
+
+@section scripts{
+
+    <script src="~/lib/slickgrid/slick.core.min.js"></script>
+    <script src="~/lib/slickgrid/slick.grid.min.js"></script>
+    <script src="~/lib/slickgrid/slick.formatters.js"></script>
+    <script src="~/lib/slickgrid/slick.editors.js"></script>
+    <script src="~/lib/slickgrid/slick.dataview.min.js"></script>
+    <script src="~/lib/slickgrid/plugins/slick.rowselectionmodel.min.js"></script>
+    <script src="~/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
+    <script src="~/lib/slickgrid/controls/slick.pager.js"></script>
+    <script src="~/lib/slickgrid/controls/slick.columnpicker.js"></script>
+
+    <script src="~/js/InCal.js"></script>
+
+}

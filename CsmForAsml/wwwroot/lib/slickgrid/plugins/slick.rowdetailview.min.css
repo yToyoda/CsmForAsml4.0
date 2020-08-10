@@ -1,0 +1,8 @@
+/**
+ * Minified by jsDelivr using clean-css v4.2.3.
+ * Original file: /npm/slickgrid@2.4.27/plugins/slick.rowdetailview.css
+ *
+ * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
+ */
+.detailView-toggle{display:inline-block}.detailView-toggle.expand{cursor:pointer;height:20px;width:20px;background:url(../images/arrow-right.gif) no-repeat center center}.detailView-toggle.collapse{cursor:pointer;height:20px;width:20px;background:url(../images/sort-desc.gif) no-repeat center center}.dynamic-cell-detail{z-index:10000;position:absolute;background-color:#dae5e8;margin:0;padding:0;width:100%;overflow:auto}.dynamic-cell-detail>:first-child{vertical-align:middle;line-height:13px}.dynamic-cell-detail>.detail-container{overflow:auto;display:block!important}
+/*# sourceMappingURL=/sm/560e2e6df210cfbb57e74b0ebd9786870651373d216c7842ed9f05dcc325a330.map */

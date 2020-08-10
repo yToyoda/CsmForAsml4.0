@@ -1,0 +1,114 @@
+﻿@model CsmForAsml.Models.MaterialNeedCal
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>MaterialNeedCal</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Material)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Material)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MaterialDescription)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MaterialDescription)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CalPlace)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CalPlace)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CalVendor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CalVendor)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CalInterval)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CalInterval)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Instruction)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Instruction)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AddRemove)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AddRemove)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ChangeDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ChangeDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NeedCal)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NeedCal)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NeedSafety)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NeedSafety)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SafetyInterval)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SafetyInterval)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PMaker)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PMaker)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PModel)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PModel)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PriceToUser)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PriceToUser)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PriceFromVendor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PriceFromVendor)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Material">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

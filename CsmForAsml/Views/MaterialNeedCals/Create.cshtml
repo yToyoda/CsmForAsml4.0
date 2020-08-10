@@ -1,0 +1,98 @@
+﻿@model CsmForAsml.Models.MaterialNeedCal
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>MaterialNeedCal</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Material" class="control-label"></label>
+                <input asp-for="Material" class="form-control" />
+                <span asp-validation-for="Material" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaterialDescription" class="control-label"></label>
+                <input asp-for="MaterialDescription" class="form-control" />
+                <span asp-validation-for="MaterialDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CalPlace" class="control-label"></label>
+                <input asp-for="CalPlace" class="form-control" />
+                <span asp-validation-for="CalPlace" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CalVendor" class="control-label"></label>
+                <input asp-for="CalVendor" class="form-control" />
+                <span asp-validation-for="CalVendor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CalInterval" class="control-label"></label>
+                <input asp-for="CalInterval" class="form-control" />
+                <span asp-validation-for="CalInterval" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Instruction" class="control-label"></label>
+                <input asp-for="Instruction" class="form-control" />
+                <span asp-validation-for="Instruction" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AddRemove" class="control-label"></label>
+                <input asp-for="AddRemove" class="form-control" />
+                <span asp-validation-for="AddRemove" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChangeDate" class="control-label"></label>
+                <input asp-for="ChangeDate" class="form-control" />
+                <span asp-validation-for="ChangeDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NeedCal" class="control-label"></label>
+                <input asp-for="NeedCal" class="form-control" />
+                <span asp-validation-for="NeedCal" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NeedSafety" class="control-label"></label>
+                <input asp-for="NeedSafety" class="form-control" />
+                <span asp-validation-for="NeedSafety" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SafetyInterval" class="control-label"></label>
+                <input asp-for="SafetyInterval" class="form-control" />
+                <span asp-validation-for="SafetyInterval" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PMaker" class="control-label"></label>
+                <input asp-for="PMaker" class="form-control" />
+                <span asp-validation-for="PMaker" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PName" class="control-label"></label>
+                <input asp-for="PName" class="form-control" />
+                <span asp-validation-for="PName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PModel" class="control-label"></label>
+                <input asp-for="PModel" class="form-control" />
+                <span asp-validation-for="PModel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

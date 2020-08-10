@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CsmForAsml</title>
+    <style>
+        :root {
+            --height-functions: 320px;
+        }
+    </style>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.min.css" />
+    <link rel="stylesheet" href="~/lib/slickgrid/slick.grid.css" type="text/css" />
+    <link rel="stylesheet" href="~/lib/slickgrid/controls/slick.columnpicker.css" type="text/css" />
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/csm.css" />
+    <style>
+  
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CsmForAsml</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <partial name="_LoginPartial" />
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="MaterialNeedCals" asp-action="Index">MaterialNeedCal</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="ToolInventories" asp-action="Index">Tools-Inventory</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="CalInProcesses" asp-action="Index">Cal-In-Process</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Locations" asp-action="Index">Locations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Holidays" asp-action="Index">Holidays</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- <div class="container"> -->
+    <div >
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+        </div>
+    </footer>
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/jquery.event.drag-2.3.0.js"></script>
+    <script src="~/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+    <script src="~/lib/jquery.japanese-input-change/jquery.japanese-input-change.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/moment/moment.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

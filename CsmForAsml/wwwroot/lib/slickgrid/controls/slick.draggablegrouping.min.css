@@ -1,0 +1,8 @@
+/**
+ * Minified by jsDelivr using clean-css v4.2.3.
+ * Original file: /npm/slickgrid@2.4.27/controls/slick.draggablegrouping.css
+ *
+ * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
+ */
+.slick-group-toggle-all.expanded{background:url(../images/collapse.gif) no-repeat center center;width:9px;height:9px;position:absolute;display:inline-block;right:10px}.slick-group-toggle-all.collapsed{background:url(../images/expand.gif) no-repeat center center;width:9px;height:9px;position:absolute;display:inline-block;right:10px}.slick-column-groupable{width:9px;height:9px;display:inline-block;margin-left:4px}.slick-column-groupable-image{background:url(../images/column-grouping.png) no-repeat center center}.slick-dropped-grouping{display:inline-block;margin-right:5px;vertical-align:middle;cursor:pointer}.slick-groupby-remove{padding-right:20px;display:inline-flex}.slick-groupby-remove-image{background:url(../images/delete.png) no-repeat center right}.slick-placeholder{height:25px}.ui-droppable{padding:5px}
+/*# sourceMappingURL=/sm/3569b1125ac2cc75d2468bf1ae28f40613965aadb3f0b1351bc2fbcbf2d76825.map */

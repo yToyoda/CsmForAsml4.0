@@ -1,0 +1,168 @@
+﻿@model CsmForAsml.Models.ToolInventory
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>ToolInventory</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SerialNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SerialNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Plant)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Plant)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StoreLocation)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StoreLocation)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Material)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Material)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LatestCalDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LatestCalDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CalStatus)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CalStatus)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Comment)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CalDue)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CalDue)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SystemStatus)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SystemStatus)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserStatus)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserStatus)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Room)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Room)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SuperordEquip)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SuperordEquip)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SortField)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SortField)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Machine)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Machine)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ToolkitMachine)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ToolkitMachine)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ToolkitSloc)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ToolkitSloc)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LatestSafetyDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LatestSafetyDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SafetyDue)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SafetyDue)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NeedCal)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NeedCal)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NeedSafety)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NeedSafety)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RemovedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RemovedDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UpdatedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UpdatedDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.InCal)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.InCal)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PSN)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PSN)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.SerialNumber">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

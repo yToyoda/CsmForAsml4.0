@@ -1,0 +1,41 @@
+﻿@model IEnumerable<CsmForAsml.Models.Location>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Plant)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location1)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Plant)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Location1)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Plant">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Plant">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Plant">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

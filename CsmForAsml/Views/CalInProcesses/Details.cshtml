@@ -1,0 +1,120 @@
+﻿@model CsmForAsml.Models.CalInProcess
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>CalInProcess</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SerialNumber)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SerialNumber)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RegisteredDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RegisteredDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UserShipDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UserShipDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.VenReceiveDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.VenReceiveDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CalDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CalDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CalResult)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CalResult)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.VenComment)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.VenComment)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.PlanedShipDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.PlanedShipDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.VenShipDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.VenShipDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UserReceiveDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UserReceiveDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CcReceiveDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CcReceiveDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CcUploadDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CcUploadDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Tat)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Tat)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Finished)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Finished)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Plant)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Plant)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.StdTat)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.StdTat)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TatStatus)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TatStatus)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
