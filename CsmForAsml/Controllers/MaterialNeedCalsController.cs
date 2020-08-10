@@ -161,5 +161,84 @@ namespace CsmForAsml.Controllers
         {
             return _context.MaterialNeedCal.Any(e => e.Material == id);
         }
+
+        /// <summary>
+        /// Json で表した 全Equipments の情報をクライアント側に返す
+        /// </summary>
+        /// <returns>Json フォーマットでシリアライズされた全Equipment の情報</returns>
+        [HttpGet]
+        public ActionResult GetData() {
+            var equipments = _equipmentRepo.GetAllRecords();
+            List<EquipmentDispModel> equip = new List<EquipmentDispModel>();
+            CopyEq(equipments, equip);
+
+            return Json(equip, JsonRequestBehavior.AllowGet);
+        }
+        /// <summary>
+        /// CSM_Context の Equipmentのリストを、　EquipmentDispModelのリストに変換する
+        /// </summary>
+        /// <param name="equips">IEnumerable &lt;Equipment&gt; 型のEquipment の情報 (ソース) </param>
+        /// <param name="equipt">変換された List &lt;EquipmentDispModel&gt; 型のEquipment の情報 (デスティネーション) </param>
+        private void CopyEq(IEnumerable<Equipment> equips, List<EquipmentDispModel> equipt) {
+            DateTime today = DateTime.Now.Date;
+            DateTime firstNM = App_Utility.FirstDayOfNMonth(today, 1);
+            DateTime first2M = App_Utility.FirstDayOfNMonth(today, 2);
+            bool inCal = false;
+
+            foreach (var eqs in equips) {
+                EquipmentDispModel eqt = new EquipmentDispModel();
+                eqt.EquipNo = eqs.EquipNo;
+                eqt.User_Department = eqs.User_Department ?? "";
+                eqt.User_Location1 = eqs.User_Location1 ?? "";
+                eqt.User_Location2 = eqs.User_Location2 ?? "";
+                eqt.User_Individual = eqs.User_Individual ?? "";
+                eqt.User_Administrator = eqs.User_Administrator ?? "";
+
+                eqt.Manufacturer = eqs.Manufacturer ?? "";
+                eqt.ModelNumber = eqs.ModelNumber ?? "";
+                eqt.ProductName = eqs.ProductName ?? "";
+                eqt.Serial = eqs.Serial ?? "";
+                eqt.InitialRegistoredDate = ToShortDate(eqs.InitialRegistoredDate);
+                eqt.Status = eqs.Status ?? "";
+                eqt.StatusChangeDate = ToShortDate(eqs.StatusChangeDate);
+                eqt.CalInterval = eqs.CalInterval?.ToString() ?? "";
+                eqt.LatestCalDate = ToShortDate(eqs.LatestCalDate);
+                eqt.CalResult = eqs.CalResult ?? "";
+                eqt.CalDueStatus = "";
+
+                if (eqt.Status.Contains("校正対象")) {
+
+                    eqt.CalDue = ToShortDate(eqs.CalDue);
+                    if (eqs.CalDue == null) {
+                        eqt.CalDueStatus = "NO CalDue";
+                    } else {
+                        inCal = (eqs.StopUsingDate != null);
+                        if (inCal) {
+                            eqt.CalDueStatus = "In Cal";
+                        } else if (eqs.CalDue < today) {
+                            eqt.CalDueStatus = "OverDue";
+                        } else if (eqs.CalDue >= today && eqs.CalDue < firstNM) {
+                            eqt.CalDueStatus = "Due-TM";
+                        } else if (eqs.CalDue < first2M) {
+                            eqt.CalDueStatus = "Due-NM";
+                        }
+                    }
+                } else {
+                    eqt.CalDue = "";
+                }
+                eqt.StopUsingDate = ToShortDate(eqs.StopUsingDate);
+                eqt.Notes = eqs.Notes ?? "";
+                eqt.RelatedCustomer = eqs.RelatedCustomer ?? "";
+                eqt.UseForYakki = (eqs.UseForYakki == null) ? "" : eqs.UseForYakki.Value.ToString();
+                eqt.StopStatus = eqs.StopStatus ?? "";
+                eqt.User_Memo = eqs.User_Memo ?? "";
+                equipt.Add(eqt);
+            }
+        }
+
+        private string ToShortDate(DateTime? date) {
+            return (date == null) ? "" : date.Value.ToShortDateString();
+        }
+
     }
 }
