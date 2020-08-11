@@ -487,31 +487,31 @@ $(function () {  //main of slickgrid
     columns.push(checkboxSelector.getColumnDefinition());
 
 
-    columns.push({ id: "Plant", name: "Plant", field: "plant", sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Serial", name: "Serial", field: "serialNumber", sortable: true });
-    columns.push({ id: "Material", name: "Material", field: "material", width: 120, sortable: true });
-    columns.push({ id: "Description", name: "Description", field: "description", width: 260, sortable: true });
-    columns.push({ id: "Date0", name: "CalDue", field: "calDue", sortable: true });
-    columns.push({ id: "CalDueStatus", name: "Status", field: "calStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
-    columns.push({ id: "Comment", name: "Comment", field: "comment", width: 60, sortable: true },);
-    columns.push({ id: "Date1", name: "Latest CalDate", field: "latestCalDate", sortable: true });
-    columns.push({ id: "Date2", name: "SafetyDue", field: "safetyDue", sortable: true });
-    columns.push({ id: "Date3", name: "Latest SafetyDate", field: "latestSafetyDate", sortable: true });
-    columns.push({ id: "CalInt", name: "Cal Interval", field: "calInt", sortable: true });
-    columns.push({ id: "CalPlace", name: "Cal Place", field: "calPlace", sortable: true });
-    columns.push({ id: "StoreLoc", name: "Store Location", field: "storeLocation", sortable: true });
-    columns.push({ id: "SysStat", name: "System Status", field: "systemStatus", sortable: true });
-    columns.push({ id: "UserStat", name: "User Satus", field: "userStatus", sortable: true });
-    columns.push({ id: "Room", name: "Room", field: "room", sortable: true });
-    columns.push({ id: "SuperordEquip", name: "SuperordEquip", field: "superordEquip", sortable: true });
-    columns.push({ id: "SortField", name: "SortField", field: "sortField", sortable: true });
-    columns.push({ id: "Machine", name: "Machine", field: "machine", sortable: true });
-    columns.push({ id: "ToolkitMachine", name: "ToolkitMachine", field: "toolkitMachine", sortable: true });
-    columns.push({ id: "ToolkitSloc", name: "ToolkitSloc", field: "toolkitSloc", sortable: true });
-    columns.push({ id: "InCal", name: "InCal", field: "inCal", sortable: true });
-    columns.push({ id: "NeedCal", name: "NeedCal", field: "needCal", sortable: true });
-    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "needSafety", sortable: true });
-    columns.push({ id: "PSN", name: "PSN", field: "pSN", sortable: true });
+    columns.push({ id: "Plant", name: "Plant", field: "Plant", sortable: true, editor: Slick.Editors.TextNC });
+    columns.push({ id: "Serial", name: "Serial", field: "SerialNumber", sortable: true });
+    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
+    columns.push({ id: "Description", name: "Description", field: "Description", width: 260, sortable: true });
+    columns.push({ id: "Date0", name: "CalDue", field: "CalDue", sortable: true });
+    columns.push({ id: "CalDueStatus", name: "Status", field: "CalStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
+    columns.push({ id: "Comment", name: "Comment", field: "Comment", width: 60, sortable: true },);
+    columns.push({ id: "Date1", name: "Latest CalDate", field: "LatestCalDate", sortable: true });
+    columns.push({ id: "Date2", name: "SafetyDue", field: "SafetyDue", sortable: true });
+    columns.push({ id: "Date3", name: "Latest SafetyDate", field: "LatestSafetyDate", sortable: true });
+    columns.push({ id: "CalInt", name: "Cal Interval", field: "CalInt", sortable: true });
+    columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
+    columns.push({ id: "StoreLoc", name: "Store Location", field: "StoreLocation", sortable: true });
+    columns.push({ id: "SysStat", name: "System Status", field: "SystemStatus", sortable: true });
+    columns.push({ id: "UserStat", name: "User Satus", field: "UserStatus", sortable: true });
+    columns.push({ id: "Room", name: "Room", field: "Room", sortable: true });
+    columns.push({ id: "SuperordEquip", name: "SuperordEquip", field: "SuperordEquip", sortable: true });
+    columns.push({ id: "SortField", name: "SortField", field: "SortField", sortable: true });
+    columns.push({ id: "Machine", name: "Machine", field: "Machine", sortable: true });
+    columns.push({ id: "ToolkitMachine", name: "ToolkitMachine", field: "ToolkitMachine", sortable: true });
+    columns.push({ id: "ToolkitSloc", name: "ToolkitSloc", field: "ToolkitSloc", sortable: true });
+    columns.push({ id: "InCal", name: "InCal", field: "InCal", sortable: true });
+    columns.push({ id: "NeedCal", name: "NeedCal", field: "NeedCal", sortable: true });
+    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "NeedSafety", sortable: true });
+    columns.push({ id: "PSN", name: "PSN", field: "PSN", sortable: true });
 
 
 /*  

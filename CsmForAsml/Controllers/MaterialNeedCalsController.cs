@@ -181,6 +181,7 @@ namespace CsmForAsml.Controllers
                 PropertyNamingPolicy = null,
                 WriteIndented = true
             };
+            serializeOptions.Converters.Add(new DateTimeConverter());
 
             return Json(equipments, serializeOptions);
         }

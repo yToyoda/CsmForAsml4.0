@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -153,8 +154,15 @@ namespace CsmForAsml.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetData() {
-            var inventories = await _toolRepo.GetAllRecordsAsync();            
-            return Json(inventories);
+            var inventories = await _toolRepo.GetAllRecordsAsync();
+
+            var serializeOptions = new JsonSerializerOptions {
+                //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNamingPolicy = null,
+                WriteIndented = true
+            };
+            serializeOptions.Converters.Add(new DateTimeConverter());
+            return Json(inventories, serializeOptions);
         }
 
     }

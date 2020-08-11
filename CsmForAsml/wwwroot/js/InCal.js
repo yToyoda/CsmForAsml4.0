@@ -19,8 +19,6 @@ $(function () {
 
 $(function () {
     "use strict";
-    //let host = "http://localhost:42666";
-    let host = window.location.protocol + "//" + window.location.host;
 
     let grid;
     let data = [];
@@ -645,22 +643,22 @@ $(function () {
     // columns.push({ id: "Sel", name: "Select", width: 80, minWidth: 20, maxWidth: 80, field: "Select", formatter: Slick.Formatters.Checkmark, editor: Slick.Editors.Checkbox, cannotTriggerInsert: true, sortable: true },);
     // columns.push({ id: "id", name: "ID", field: "cid", width: 40, sortable: true, editor: Slick.Editors.TextNC });
     columns.push({ id: "Plant", name: "Plant", field: "Plant", width: 40, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Serial", name: "Serial", field: "Serial", width: 80, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
+    columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", width: 80, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
     columns.push({ id: "Material", name: "Material", field: "Material", width: 120, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
     columns.push({ id: "Description", name: "Description", field: "Description", width: 250, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
     //    {id: "CalInt", name: "Cal Interval", field: "CalInt"},
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", resizable: true, sortable: true });
-    columns.push({ id: "Date0", name: "登録日", field: "Date0", resizable: true, sortable: true });
-    columns.push({ id: "Date1", name: "ASML発送日", field: "Date1", resizable: true, sortable: true });
-    columns.push({ id: "Date2", name: "受領日", field: "Date2", resizable: true, sortable: true });
-    columns.push({ id: "Date3", name: "校正実施日", field: "Date3", resizable: true, sortable: true });
+    columns.push({ id: "Date0", name: "登録日", field: "RegisteredDate", resizable: true, sortable: true });
+    columns.push({ id: "Date1", name: "ASML発送日", field: "UserShipDate", resizable: true, sortable: true });
+    columns.push({ id: "Date2", name: "受領日", field: "VenReceiveDate", resizable: true, sortable: true });
+    columns.push({ id: "Date3", name: "校正実施日", field: "CalDate", resizable: true, sortable: true });
     columns.push({ id: "CalResult", name: "校正結果", field: "CalResult", width: 60, resizable: true, sortable: true });
-    columns.push({ id: "Comments", name: "コメント", field: "Comments", width: 120, resizable: true, sortable: true, editor: Slick.Editors.Text });
-    columns.push({ id: "Date4", name: "予定出荷日", field: "Date4", resizable: true, sortable: true });
-    columns.push({ id: "Date5", name: "返送出荷日", field: "Date5", resizable: true, sortable: true });
-    columns.push({ id: "Date6", name: "ASML受領日", field: "Date6", resizable: true, sortable: true });
-    columns.push({ id: "Date7", name: "証明書受領日", field: "Date7", resizable: true, sortable: true });
-    columns.push({ id: "Date8", name: "証明書登録日", field: "Date8", resizable: true, sortable: true });
+    columns.push({ id: "Comments", name: "コメント", field: "VenComment", width: 120, resizable: true, sortable: true, editor: Slick.Editors.Text });
+    columns.push({ id: "Date4", name: "予定出荷日", field: "PlanedShipDate", resizable: true, sortable: true });
+    columns.push({ id: "Date5", name: "返送出荷日", field: "VenShipDate", resizable: true, sortable: true });
+    columns.push({ id: "Date6", name: "ASML受領日", field: "UserReceiveDate", resizable: true, sortable: true });
+    columns.push({ id: "Date7", name: "証明書受領日", field: "CcReceiveDate", resizable: true, sortable: true });
+    columns.push({ id: "Date8", name: "証明書登録日", field: "CcUploadDate", resizable: true, sortable: true });
     columns.push({ id: "Tat", name: "TAT", field: "Tat", resizable: true, sortable: true });
     columns.push({ id: "Comp", name: "完了", field: "Comp", resizable: true, sortable: true });
 
@@ -823,7 +821,46 @@ $(function () {
         grid.render();
     });
 
+    let host = window.location.protocol + "//" + window.location.host;
 
+    $.get(host + "/CalInProcesses/GetData").then(
+        function (ans) {
+            console.log("Data received ");
+            let length = ans.length;
+
+            data = ans;
+            //add :id to each row
+            /*
+            for (let index = 0; index < length; index += 1) {
+                let d = data[index];
+                d['id'] = index;
+            }
+            */
+
+
+            // execute following code after setup
+            // initialize the model after all the events have been hooked up
+            dataView.beginUpdate();
+            dataView.setItems(data, "Id");
+            dataView.setFilterArgs(filterValues);
+            dataView.setFilter(myFilter);
+            dataView.endUpdate();
+
+            dataView.syncGridSelection(grid, true);
+            showNumber();
+            updateDropdownList();
+            setDropdownList("#selectPlant", selectionListPlant);
+            setDropdownList("#selectCalPlace", selectionListCalPlaces);
+            // $("#gridContainer").resizable();
+        },
+
+        function (jqXHR, textStatus, err) {
+            console.error("Error Hapened");
+            $('#NumShowing').text("Error");
+            $('#NumTotal').text(textStatus);
+        }
+    );
+    /*
     dataView.beginUpdate();
     dataView.setItems(data, "cid");
     dataView.setFilterArgs(filterValues);
@@ -838,4 +875,5 @@ $(function () {
     $('#date1To').datepicker({ numberOfMonths: 3 });
     showNumber();
     updateDropdownList();
+    */
 });

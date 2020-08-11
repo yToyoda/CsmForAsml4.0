@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +14,12 @@ namespace CsmForAsml.Controllers
     public class CalInProcessesController : Controller
     {
         private readonly CsmForAsml2Context _context;
+        private readonly CalInProcessRepository _calInProRepo;
 
         public CalInProcessesController(CsmForAsml2Context context)
         {
             _context = context;
+            _calInProRepo = context.CalInProcessRepository;
         }
 
         // GET: CalInProcesses
@@ -144,9 +148,31 @@ namespace CsmForAsml.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+
         private bool CalInProcessExists(int id)
         {
             return _context.CalInProcess.Any(e => e.Id == id);
         }
+
+        /// <summary>
+        /// Json で表した 全 Entry  の情報をクライアント側に返す
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetData() {
+            var cals = await _calInProRepo.GetAllRecordsAsync();
+
+            var serializeOptions = new JsonSerializerOptions {
+                //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNamingPolicy = null,                
+                WriteIndented = true
+            };
+            serializeOptions.Converters.Add(new DateTimeConverter());
+
+            return Json(cals, serializeOptions);
+        }
+
+        
     }
 }
