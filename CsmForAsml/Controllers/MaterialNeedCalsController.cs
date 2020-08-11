@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace CsmForAsml.Controllers
 {
@@ -175,15 +175,14 @@ namespace CsmForAsml.Controllers
         [HttpGet]
         public async Task<IActionResult> GetData() {
             var equipments = await _mncRepo.GetAllRecordsAsync();
-            
-            CopyEq(equipments);
-
-            var settings = new JsonSerializerSettings {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+          
+            var serializeOptions = new JsonSerializerOptions {
+//                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNamingPolicy = null,
+                WriteIndented = true
             };
-            var jsonData = JsonConvert.SerializeObject(equipments, settings);
 
-            return Json(jsonData);
+            return Json(equipments, serializeOptions);
         }
         /// <summary>
         /// CSM_Context の Equipmentのリストを、　EquipmentDispModelのリストに変換する

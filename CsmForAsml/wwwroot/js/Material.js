@@ -31,6 +31,8 @@ $(function () {  //main of slickgrid
 
     let filterValues = {
         texts: {},
+        needCal: null,
+        needSafety : null,
         selection: null,
         dateFrom: null,
         dateTo: null
@@ -45,11 +47,24 @@ $(function () {  //main of slickgrid
                 return false;
             }
         }
+        // by needCal
+        if (args.needCal !== null) {
+            if (args.needCal !== item.NeedCal) {
+                return false;
+            }
+        }
+        // by needSafety
+        if (args.needSafety !== null) {
+            if (args.needSafety !== item.NeedSafety) {
+                return false;
+            }
+        }
+
         // text filters        
         for (let columnId in args.texts) {
             if (columnId !== undefined && args.texts[columnId] !== "") {
                 let val = item[columnId];  // in order to this statement work, keep 'id:' is equal to 'field:' in column definition
-                if (val === undefined || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
+                if ( ! Boolean(val)  || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
                     return false;
                 }
             }
@@ -205,7 +220,7 @@ $(function () {  //main of slickgrid
     const filterValChanged = function () {
         let columnId = $(this).data("columnId");
         let kwd = $(this).val();
-        if (kwd) {
+        if ($.trim(kwd)) {
             kwd = $.trim(kwd).toUpperCase();
         } else {
             kwd = "";
@@ -230,13 +245,27 @@ $(function () {  //main of slickgrid
     });
 
     $("#selectNeedCal").on("change", function () {
-        filterValues.texts['NeedCal'] = $(this).val().toUpperCase();
+        let sel = $(this).val();
+        if (sel === "True") {
+            filterValues.needCal = true;
+        } else if (sel === "False") {
+            filterValues.needCal = false;
+        } else {
+            filterValues.needCal = null;
+        }
         selectListReloadLevel = 2;
         updateFilter();
     });
 
     $("#selectSafety").on("change", function () {
-        filterValues.texts['NeedSafety'] = $(this).val().toUpperCase();
+        let sel = $(this).val();
+        if (sel === "True") {
+            filterValues.needSafety = true;
+        } else if (sel === "False") {
+            filterValues.needSafety = false;
+        } else {
+            filterValues.needSafety = null;
+        }       
         selectListReloadLevel = 2;
         updateFilter();
     });
@@ -367,8 +396,8 @@ $(function () {  //main of slickgrid
         let cell = $(args.node);
         //if (columnId === "Plant") return;
         if (columnId === "id") return;
-        //if (columnId === "CalDue") return;
-        //if (columnId === "LatestCalDate") return;
+        if (columnId === "NeedCal" || columnId ==="NeedSafety" || columnId === "CalInterval" ) return;
+        
         cell.empty();
         if (columnId === "_checkbox_selector") {
             // let lb = $(document.createTextNode("C"));
@@ -498,5 +527,5 @@ $(function () {  //main of slickgrid
     showNumber();
     updateDropdownList();*/
 
-    
+    showNumber();
 });
