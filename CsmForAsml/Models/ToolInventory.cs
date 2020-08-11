@@ -31,4 +31,5 @@ namespace CsmForAsml.Models
         public bool? InCal { get; set; }
         public string PSN { get; set; }
     }
+    // cal interval , safety interval が無い
 }

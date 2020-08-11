@@ -27,6 +27,7 @@ $(function () {  //main of slickgrid
     let options;
     let selectListReloadLevel = 0;
     let headerRowInputIds = [];
+    let host = window.location.protocol + "//" + window.location.host;
 
     let filterValues = {
         texts: {},
@@ -453,6 +454,26 @@ $(function () {  //main of slickgrid
         updateFilter();
     });
 
+    const checkDuedate = function (ardata) {
+        let d0 = moment();
+        let d1 = firstDay(1);
+        let d2 = firstDay(2);
+        let caldue;
+        // check cal due and generate CalDueStatus
+        for (let i = 0; i < ardata.length; i += 1) {
+            let status = "";
+            caldue = moment(ardata[i].Date0, "YYYY/MM/DD");
+            if (caldue.isBefore(d0, "day")) {
+                status = "OverDue";
+            } else if (caldue.isBefore(d1, "day")) {
+                status = "Due TM";
+            } else if (caldue.isBefore(d2, "day")) {
+                status = "Due NM";
+            }; 
+            ardata[i].CalDueStatus = status;
+        }
+    }
+
     // events from fnkey area
 
 
@@ -466,67 +487,34 @@ $(function () {  //main of slickgrid
     columns.push(checkboxSelector.getColumnDefinition());
 
 
-    columns.push({ id: "Plant", name: "Plant", field: "Plant", sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Serial", name: "Serial", field: "Serial", sortable: true });
-    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
-    columns.push({ id: "Description", name: "Description", field: "Description", width: 260, sortable: true });
-    columns.push({ id: "Date0", name: "CalDue", field: "Date0", sortable: true });
-    columns.push({ id: "CalDueStatus", name: "Status", field: "CalDueStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
-    //columns.push({ id: "CalDueStatus", name: "Status", field: "CalDueStatus", width: 60, sortable: true },);
-    columns.push({ id: "Date1", name: "Latest CalDate", field: "Date1", sortable: true });
-    columns.push({ id: "Date2", name: "SafetyDue", field: "Date2", sortable: true });
-    columns.push({ id: "Date3", name: "Latest SafetyDate", field: "Date3", sortable: true });
-    columns.push({ id: "CalInt", name: "Cal Interval", field: "CalInt", sortable: true });
-    columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
-    columns.push({ id: "StoreLoc", name: "Store Location", field: "StoreLoc", sortable: true });
-    columns.push({ id: "SysStat", name: "System Status", field: "SysStat", sortable: true });
-    columns.push({ id: "UserStat", name: "User Satus", field: "UserStat", sortable: true });
-    columns.push({ id: "Room", name: "Room", field: "Room", sortable: true });
+    columns.push({ id: "Plant", name: "Plant", field: "plant", sortable: true, editor: Slick.Editors.TextNC });
+    columns.push({ id: "Serial", name: "Serial", field: "serialNumber", sortable: true });
+    columns.push({ id: "Material", name: "Material", field: "material", width: 120, sortable: true });
+    columns.push({ id: "Description", name: "Description", field: "description", width: 260, sortable: true });
+    columns.push({ id: "Date0", name: "CalDue", field: "calDue", sortable: true });
+    columns.push({ id: "CalDueStatus", name: "Status", field: "calStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
+    columns.push({ id: "Comment", name: "Comment", field: "comment", width: 60, sortable: true },);
+    columns.push({ id: "Date1", name: "Latest CalDate", field: "latestCalDate", sortable: true });
+    columns.push({ id: "Date2", name: "SafetyDue", field: "safetyDue", sortable: true });
+    columns.push({ id: "Date3", name: "Latest SafetyDate", field: "latestSafetyDate", sortable: true });
+    columns.push({ id: "CalInt", name: "Cal Interval", field: "calInt", sortable: true });
+    columns.push({ id: "CalPlace", name: "Cal Place", field: "calPlace", sortable: true });
+    columns.push({ id: "StoreLoc", name: "Store Location", field: "storeLocation", sortable: true });
+    columns.push({ id: "SysStat", name: "System Status", field: "systemStatus", sortable: true });
+    columns.push({ id: "UserStat", name: "User Satus", field: "userStatus", sortable: true });
+    columns.push({ id: "Room", name: "Room", field: "room", sortable: true });
+    columns.push({ id: "SuperordEquip", name: "SuperordEquip", field: "superordEquip", sortable: true });
+    columns.push({ id: "SortField", name: "SortField", field: "sortField", sortable: true });
+    columns.push({ id: "Machine", name: "Machine", field: "machine", sortable: true });
+    columns.push({ id: "ToolkitMachine", name: "ToolkitMachine", field: "toolkitMachine", sortable: true });
+    columns.push({ id: "ToolkitSloc", name: "ToolkitSloc", field: "toolkitSloc", sortable: true });
+    columns.push({ id: "InCal", name: "InCal", field: "inCal", sortable: true });
+    columns.push({ id: "NeedCal", name: "NeedCal", field: "needCal", sortable: true });
+    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "needSafety", sortable: true });
+    columns.push({ id: "PSN", name: "PSN", field: "pSN", sortable: true });
 
 
-    let adata = [
-        ["JP01", "1000009977", "4022.502.16143", "TESA DISPLAY UNIT TT10", "2020/03/13", "2021/03/31", "MIYAGI (KT)", "12", "TFLJ", "ESTO", "DEFA", "ZLF04031", "", ""],
-        ["JP05", "1000018906", "SERV.453.31162", "LM HOISTING ADAPTOR", "2016/01/28", "2017/01/31", "", "12", "BLCK", "ESTO", "CTRL", "APZ00S", "", ""],
-        ["JP04", "1000019146", "SERV.485.22011", "TORQUEWRENCH (10-100NM) 4100-01", "2020/03/24", "2021/03/31", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB", "ALF02011", "", ""],
-        ["JP05", "1000019150", "SERV.485.22011", "TORQUEWRENCH (10-100NM) 4100-01", "2020/05/19", "2021/05/31", "MIYAGI (KT)", "12", "CLBR", "ESTO", "INCA TOST", "", "", ""],
-        ["JP07", "1000019342", "SERV.489.50876", "WRENCH TORQUE 1/2 20-120NM 6121-1-CT", "2020/02/10", "2021/02/28", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB", "ASD05041", "", ""],
-        ["JP05", "1000019760", "SERV.450.92941", "TESA TRONIC TOOL TT10 SET (5X)", "2019/11/14", "2020/11/30", "MIYAGI (KT)", "12", "9801", "ESTO", "USAB TOST", "CLC06021", "", ""],
-        ["JP04", "1000020076", "SERV.477.29682", "ATWS MIRRORBLOCK HOIST. INTERF.", "2017/01/16", "2018/01/31", "", "12", "BLCK", "ESTO", "CERT TOST", "BLCK", "", ""],
-        ["JP08", "1000021303", "SERV.453.55201", "LEVEL READOUT UNIT", , , "MIYAGI (KT)", "12", "", "ASEQ", "USAB", "TFLJ", "2020/03/26", "2021/03/25"],
-        ["JP01", "1000024082", "SERV.488.00621", "PHM TORQUE WRENCH 100 NCM", "2019/11/01", "2020/11/30", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ZLD01041", "", ""],
-        ["JP04", "1000024174", "SERV.453.76291", "ADDITION STAND.SERV.TOOLCASE", , , "TOKYO (KT)", "12", "0003", "ESTO", "USAB TOST", "ALF08041", "2019/04/05", "2020/04/04"],
-        ["JP05", "1000025729", "SERV.489.50265", "CARRIER PLATE SUCTION PA 80KG", , , "", "12", "0003", "ESTO", "USAB TOST", "CLC10011", "2019/07/23", "2020/07/22"],
-        ["JP03", "1000026540", "SERV.483.64772", "LENS TOP TOOL 3 IL AT", "2020/04/17", "2021/04/30", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ATF01021", "", ""],
-        ["JP05", "1000026726", "SERV.450.31891", "SPIRIT LEVEL 100H01 80X16 FLAT", "2019/07/08", "2020/07/31", "MIYAGI (KT)", "12", "Cust", "ECUS ESTO", "USAB TOST", "", "", ""],
-        ["JP04", "1000026727", "SERV.450.31891", "SPIRIT LEVEL 100H01 80X16 FLAT", "2020/02/12", "2021/02/28", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ALF03031", "", ""],
-        ["JP04", "1000027394", "SERV.450.31891", "SPIRIT LEVEL 100H01 80X16 FLAT", "2019/07/08", "2020/08/31", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ALF03031", "", ""],
-        ["JP05", "1000027554", "SERV.483.61091", "MAN TEMPTUNE CALIBRATION KIT", , , " New", "12", "0003", "ESTO", "USAB TOST", "CLB08021", "2020/04/23", "2021/04/22"],
-        ["JP04", "1000027556", "SERV.483.61091", "MAN TEMPTUNE CALIBRATION KIT", , , "New", "12", "0003", "ESTO", "USAB TOST", "ALE02031", "2020/06/30", "2021/06/29"],
-        ["JP07", "1000027793", "SERV.436.56352", "PRESS. METER MONOX P10000 SET", "2020/05/07", , "TOKYO (KT)", "12", "PEND", "ESTO", "DEFA TOST", "PEND", "", ""],
-        ["JP05", "1000027816", "SERV.453.76291", "ADDITION STAND.SERV.TOOLCASE", , , "TOKYO (KT)", "12", "0003", "ESTO", "USAB", "CLC08011", "2020/07/01", "2021/06/30"],
-        ["JP05", "1000028116", "SERV.477.29682", "ATWS MIRRORBLOCK HOIST. INTERF.", , , "", "12", "0003", "ESTO", "USAB", "CPB04M", "2019/05/15", "2020/05/14"],
-        ["JP07", "1000028964", "SERV.502.28286", "PDT TOOL", , , "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "HPD01M", "2019/06/03", "2020/06/02"],
-        ["JP01", "1000030218", "SERV.502.29150", "WATER CONDUCTIVITY METER SET", "2019/07/18", "2020/07/31", "TOKYO (KT)", "12", "Cust", "ECUS ESTO", "USAB TOST", "", "", ""],
-        ["JP07", "1000030369", "SERV.453.76291", "ADDITION STAND.SERV.TOOLCASE", , , "TOKYO (KT)", "12", "0003", "ESTO", "USAB", "ASD02011", "", ""],
-        ["JP03", "1000032085", "SERV.477.33172", "PRESS. TESTER FLOW AIRSHOWERS", "2020/01/21", , "TOKYO (KT)", "12", "0005", "ESTO", "DEFA TOST", "ATH01S", "", ""],
-        ["JP07", "1000032272", "SERV.436.58543", "TESA TT 20 DISPL UNIT 110/230V", "2020/03/06", "2021/03/31", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ASC03021", "", ""],
-        ["JP07", "1000032424", "SERV.488.00621", "PHM TORQUE WRENCH 100 NCM", "2019/07/08", "2020/07/31", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ASE01031", "", ""],
-        ["JP04", "1000033293", "SERV.477.33172", "PRESS. TESTER FLOW AIRSHOWERS", "2020/04/16", "2021/04/30", "TOKYO (KT)", "12", "0005", "ESTO", "DEFA TOST", "DEFECT", "", ""],
-        ["JP04", "1000033312", "SERV.453.13731", "TORQUE WRENCH 4-20NM PUSH-ON", , , "MIYAGI (KT)", "12", "0003", "ESTO", "USAB", "ALF03041", "", ""],
-        ["JP01", "1000033402", "SERV.477.33181", "FLOW TESTER AIR SYSTEM", "2019/06/13", "2020/06/30", "TOKYO (KT)", "12", "0003", "ESTO", "USAB TOST", "ZLC01021", "", ""],
-        ["JP05", "1000033403", "SERV.477.33181", "FLOW TESTER AIR SYSTEM", , , "TOKYO (KT)", "12", "0003", "ESTO", "USAB", "CLA04031", "", ""],
-        ["JP07", "1000033404", "SERV.477.33181", "FLOW TESTER AIR SYSTEM", , , "TOKYO (KT)", "12", "CLBR", "ESTO", "INCA TOST", "CLBR", "", ""],
-        ["JP05", "1000034386", "SERV.502.28208", "ADJUSTABLE SPIRIT LEVEL", "2020/03/10", "2021/03/31", "MIYAGI (KT)", "12", "9801", "ESTO", "USAB TOST", "CLC06041", "", ""],
-        ["JP04", "1000034387", "SERV.502.28208", "ADJUSTABLE SPIRIT LEVEL", "2020/03/06", "2021/03/31", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ALF09031", "", ""],
-        ["JP03", "1000035820", "4022.502.15499", "TESA PROBE GT31 032.10802", "2019/10/04", "2020/10/31", "MIYAGI (KT)", "12", "0003", "ESTO", "USAB TOST", "ATC02031", "", ""],
-        ["JP05", "1000035859", "SERV.436.58543", "TESA TT 20 DISPL UNIT 110/230V", "2020/05/19", "2021/05/31", "MIYAGI (KT)", "12", "CLBR", "ESTO", "INCA TOST", "", "", ""],
-    ];
-
-    let d0 = moment();
-    let d1 = firstDay(1);
-    let d2 = firstDay(2);
-    let caldue;
-
+/*  
     for (let i = 0; i < adata.length; i += 1) {
         data[i] = {
             sid: i,
@@ -537,16 +525,9 @@ $(function () {  //main of slickgrid
             Room: adata[i][11],
             Date2: adata[i][13], Date3: adata[i][12],
         }
-        // check cal due and generate CalDueStatus
-        caldue = moment(data[i].Date0, "YYYY/MM/DD");
-        if (caldue.isBefore(d0, "day")) {
-            data[i].CalDueStatus = "OverDue";
-        } else if (caldue.isBefore(d1, "day")) {
-            data[i].CalDueStatus = "Due TM";
-        } else if (caldue.isBefore(d2, "day")) {
-            data[i].CalDueStatus = "Due NM";
-        } else data[i].CalDueStatus = "";
+ 
     };
+ */   
 
     options = {
         columnPicker: {
@@ -628,10 +609,45 @@ $(function () {  //main of slickgrid
         grid.render();
     });
 
-    // grid.onClick.subscribe(function (e, cell) {
-    //     let x = e;
-    //     let y = cell;
-    // })
+
+    $.get(host + "/ToolInventories/GetData").then(
+        function (ans) {
+            console.log("Data received ");
+            let length = ans.length;
+
+            data = ans;
+            //add :id to each row
+            for (let index = 0; index < length; index += 1) {
+                let d = data[index];
+                d['id'] = index;
+            }
+
+
+            // execute following code after setup
+            // initialize the model after all the events have been hooked up
+            checkDuedate(data);
+            dataView.beginUpdate();
+            dataView.setItems(data, "id");
+            dataView.setFilterArgs(filterValues);
+            dataView.setFilter(myFilter);
+            dataView.endUpdate();
+
+            dataView.syncGridSelection(grid, true);
+            showNumber();
+            updateDropdownList();
+
+            // $("#gridContainer").resizable();
+        },
+
+        function (jqXHR, textStatus, err) {
+            console.error("Error Hapened");
+            $('#NumShowing').text("Error");
+            $('#NumTotal').text(textStatus);
+        }
+    );
+
+    /*
+    checkDuedate(data);
 
     dataView.beginUpdate();
     dataView.setItems(data, "sid");
@@ -642,4 +658,5 @@ $(function () {  //main of slickgrid
 
     showNumber();
     updateDropdownList();
+    */
 });

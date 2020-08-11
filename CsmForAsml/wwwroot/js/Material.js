@@ -318,22 +318,21 @@ $(function () {  //main of slickgrid
         cssClass: "slick-cell-checkboxsel"
     });
 
-    columns.push(checkboxSelector.getColumnDefinition());
-    /
-    columns.push({ id: "Material", name: "Material", field: "material", width: 120, sortable: true });
-    columns.push({ id: "Description", name: "Description", field: "materialDescription", width: 260, sortable: true });
-    columns.push({ id: "CalPlace", name: "Cal Place", field: "calPlace", sortable: true });
-    columns.push({ id: "CalVendor", name: "Cal Vendor", field: "calVendor", sortable: true });
-    columns.push({ id: "Instruction", name: "Instruction", field: "instruction", sortable: true });
-    columns.push({ id: "NeedCal", name: "NeedCal", field: "needCal", sortable: true });
-    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "needSafety", sortable: true });
-    columns.push({ id: "CalInt", name: "Cal Interval", field: "calInterval", sortable: true });
-    columns.push({ id: "SafetyInt", name: "Safety Interval", field: "safetyInterval", sortable: true });
-    columns.push({ id: "PMaker", name: "P.Maker", field: "pMaker", sortable: true });
-    columns.push({ id: "PName", name: "P.Name", field: "pName", sortable: true });
-    columns.push({ id: "PModel", name: "P.Model", field: "pModel", sortable: true });
-    columns.push({ id: "Status", name: "Status", field: "status", sortable: true });
-    columns.push({ id: "ChangeDate", name: "ChangeDate", field: "changeDate", sortable: true });
+    columns.push(checkboxSelector.getColumnDefinition());   
+    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
+    columns.push({ id: "MaterialDescription", name: "Description", field: "MaterialDescription", width: 260, sortable: true });
+    columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
+    columns.push({ id: "CalVendor", name: "Cal Vendor", field: "CalVendor", sortable: true });
+    columns.push({ id: "Instruction", name: "Instruction", field: "Instruction", sortable: true });
+    columns.push({ id: "NeedCal", name: "NeedCal", field: "NeedCal", sortable: true });
+    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "NeedSafety", sortable: true });
+    columns.push({ id: "CalInterval", name: "Cal Interval", field: "CalInterval", sortable: true });
+    columns.push({ id: "SafetyInterval", name: "Safety Interval", field: "SafetyInterval", sortable: true });
+    columns.push({ id: "PMaker", name: "P.Maker", field: "PMaker", sortable: true });
+    columns.push({ id: "PName", name: "P.Name", field: "PName", sortable: true });
+    columns.push({ id: "PModel", name: "P.Model", field: "PModel", sortable: true });
+    columns.push({ id: "Status", name: "Status", field: "Status", sortable: true });
+    columns.push({ id: "ChangeDate", name: "ChangeDate", field: "ChangeDate", sortable: true });
    
     options = {
         columnPicker: {

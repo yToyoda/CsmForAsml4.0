@@ -9,6 +9,7 @@ using CsmForAsml.Models;
 
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace CsmForAsml.Controllers
 {
@@ -176,8 +177,13 @@ namespace CsmForAsml.Controllers
             var equipments = await _mncRepo.GetAllRecordsAsync();
             
             CopyEq(equipments);
-            
-            return Json(equipments);
+
+            var settings = new JsonSerializerSettings {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            };
+            var jsonData = JsonConvert.SerializeObject(equipments, settings);
+
+            return Json(jsonData);
         }
         /// <summary>
         /// CSM_Context の Equipmentのリストを、　EquipmentDispModelのリストに変換する
@@ -190,6 +196,7 @@ namespace CsmForAsml.Controllers
 
                 eqs.NeedCal = eqs.NeedCal ?? false;
                 eqs.NeedSafety = eqs.NeedSafety ?? false;
+                // eqs.ChangeDate = ToShortDate(eqs.ChangeDate);
             }
 
         }

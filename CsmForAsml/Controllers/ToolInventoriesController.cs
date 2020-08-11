@@ -12,10 +12,12 @@ namespace CsmForAsml.Controllers
     public class ToolInventoriesController : Controller
     {
         private readonly CsmForAsml2Context _context;
+        private ToolInventoryRepository _toolRepo;
 
         public ToolInventoriesController(CsmForAsml2Context context)
         {
             _context = context;
+            _toolRepo = context.ToolInventoryRepository;
         }
 
         // GET: ToolInventories
@@ -148,5 +150,12 @@ namespace CsmForAsml.Controllers
         {
             return _context.ToolInventory.Any(e => e.SerialNumber == id);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetData() {
+            var inventories = await _toolRepo.GetAllRecordsAsync();            
+            return Json(inventories);
+        }
+
     }
 }
