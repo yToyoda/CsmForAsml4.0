@@ -227,6 +227,7 @@ $(function () {  //main of slickgrid
         }
         filterValues.texts[columnId] = kwd;
         selectListReloadLevel = 0;
+
         updateFilter();
     }
 
@@ -430,6 +431,7 @@ $(function () {  //main of slickgrid
 
 
     $(grid.getHeaderRow()).japaneseInputChange('input[type=text]', filterValChanged);
+    $(grid.getHeaderRow()).keyup( filterValChanged);
 
     pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
     columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);

@@ -11,7 +11,10 @@ jQuery.browser = {};
 })();
 
 $(function () {
-    $(".datepicker").datepicker();
+    $(".datepicker").datepicker({
+        dateFormat: "yy/mm/dd",
+        dayNamesMin: ['日', '月', '火', '水', '木', '金', '土']
+    });
 });
 
 $(function () {  //main of slickgrid 
@@ -28,6 +31,7 @@ $(function () {  //main of slickgrid
     let selectListReloadLevel = 0;
     let headerRowInputIds = [];
     let host = window.location.protocol + "//" + window.location.host;
+ 
 
     let filterValues = {
         texts: {},
@@ -39,6 +43,7 @@ $(function () {  //main of slickgrid
 
 
     const myFilter = function (item, args) {
+        let datenames = ["CalDue", "LatestCalDate", "SafetyDue", "LatestSafetyDate"];
         // by selection
         if (args.selection !== null) {
             if (args.selection !== item.sel) {
@@ -60,11 +65,11 @@ $(function () {  //main of slickgrid
         let tgt;
         for (let i = 0; i < 4; i++) {
             if (args.dateFrom[i] !== null) {
-                tgt = item[`Date${i}`];
+                tgt = item[datenames[i]];
                 if (!(tgt) || moment(tgt, "YYYY/MM/DD").isBefore(args.dateFrom[i], "day")) return false;
             }
             if (args.dateTo[i] !== null) {
-                tgt = item[`Date${i}`];
+                tgt = item[datenames[i]];
                 if (!(tgt) || moment(tgt, "YYYY/MM/DD").isAfter(args.dateTo[i], "day")) return false;
             }
         }
@@ -462,7 +467,7 @@ $(function () {  //main of slickgrid
         // check cal due and generate CalDueStatus
         for (let i = 0; i < ardata.length; i += 1) {
             let status = "";
-            caldue = moment(ardata[i].Date0, "YYYY/MM/DD");
+            caldue = moment(ardata[i].CalDue, "YYYY/MM/DD");
             if (caldue.isBefore(d0, "day")) {
                 status = "OverDue";
             } else if (caldue.isBefore(d1, "day")) {
@@ -486,22 +491,22 @@ $(function () {  //main of slickgrid
 
     columns.push(checkboxSelector.getColumnDefinition());
 
-
+    // id !== field
     columns.push({ id: "Plant", name: "Plant", field: "Plant", sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Serial", name: "Serial", field: "SerialNumber", sortable: true });
+    columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", sortable: true });
     columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
     columns.push({ id: "Description", name: "Description", field: "Description", width: 260, sortable: true });
-    columns.push({ id: "Date0", name: "CalDue", field: "CalDue", sortable: true });
-    columns.push({ id: "CalDueStatus", name: "Status", field: "CalStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
+    columns.push({ id: "CalDue", name: "CalDue", field: "CalDue", sortable: true });
+    columns.push({ id: "CalDueStatus", name: "Status", field: "CalDueStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
     columns.push({ id: "Comment", name: "Comment", field: "Comment", width: 60, sortable: true },);
-    columns.push({ id: "Date1", name: "Latest CalDate", field: "LatestCalDate", sortable: true });
-    columns.push({ id: "Date2", name: "SafetyDue", field: "SafetyDue", sortable: true });
-    columns.push({ id: "Date3", name: "Latest SafetyDate", field: "LatestSafetyDate", sortable: true });
+    columns.push({ id: "LatestCalDate", name: "Latest CalDate", field: "LatestCalDate", sortable: true });
+    columns.push({ id: "SafetyDue", name: "SafetyDue", field: "SafetyDue", sortable: true });
+    columns.push({ id: "LatestSafetyDate", name: "Latest SafetyDate", field: "LatestSafetyDate", sortable: true });
     columns.push({ id: "CalInt", name: "Cal Interval", field: "CalInt", sortable: true });
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
-    columns.push({ id: "StoreLoc", name: "Store Location", field: "StoreLocation", sortable: true });
-    columns.push({ id: "SysStat", name: "System Status", field: "SystemStatus", sortable: true });
-    columns.push({ id: "UserStat", name: "User Satus", field: "UserStatus", sortable: true });
+    columns.push({ id: "StoreLocation", name: "Store Location", field: "StoreLocation", sortable: true });
+    columns.push({ id: "SystemStatus", name: "System Status", field: "SystemStatus", sortable: true });
+    columns.push({ id: "UserStatus", name: "User Satus", field: "UserStatus", sortable: true });
     columns.push({ id: "Room", name: "Room", field: "Room", sortable: true });
     columns.push({ id: "SuperordEquip", name: "SuperordEquip", field: "SuperordEquip", sortable: true });
     columns.push({ id: "SortField", name: "SortField", field: "SortField", sortable: true });
@@ -514,20 +519,7 @@ $(function () {  //main of slickgrid
     columns.push({ id: "PSN", name: "PSN", field: "PSN", sortable: true });
 
 
-/*  
-    for (let i = 0; i < adata.length; i += 1) {
-        data[i] = {
-            sid: i,
-            Plant: adata[i][0], Material: adata[i][2], Description: adata[i][3], Serial: adata[i][1],
-            Date0: adata[i][5], Date1: adata[i][4], CalInt: adata[i][7], CalPlace: adata[i][6], StoreLoc: adata[i][8],
-            SysStat: adata[i][9],
-            UserStat: adata[i][10],
-            Room: adata[i][11],
-            Date2: adata[i][13], Date3: adata[i][12],
-        }
- 
-    };
- */   
+  
 
     options = {
         columnPicker: {
