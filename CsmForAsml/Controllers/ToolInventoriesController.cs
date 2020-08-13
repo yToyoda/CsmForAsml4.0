@@ -154,7 +154,24 @@ namespace CsmForAsml.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetData() {
+
+            var _materiapRepo = _context.MaterialNeedCalRepository;
+            var materials = await _materiapRepo.GetAllRecordsAsync();
+
             var inventories = await _toolRepo.GetAllRecordsAsync();
+
+            var res = from i in inventories
+                      join m in materials 
+                        on i.Material equals m.Material
+                      select new { Inv = i, Mat = m };
+
+            List<ToolInventory> ans = new List<ToolInventory>();
+            foreach (var r in res) {
+                r.Inv.CalPlace = r.Mat.CalPlace;
+                r.Inv.CalInterval = r.Mat.CalInterval;
+                r.Inv.SafetyInterval = r.Mat.SafetyInterval;
+                ans.Add(r.Inv);
+            }
 
             var serializeOptions = new JsonSerializerOptions {
                 //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -162,7 +179,7 @@ namespace CsmForAsml.Controllers
                 WriteIndented = true
             };
             serializeOptions.Converters.Add(new DateTimeConverter());
-            return Json(inventories, serializeOptions);
+            return Json(ans, serializeOptions);
         }
 
     }

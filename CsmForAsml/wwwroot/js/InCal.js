@@ -148,9 +148,9 @@ $(function () {
         }
         // text filters        
         for (let columnId in args.texts) {
-            if (columnId !== undefined && args.texts[columnId] !== "") {
+            if ( (columnId ) && (args.texts[columnId])) {
                 let val = item[columnId];  // in order to this statement work, keep 'id:' is equal to 'field:' in column definition
-                if (val === undefined || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
+                if ( !Boolean(val)  || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
                     return false;
                 }
             }
@@ -259,7 +259,7 @@ $(function () {
             plantList[aRow.Plant] = true;
             calPlaceList[aRow.CalPlace] = true;
             materialList[aRow.Material] = true;
-            serialList[aRow.Serial] = true;
+            serialList[aRow.SerialNumber] = true; 
         }
 
         if (selectListReloadLevel === 0) {
@@ -403,7 +403,7 @@ $(function () {
     });
 
     $("#selectSerial").on("change", function () {
-        filterValues.texts['Serial'] = $(this).val();
+        filterValues.texts['SerialNumber'] = $(this).val();
         selectListReloadLevel = 3;
         updateFilter();
     });
@@ -597,7 +597,7 @@ $(function () {
         currentRow = oData[index];
         stage = judgeStage(currentRow);
         let ind = prepareDialog(stage);
-        $('#dlpSerial').text("Serial : " + currentRow.Serial);
+        $('#dlpSerial').text("Serial : " + currentRow.SerialNumber);
         $('#dlpdl1').text(currentRow[`Date${1}`] || "");
         $('#dlpdl2').text(currentRow[`Date${2}`] || "");
         $('#dlpdl3').text(currentRow[`Date${3}`] || "");
@@ -665,12 +665,15 @@ $(function () {
     });
 
     columns.push(checkboxSelector.getColumnDefinition());
+    // Filter での扱いを簡単にするために、　id (grid で columnId として扱われる) と field (dataViewでのデータのプロパティ名) を同一にしておくこと
+    // Column  id: Date0 から　Date8 は特殊な扱いをしているので例外
+
     // columns.push({ id: "Sel", name: "Select", width: 80, minWidth: 20, maxWidth: 80, field: "Select", formatter: Slick.Formatters.Checkmark, editor: Slick.Editors.Checkbox, cannotTriggerInsert: true, sortable: true },);
     // columns.push({ id: "id", name: "ID", field: "cid", width: 40, sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Plant", name: "Plant", field: "Plant", width: 40, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", width: 80, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Description", name: "Description", field: "Description", width: 250, resizable: true, sortable: true, editor: Slick.Editors.TextNC });
+    columns.push({ id: "Plant", name: "Plant", field: "Plant", width: 40, resizable: true, sortable: true  });
+    columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", width: 80, resizable: true, sortable: true});
+    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, resizable: true, sortable: true});
+    columns.push({ id: "Description", name: "Description", field: "Description", width: 250, resizable: true, sortable: true});
     //    {id: "CalInt", name: "Cal Interval", field: "CalInt"},
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", resizable: true, sortable: true });
     columns.push({ id: "Date0", name: "登録日", field: "RegisteredDate", resizable: true, sortable: true });
@@ -678,7 +681,7 @@ $(function () {
     columns.push({ id: "Date2", name: "受領日", field: "VenReceiveDate", resizable: true, sortable: true });
     columns.push({ id: "Date3", name: "校正実施日", field: "CalDate", resizable: true, sortable: true });
     columns.push({ id: "CalResult", name: "校正結果", field: "CalResult", width: 60, resizable: true, sortable: true });
-    columns.push({ id: "VenComment", name: "コメント", field: "VenComment", width: 120, resizable: true, sortable: true, editor: Slick.Editors.Text });
+    columns.push({ id: "VenComment", name: "コメント", field: "VenComment", width: 120, resizable: true, sortable: true });
     columns.push({ id: "Date4", name: "予定出荷日", field: "PlanedShipDate", resizable: true, sortable: true });
     columns.push({ id: "Date5", name: "返送出荷日", field: "VenShipDate", resizable: true, sortable: true });
     columns.push({ id: "Date6", name: "ASML受領日", field: "UserReceiveDate", resizable: true, sortable: true });
@@ -709,12 +712,14 @@ $(function () {
         asyncEditorLoading: true,
         forceFitColumns: false,
         enableColumnReorder: true,
+        enableTextSelectionOnCells: true, 
         topPanelHeight: 25,
         showHeaderRow: true,    // この行で表示をオンに
         headerRowHeight: 30,　　//  この行で高さを 30 pixels にする        
         autoHeight: false,
         explicitInitialization: true,
-        fullWidthRows: true
+        fullWidthRows: true    // false だと、初期化時に表示されていない Column のフィルター入力が作成されない  
+                               //True だと隠れていても作成されるる
     };
 
     headerRowInputIds = [];
@@ -730,18 +735,28 @@ $(function () {
         let columnId = args.column.id;
         if (columnId === "_checkbox_selector") return;
         // if (columnId === "Plant") return;
-        if (columnId === "id") return;
+        if (columnId === "id" || columnId ==="Finished" ) return;
         if (columnId.indexOf('Date') !== -1) return;
         let cell = $(args.node);
         cell.empty();
         let $atr = $(document.createElement("input"))
             .attr("type", "text")
-            .attr("id", columnId)
+          //  .attr("id", columnId)
             .data("columnId", columnId)
             // .val(columnFilters[args.column.id])
             .val(filterValues.texts[columnId])
             .appendTo(cell);
         headerRowInputIds.push(columnId);
+        /*
+        grid.onHeaderRowCellRendered.subscribe(function(e, args) {
+        $(args.node).empty();
+        $("<input type='text'>")
+           .data("columnId", args.column.id)
+           .val(columnFilters[args.column.id])
+           .appendTo(args.node);
+    });
+         */
+
     });
 
     $(grid.getHeaderRow()).japaneseInputChange('input[type=text]', filterValChanged);

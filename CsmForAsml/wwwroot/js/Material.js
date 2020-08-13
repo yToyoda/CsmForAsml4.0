@@ -62,7 +62,7 @@ $(function () {  //main of slickgrid
 
         // text filters        
         for (let columnId in args.texts) {
-            if (columnId !== undefined && args.texts[columnId] !== "") {
+            if (　(columnId) && ( args.texts[columnId] ) ) {
                 let val = item[columnId];  // in order to this statement work, keep 'id:' is equal to 'field:' in column definition
                 if ( ! Boolean(val)  || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
                     return false;

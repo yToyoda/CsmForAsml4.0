@@ -52,9 +52,9 @@ $(function () {  //main of slickgrid
         }
         // text filters        
         for (let columnId in args.texts) {
-            if (columnId !== undefined && args.texts[columnId] !== "") {
+            if ((columnId) && (args.texts[columnId])) {
                 let val = item[columnId];  // in order to this statement work, keep 'id:' is equal to 'field:' in column definition
-                if (val === undefined || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
+                if (!Boolean(val)  || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
                     return false;
                 }
             }
@@ -131,7 +131,7 @@ $(function () {  //main of slickgrid
             plantList[aRow.Plant] = true;
             calPlaceList[aRow.CalPlace] = true;
             materialList[aRow.Material] = true;
-            serialList[aRow.Serial] = true;
+            serialList[aRow.SerialNumber] = true;
 
         }
 
@@ -276,7 +276,7 @@ $(function () {  //main of slickgrid
     });
 
     $("#selectSerial").on("change", function () {
-        filterValues.texts['Serial'] = $(this).val();
+        filterValues.texts['SerialNumber'] = $(this).val();
         selectListReloadLevel = 3;
         updateFilter();
     });
@@ -502,7 +502,7 @@ $(function () {  //main of slickgrid
     columns.push({ id: "LatestCalDate", name: "Latest CalDate", field: "LatestCalDate", sortable: true });
     columns.push({ id: "SafetyDue", name: "SafetyDue", field: "SafetyDue", sortable: true });
     columns.push({ id: "LatestSafetyDate", name: "Latest SafetyDate", field: "LatestSafetyDate", sortable: true });
-    columns.push({ id: "CalInt", name: "Cal Interval", field: "CalInt", sortable: true });
+    columns.push({ id: "CalInterval", name: "Cal Interval", field: "CalInterval", sortable: true });
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
     columns.push({ id: "StoreLocation", name: "Store Location", field: "StoreLocation", sortable: true });
     columns.push({ id: "SystemStatus", name: "System Status", field: "SystemStatus", sortable: true });

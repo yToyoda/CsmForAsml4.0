@@ -161,7 +161,30 @@ namespace CsmForAsml.Controllers
         /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetData() {
+            var _materiapRepo = _context.MaterialNeedCalRepository;
+            var _inventoryRepo = _context.ToolInventoryRepository;
+
+            var materials = await _materiapRepo.GetAllRecordsAsync();
+            var inventories = await _inventoryRepo.GetAllRecordsAsync();
             var cals = await _calInProRepo.GetAllRecordsAsync();
+
+
+            var res = from calinp in cals
+                      join inv in inventories on calinp.SerialNumber equals inv.SerialNumber
+                      join mat in materials on inv.Material equals mat.Material
+                      select new { Cal = calinp, Inv = inv, Mat = mat };
+
+            List<CalInProcess> ans = new List<CalInProcess>();
+
+            foreach (var r in res) {
+                r.Cal.Material = r.Inv.Material;
+                r.Cal.Description = r.Mat.MaterialDescription;
+                r.Cal.CalPlace = r.Mat.CalPlace;
+                ans.Add(r.Cal);
+            }
+
+     
+
 
             var serializeOptions = new JsonSerializerOptions {
                 //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -170,9 +193,10 @@ namespace CsmForAsml.Controllers
             };
             serializeOptions.Converters.Add(new DateTimeConverter());
 
-            return Json(cals, serializeOptions);
+            return Json(ans, serializeOptions);
         }
 
         
     }
+   
 }

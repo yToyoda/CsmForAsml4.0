@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -25,6 +26,13 @@ namespace CsmForAsml.Models
         public string Plant { get; set; }
         public int? StdTat { get; set; }
         public string TatStatus { get; set; }
+
+        [NotMapped]
+        public string Material { get; set; }
+        [NotMapped] 
+        public string Description { get; set; }
+        [NotMapped] 
+        public string CalPlace { get; set; }
     }
 
     public partial class CalInProcess : CalInProcessCore {
@@ -34,6 +42,8 @@ namespace CsmForAsml.Models
     public partial class CalInProcessBU: CalInProcessCore {
 
     }
+
+ 
 
     public class DateTimeConverter : JsonConverter<DateTime?> {
         public override DateTime? Read(

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CsmForAsml.Models
 {
@@ -30,6 +31,14 @@ namespace CsmForAsml.Models
         public DateTime? UpdatedDate { get; set; }
         public bool? InCal { get; set; }
         public string PSN { get; set; }
+
+        [NotMapped]
+        public string CalPlace { get; set; }
+        [NotMapped]
+        public int? CalInterval { get; set; }
+        [NotMapped]
+        public int? SafetyInterval { get; set; }
+
     }
     // cal interval , safety interval が無い
 }
