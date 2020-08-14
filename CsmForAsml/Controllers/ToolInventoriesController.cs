@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace CsmForAsml.Controllers
 {
@@ -182,5 +183,22 @@ namespace CsmForAsml.Controllers
             return Json(ans, serializeOptions);
         }
 
+        /// <summary>
+        /// クライアント側で、Move TO InCAL のキーが押された時に起動される処理ルーチン
+        /// [HttpPost]
+        /// </summary>
+        /// <param name="serialNumList">InCal に登録する SerialNumber のリスト</param>
+        /// <returns>Default の View()</returns>
+        [HttpPost]
+        public ActionResult MoveToIncal(SerialNumList serialNumList) {
+            HttpContext.Session.SetString("pdffile", "");
+            
+            foreach (var equipNo in serialNumList.SerialNumbers) {
+
+                
+            }
+            
+           return View();
+        }
     }
 }

@@ -459,6 +459,21 @@ $(function () {  //main of slickgrid
         updateFilter();
     });
 
+    // fnkey4  Move to Incal
+    $('#fnkey4').click(function () {
+        let totalNumber = data.length;
+        let arow;
+        let serialNumberList = [];
+        copyselection();
+        for (let i = 0; i < totalNumber; i += 1) {
+            arow = dataView.getItemByIdx(i);
+            if (arow.sel) {
+                serialNumberList.push(arow.SerialNumber);
+            }
+        };
+        postEqList("/ToolInventories/MoveToIncal", serialNumberList)
+    });
+
     const checkDuedate = function (ardata) {
         let d0 = moment();
         let d1 = firstDay(1);
@@ -477,6 +492,25 @@ $(function () {  //main of slickgrid
             }; 
             ardata[i].CalDueStatus = status;
         }
+    }
+
+    const postEqList = function (urlto, SerialNumbers) {
+        let post_data = { SerialNumbers: SerialNumbers };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+        // そうしないと、C#側で受け取りのパラメータに null が渡る
+        let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
+        $.ajax({
+            url: urlto,
+            type: 'POST',
+            data: jsonstring,
+            dataType: 'json',
+            contentType: 'application/json',    // content-typeをJSONに指定する
+            error: function () {
+                console.error("Error sending Json to " + urlto);
+            },
+            complete: function (data) {
+                timer1 = setInterval(getStatus, 500);
+            }
+        });
     }
 
     // events from fnkey area
