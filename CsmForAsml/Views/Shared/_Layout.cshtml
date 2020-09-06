@@ -9,6 +9,7 @@
             --height-functions: 320px;
         }
     </style>
+    <!--
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.min.css" />
     <link rel="stylesheet" href="~/lib/slickgrid/slick.grid.css" type="text/css" />
@@ -16,8 +17,9 @@
 
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/csm.css" />
+    -->
+    <link rel="stylesheet" href="~/css/site.min.css" />
     <style>
-  
     </style>
 </head>
 <body>
@@ -60,7 +62,7 @@
         </nav>
     </header>
     <!-- <div class="container"> -->
-    <div >
+    <div>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -71,14 +73,15 @@
         </div>
     </footer>
 
-
+    <!--
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/jquery.event.drag-2.3.0.js"></script>
     <script src="~/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
     <script src="~/lib/jquery.japanese-input-change/jquery.japanese-input-change.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/lib/moment/moment.js"></script>
-
+    -->
+    <script src="~/js/site.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

@@ -5,139 +5,140 @@
 }
 
 
-    <h1>Material Need Calibration</h1>
+<h1>Material Need Calibration</h1>
 
-    <div class="filterPannel">
-        <div class="flex">
-            <div id="b1">
-                <div class="row" id="filter-row1">
-                    <div class="col-md-4">
-                        <label>CalPlaace</label>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Need Cal</label>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Need Safety</label>
-                    </div>
+<div class="filterPannel">
+    <div class="flex">
+        <div id="b1">
+            <div class="row" id="filter-row1">
+                <div class="col-md-4">
+                    <label>CalPlaace</label>
                 </div>
-
-                <div class="row" id="filter-row2">
-                    <div class="col-md-4">
-                        <select id="selectCalPlace" name="CalPlace">
-                            <option value="sample">CalPlace</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select id="selectNeedCal">
-                            <option value="sample">off</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select id="selectSafety">
-                            <option value="sample">off</option>
-                        </select>
-                    </div>
+                <div class="col-md-4">
+                    <label>Need Cal</label>
                 </div>
+                <div class="col-md-4">
+                    <label>Need Safety</label>
+                </div>
+            </div>
 
-                <div class="row" id="checkfilter">
-                    <div class="col-md-1">
-                        <button id="clrSelBtn">Clr</button>
-                    </div>
-                    <div class="col-md-3">
-                        <p class="text-right">Filter by Selection</p>
-                    </div>
-                    <div class="col-md-2">
-                        <input type="radio" name="filBySel" value="0" checked="checked">Off
-                    </div>
-                    <div class="col-md-2">
-                        <input type="radio" name="filBySel" value="1">Selected
-                    </div>
-                    <div class="col-md-3">
-                        <input type="radio" name="filBySel" value="2">Unselected
-                    </div>
+            <div class="row" id="filter-row2">
+                <div class="col-md-4">
+                    <select id="selectCalPlace" name="CalPlace">
+                        <option value="sample">CalPlace</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="selectNeedCal">
+                        <option value="sample">off</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="selectSafety">
+                        <option value="sample">off</option>
+                    </select>
+                </div>
+            </div>
 
+            <div class="row" id="checkfilter">
+                <div class="col-md-1">
+                    <button id="clrSelBtn">Clr</button>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-right">Filter by Selection</p>
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" name="filBySel" value="0" checked="checked">Off
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" name="filBySel" value="1">Selected
+                </div>
+                <div class="col-md-3">
+                    <input type="radio" name="filBySel" value="2">Unselected
                 </div>
 
             </div>
 
-            <!-- <div id="b2"> -->
-            <div id="b2">
-                <div class="row" style="margin-left: 0" 　>
-                    <div class="col-md-3" style="padding:2px 2px 2px 0px">
-                        <button id="clrAllFil" style="float: left;">全フィルタクリア</button>
-                    </div>
-                    <div class="col-md-offset-1  col-md-3" style="padding:2px 2px 2px 0px">
-                        <button id="clrDateFil">日付フィルタクリア</button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3">
-                        <label>　　　</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Change Date</label>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="row">
-                            <label style="font-size: xx-small">From</label>
-                            <input type="text" name="From" id="din0From" class="datepicker" />
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="row">
-                            <label style="font-size: xx-small">To</label>
-                            <input type="text" name="To" id="din0To" class="datepicker" />
-                        </div>
-                    </div>
-                </div>
-
-            </div>
         </div>
 
-    </div> <!-- end of class="filterPannel" -->
+        <!-- <div id="b2"> -->
+        <div id="b2">
+            <div class="row" style="margin-left: 0" 　>
+                <div class="col-md-3" style="padding:2px 2px 2px 0px">
+                    <button id="clrAllFil" style="float: left;">全フィルタクリア</button>
+                </div>
+                <div class="col-md-offset-1  col-md-3" style="padding:2px 2px 2px 0px">
+                    <button id="clrDateFil">日付フィルタクリア</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <label>　　　</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Change Date</label>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <label style="font-size: xx-small">From</label>
+                        <input type="text" name="From" id="din0From" class="datepicker" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <label style="font-size: xx-small">To</label>
+                        <input type="text" name="To" id="din0To" class="datepicker" />
+                    </div>
+                </div>
+            </div>
 
-    <div class="grid-area" id="myGrid"></div>
-
-    <div class="fnkey-area">
-        <div class="row">
-            <div class="col-md-6" style="font-size: small;">
-                Showing
-                <label id="NumShowing" style="font-size: small;"> xxxx </label>
-                of Total
-                <label id="NumTotal" style="font-size: small;"> mmmm </label>
-                rows data.
-            </div>
-        </div>
-        <div class="row" style="margin-left: 20px;">
-            <div class="col-md-2" style="padding:2px 2px 2px 2px">
-                <button id="fnkey1">Download</button>
-            </div>
-            <div class="col-md-2" style="padding:2px 2px 2px 2px">
-                <button id="fnkey2">Cal History</button>
-            </div>
-            <div class="col-md-2" style="padding:2px 2px 2px 2px">
-                <button id="fnkey3">Latest Cal Cert</button>
-            </div>
-            <div class="col-md-offset-2 col-md-2" style="padding:2px 2px 2px 2px">
-                <button id="fnkey4">Move to Incal</button>
-            </div>
         </div>
     </div>
 
-@section scripts{ 
- 
-    <script src="~/lib/slickgrid/slick.core.min.js"></script>
-    <script src="~/lib/slickgrid/slick.grid.min.js"></script>
-    <script src="~/lib/slickgrid/slick.formatters.js"></script>
-    <script src="~/lib/slickgrid/slick.editors.js"></script>
-    <script src="~/lib/slickgrid/slick.dataview.min.js"></script>
-    <script src="~/lib/slickgrid/plugins/slick.rowselectionmodel.min.js"></script>
-    <script src="~/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
-    <script src="~/lib/slickgrid/controls/slick.pager.js"></script>
-    <script src="~/lib/slickgrid/controls/slick.columnpicker.js"></script>
+</div> <!-- end of class="filterPannel" -->
 
+<div class="grid-area" id="myGrid"></div>
+
+<div class="fnkey-area">
+    <div class="row">
+        <div class="col-md-6" style="font-size: small;">
+            Showing
+            <label id="NumShowing" style="font-size: small;"> xxxx </label>
+            of Total
+            <label id="NumTotal" style="font-size: small;"> mmmm </label>
+            rows data.
+        </div>
+    </div>
+    <div class="row" style="margin-left: 20px;">
+        <div class="col-md-2" style="padding:2px 2px 2px 2px">
+            <button id="fnkey1">Download</button>
+        </div>
+        <div class="col-md-2" style="padding:2px 2px 2px 2px">
+            <button id="fnkey2">Cal History</button>
+        </div>
+        <div class="col-md-2" style="padding:2px 2px 2px 2px">
+            <button id="fnkey3">Latest Cal Cert</button>
+        </div>
+        <div class="col-md-offset-2 col-md-2" style="padding:2px 2px 2px 2px">
+            <button id="fnkey4">Move to Incal</button>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <!--
+        <script src="~/lib/slickgrid/slick.core.min.js"></script>
+        <script src="~/lib/slickgrid/slick.grid.min.js"></script>
+        <script src="~/lib/slickgrid/slick.formatters.js"></script>
+        <script src="~/lib/slickgrid/slick.editors.js"></script>
+        <script src="~/lib/slickgrid/slick.dataview.min.js"></script>
+        <script src="~/lib/slickgrid/plugins/slick.rowselectionmodel.min.js"></script>
+        <script src="~/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
+        <script src="~/lib/slickgrid/controls/slick.pager.js"></script>
+        <script src="~/lib/slickgrid/controls/slick.columnpicker.js"></script>
+    -->
+    <script src="~/js/slick.min.js"></script>
     <script src="~/js/Material.js"></script>
 }

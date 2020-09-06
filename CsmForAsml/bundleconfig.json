@@ -1,20 +1,54 @@
 [
-    {
-      "outputFileName": "wwwroot/css/site.min.css",
-      "inputFiles": [
-        "wwwroot/css/site.css",
-        "wwwroot/css/csm.css"
-      ]
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    "inputFiles": [
+      "wwwroot/lib/bootstrap/dist/css/bootstrap.min.css",
+      "wwwroot/lib/jquery-ui-1.12.1/jquery-ui.min.css",
+      "wwwroot/lib/slickgrid/slick.grid.css",
+      "wwwroot/lib/slickgrid/controls/slick.columnpicker.css",
+      "wwwroot/css/site.css",
+      "wwwroot/css/csm.css"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
     },
-    {
+    "sourceMap": false
+  
+   },
+   {
       "outputFileName": "wwwroot/js/site.min.js",
-      "inputFiles": [
-        "wwwroot/js/site.js"
-      ],
+    "inputFiles": [
+      "wwwroot/lib/jquery/dist/jquery.min.js",
+      "wwwroot/js/jquery.event.drag-2.3.0.js",
+      "wwwroot/lib/jquery-ui-1.12.1/jquery-ui.min.js",
+      "wwwroot/lib/jquery.japanese-input-change/jquery.japanese-input-change.js",      
+      "wwwroot/lib/bootstrap/dist/js/bootstrap.min.js",
+      "wwwroot/lib/moment/moment.js"
+    ],
       "minify": {
         "enabled": true,
         "renameLocals": true
       },
       "sourceMap": false
-    }
+    },
+  {
+    "outputFileName": "wwwroot/js/slick.min.js",
+    "inputFiles": [
+      "wwwroot/lib/slickgrid/slick.core.min.js",
+      "wwwroot/lib/slickgrid/slick.grid.min.js",
+      "wwwroot/js/slick.formatters.js",
+      "wwwroot/lib/slickgrid/slick.editors.js",
+      "wwwroot/lib/slickgrid/slick.dataview.min.js",
+      "wwwroot/lib/slickgrid/plugins/slick.rowselectionmodel.min.js",
+      "wwwroot/lib/slickgrid/plugins/slick.checkboxselectcolumn.js",
+      "wwwroot/lib/slickgrid/controls/slick.pager.js",
+      "wwwroot/lib/slickgrid/controls/slick.columnpicker.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
 ]

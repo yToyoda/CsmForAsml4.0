@@ -1,0 +1,2 @@
+﻿2020/09/06   BuildBundlerMinifier NuGet パッケージを追加インストールした　　Bundle と Minification を有効にするため
+

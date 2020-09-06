@@ -494,21 +494,23 @@ $(function () {  //main of slickgrid
         }
     }
 
-    const postEqList = function (urlto, SerialNumbers) {
-        let post_data = { SerialNumbers: SerialNumbers };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
-        // そうしないと、C#側で受け取りのパラメータに null が渡る
+    const postEqList = function (urlto, serialNumbers) {
+        //let ser = ["123456", "234567", "345678", "456789"];
+        let post_data = { SerialNums: serialNumbers };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+                                               // そうしないと、C#側で受け取りのパラメータに null が渡る
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
-        $.ajax({
+                
+        $.ajax({          
+            type: 'POST',         
             url: urlto,
-            type: 'POST',
-            data: jsonstring,
-            dataType: 'json',
-            contentType: 'application/json',    // content-typeをJSONに指定する
+            data: jsonstring,           
+            processData: true,
+            contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
             error: function () {
                 console.error("Error sending Json to " + urlto);
             },
             complete: function (data) {
-                timer1 = setInterval(getStatus, 500);
+                // timer1 = setInterval(getStatus, 500);
             }
         });
     }

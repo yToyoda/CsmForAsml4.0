@@ -40,14 +40,5 @@ namespace CsmForAsml.Models
         public int? SafetyInterval { get; set; }
 
     }
-    /// <summary>
-    /// SerialNumber のリスト ブラウザからサーバに選択されている機器を通知するために使用
-    /// </summary>
-    public class SerialNumList {
-
-        /// <summary>
-        /// 管理番号のリスト
-        /// </summary>
-        public List<string> SerialNumbers { get; set; }
-    }
+    
 }

@@ -1,4 +1,5 @@
-﻿@model IEnumerable<CsmForAsml.Models.ToolInventory>
+﻿
+@model IEnumerable<CsmForAsml.Models.ToolInventory>
 
 @{
     ViewData["Title"] = "Index";
@@ -93,7 +94,7 @@
 
             <div class="tab_content" id="content1">
                 <div class="row">
-                    
+
                     <div class="col-md-2">
                         <input type="radio" name="rdCalDue" value="0" checked="checked">Off
                     </div>
@@ -256,16 +257,17 @@
 </div>
 
 @section scripts{
-
-    <script src="~/lib/slickgrid/slick.core.min.js"></script>
-    <script src="~/lib/slickgrid/slick.grid.min.js"></script>
-    <script src="~/js/slick.formatters.js"></script>
-    <script src="~/lib/slickgrid/slick.editors.js"></script>
-    <script src="~/lib/slickgrid/slick.dataview.min.js"></script>
-    <script src="~/lib/slickgrid/plugins/slick.rowselectionmodel.min.js"></script>
-    <script src="~/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
-    <script src="~/lib/slickgrid/controls/slick.pager.js"></script>
-    <script src="~/lib/slickgrid/controls/slick.columnpicker.js"></script>
-
+    <!--
+        <script src="~/lib/slickgrid/slick.core.min.js"></script>
+        <script src="~/lib/slickgrid/slick.grid.min.js"></script>
+        <script src="~/js/slick.formatters.js"></script>
+        <script src="~/lib/slickgrid/slick.editors.js"></script>
+        <script src="~/lib/slickgrid/slick.dataview.min.js"></script>
+        <script src="~/lib/slickgrid/plugins/slick.rowselectionmodel.min.js"></script>
+        <script src="~/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
+        <script src="~/lib/slickgrid/controls/slick.pager.js"></script>
+        <script src="~/lib/slickgrid/controls/slick.columnpicker.js"></script>
+    -->
+    <script src="~/js/slick.min.js"></script>
     <script src="~/js/Inventory.js"></script>
 }

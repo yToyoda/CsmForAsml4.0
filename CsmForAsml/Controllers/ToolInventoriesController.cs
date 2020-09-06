@@ -9,37 +9,30 @@ using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace CsmForAsml.Controllers
-{
-    public class ToolInventoriesController : Controller
-    {
+namespace CsmForAsml.Controllers {
+    public class ToolInventoriesController : Controller {
         private readonly CsmForAsml2Context _context;
         private ToolInventoryRepository _toolRepo;
 
-        public ToolInventoriesController(CsmForAsml2Context context)
-        {
+        public ToolInventoriesController(CsmForAsml2Context context) {
             _context = context;
             _toolRepo = context.ToolInventoryRepository;
         }
 
         // GET: ToolInventories
-        public async Task<IActionResult> Index()
-        {
+        public async Task<IActionResult> Index() {
             return View(await _context.ToolInventory.ToListAsync());
         }
 
         // GET: ToolInventories/Details/5
-        public async Task<IActionResult> Details(string id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Details(string id) {
+            if (id == null) {
                 return NotFound();
             }
 
             var toolInventory = await _context.ToolInventory
                 .FirstOrDefaultAsync(m => m.SerialNumber == id);
-            if (toolInventory == null)
-            {
+            if (toolInventory == null) {
                 return NotFound();
             }
 
@@ -47,8 +40,7 @@ namespace CsmForAsml.Controllers
         }
 
         // GET: ToolInventories/Create
-        public IActionResult Create()
-        {
+        public IActionResult Create() {
             return View();
         }
 
@@ -57,10 +49,8 @@ namespace CsmForAsml.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SerialNumber,Plant,StoreLocation,Material,Description,LatestCalDate,CalStatus,Comment,CalDue,SystemStatus,UserStatus,Room,SuperordEquip,SortField,Machine,ToolkitMachine,ToolkitSloc,LatestSafetyDate,SafetyDue,NeedCal,NeedSafety,RemovedDate,UpdatedDate,InCal,PSN")] ToolInventory toolInventory)
-        {
-            if (ModelState.IsValid)
-            {
+        public async Task<IActionResult> Create([Bind("SerialNumber,Plant,StoreLocation,Material,Description,LatestCalDate,CalStatus,Comment,CalDue,SystemStatus,UserStatus,Room,SuperordEquip,SortField,Machine,ToolkitMachine,ToolkitSloc,LatestSafetyDate,SafetyDue,NeedCal,NeedSafety,RemovedDate,UpdatedDate,InCal,PSN")] ToolInventory toolInventory) {
+            if (ModelState.IsValid) {
                 _context.Add(toolInventory);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -69,16 +59,13 @@ namespace CsmForAsml.Controllers
         }
 
         // GET: ToolInventories/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Edit(string id) {
+            if (id == null) {
                 return NotFound();
             }
 
             var toolInventory = await _context.ToolInventory.FindAsync(id);
-            if (toolInventory == null)
-            {
+            if (toolInventory == null) {
                 return NotFound();
             }
             return View(toolInventory);
@@ -89,28 +76,20 @@ namespace CsmForAsml.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("SerialNumber,Plant,StoreLocation,Material,Description,LatestCalDate,CalStatus,Comment,CalDue,SystemStatus,UserStatus,Room,SuperordEquip,SortField,Machine,ToolkitMachine,ToolkitSloc,LatestSafetyDate,SafetyDue,NeedCal,NeedSafety,RemovedDate,UpdatedDate,InCal,PSN")] ToolInventory toolInventory)
-        {
-            if (id != toolInventory.SerialNumber)
-            {
+        public async Task<IActionResult> Edit(string id, [Bind("SerialNumber,Plant,StoreLocation,Material,Description,LatestCalDate,CalStatus,Comment,CalDue,SystemStatus,UserStatus,Room,SuperordEquip,SortField,Machine,ToolkitMachine,ToolkitSloc,LatestSafetyDate,SafetyDue,NeedCal,NeedSafety,RemovedDate,UpdatedDate,InCal,PSN")] ToolInventory toolInventory) {
+            if (id != toolInventory.SerialNumber) {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
+            if (ModelState.IsValid) {
+                try {
                     _context.Update(toolInventory);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ToolInventoryExists(toolInventory.SerialNumber))
-                    {
+                catch (DbUpdateConcurrencyException) {
+                    if (!ToolInventoryExists(toolInventory.SerialNumber)) {
                         return NotFound();
-                    }
-                    else
-                    {
+                    } else {
                         throw;
                     }
                 }
@@ -120,17 +99,14 @@ namespace CsmForAsml.Controllers
         }
 
         // GET: ToolInventories/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Delete(string id) {
+            if (id == null) {
                 return NotFound();
             }
 
             var toolInventory = await _context.ToolInventory
                 .FirstOrDefaultAsync(m => m.SerialNumber == id);
-            if (toolInventory == null)
-            {
+            if (toolInventory == null) {
                 return NotFound();
             }
 
@@ -140,16 +116,14 @@ namespace CsmForAsml.Controllers
         // POST: ToolInventories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
+        public async Task<IActionResult> DeleteConfirmed(string id) {
             var toolInventory = await _context.ToolInventory.FindAsync(id);
             _context.ToolInventory.Remove(toolInventory);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ToolInventoryExists(string id)
-        {
+        private bool ToolInventoryExists(string id) {
             return _context.ToolInventory.Any(e => e.SerialNumber == id);
         }
 
@@ -162,7 +136,7 @@ namespace CsmForAsml.Controllers
             var inventories = await _toolRepo.GetAllRecordsAsync();
 
             var res = from i in inventories
-                      join m in materials 
+                      join m in materials
                         on i.Material equals m.Material
                       select new { Inv = i, Mat = m };
 
@@ -173,14 +147,16 @@ namespace CsmForAsml.Controllers
                 r.Inv.SafetyInterval = r.Mat.SafetyInterval;
                 ans.Add(r.Inv);
             }
-
+            
             var serializeOptions = new JsonSerializerOptions {
                 //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNamingPolicy = null,
                 WriteIndented = true
             };
             serializeOptions.Converters.Add(new DateTimeConverter());
+            
             return Json(ans, serializeOptions);
+            //return Json(ans);
         }
 
         /// <summary>
@@ -189,16 +165,34 @@ namespace CsmForAsml.Controllers
         /// </summary>
         /// <param name="serialNumList">InCal に登録する SerialNumber のリスト</param>
         /// <returns>Default の View()</returns>
-        [HttpPost]
-        public ActionResult MoveToIncal(SerialNumList serialNumList) {
-            HttpContext.Session.SetString("pdffile", "");
-            
-            foreach (var equipNo in serialNumList.SerialNumbers) {
+        /// //  public ActionResult MoveToIncal(SerialNumList serialNumList)
+        /// // public ActionResult MoveToIncal( [Bind("serialNumbers")] string[] serialNumbers) {
+        /// //　[ValidateAntiForgeryToken]
 
-                
-            }
+
+        [HttpPost]
+        //[AutoValidateAntiforgeryToken]
+        //[IgnoreAntiforgeryToken]
+        public ActionResult MoveToIncal([FromBody] SerialNumList serial) {
             
-           return View();
+            var x = serial.ToString();
+
+            return Json(serial.ToString());
         }
     }
+
+    /// <summary>
+    /// SerialNumber のリスト ブラウザからサーバに選択されている機器を通知するために使用
+    /// </summary>
+    public class SerialNumList {
+        /// <summary>
+        /// 管理番号のリスト
+        /// </summary>
+        public List<string> SerialNums { get; set; }
+    }
+    public class snumber {
+        public string serialNumber { get; set; }
+        public int? units { get; set; }
+    }
+
 }
