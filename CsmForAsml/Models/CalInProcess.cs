@@ -33,6 +33,23 @@ namespace CsmForAsml.Models
         public string Description { get; set; }
         [NotMapped] 
         public string CalPlace { get; set; }
+        [NotMapped]
+        public string Location { get; set; }
+        [NotMapped]
+        public int? CalInterval { get; set; }
+        [NotMapped] 
+        public string PMaker { get; set; }
+        [NotMapped] 
+        public string PName { get; set; }
+        [NotMapped] 
+        public string PModel { get; set; }
+        [NotMapped]
+        public decimal? PriceToUser { get; set; }
+        [NotMapped] 
+        public decimal? PriceFromVendor { get; set; }
+        [NotMapped]
+        public string PSN { get; set; }
+
     }
 
     public partial class CalInProcess : CalInProcessCore {
