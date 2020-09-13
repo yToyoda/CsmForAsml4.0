@@ -24,6 +24,7 @@
     <Compile Remove="Migrations\20200629072953_MaterialNeedCalUpdated.Designer.cs" />
     <Compile Remove="Migrations\20200629073138_MaterialNeedCalUpdated2.cs" />
     <Compile Remove="Migrations\20200629073138_MaterialNeedCalUpdated2.Designer.cs" />
+    <Compile Remove="Tools\CreateExcel.cs" />
   </ItemGroup>
 
   <ItemGroup>

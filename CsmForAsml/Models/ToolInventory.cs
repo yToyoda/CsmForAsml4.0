@@ -38,7 +38,8 @@ namespace CsmForAsml.Models
         public int? CalInterval { get; set; }
         [NotMapped]
         public int? SafetyInterval { get; set; }
-
+        [NotMapped]
+        public string Location { get; set; }
     }
     
 }
