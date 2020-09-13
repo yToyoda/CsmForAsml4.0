@@ -96,8 +96,11 @@ namespace CsmForAsml.Controllers
             {
                 try
                 {
-                    _context.Update(location);
-                    await _context.SaveChangesAsync();
+                    var locrepo = _context.LocationRepository;
+                    var loc = locrepo.GetRecord(location.Plant);
+                    loc.Location1 = location.Location1;
+                    locrepo.UpdateRecord(loc);
+                    // await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

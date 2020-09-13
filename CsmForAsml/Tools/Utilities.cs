@@ -64,6 +64,18 @@ namespace CsmForAsml.Tools {
             TimeSpan oneDay = new TimeSpan(1, 0, 0, 0);
             return day.FirstDayOfNMonth(nmonths + 1).Subtract(oneDay);
         }
+
+        /// <summary>
+        /// どの地域のサーバーで実行されていても、日本時間での現在時刻を返す。 (読取専用)
+        /// </summary>
+        public static DateTime JSTNow {
+            get {
+                DateTime utcnow = DateTime.UtcNow;
+                TimeZoneInfo jstZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Tokyo Standard Time");
+                DateTime jst = TimeZoneInfo.ConvertTimeFromUtc(utcnow, jstZoneInfo);
+                return jst;
+            }
+        }
     }
     public static class RoleNames {
         public static string Admin { get; } = "Administrator";

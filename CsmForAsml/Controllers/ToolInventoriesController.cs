@@ -190,9 +190,4 @@ namespace CsmForAsml.Controllers {
         /// </summary>
         public List<string> SerialNums { get; set; }
     }
-    public class snumber {
-        public string serialNumber { get; set; }
-        public int? units { get; set; }
-    }
-
 }

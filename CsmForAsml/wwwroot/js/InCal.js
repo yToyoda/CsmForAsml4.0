@@ -533,19 +533,51 @@ $(function () {
         updateFilter();
     });
 
-
     // events from fnkey area
 
-    $('#button1').click(function () {
-        // test routine for dataView.getItem(ind);
-        let nShowing = dataView.getLength();
-        let aRow;
-        aRow = dataView.getItemByIdx(3);
-        for (let i = 0; i < nShowing; i += 1) {
-            aRow = dataView.getItem(i);
-        }
-        var selectedrows = grid.getSelectedRows();
+    $('#fnkey1').click(function () {
+        let totalNumber = data.length;
+        let arow;
+        let idNumberList = [];
+        copyselection();
+        for (let i = 0; i < totalNumber; i += 1) {
+            arow = dataView.getItemByIdx(i);
+            if (arow.sel) {
+                //NumberList.push(String(arow.Id));
+                idNumberList.push( arow.Id);
+            }
+        };
+        postEqList("/CalInProcesses/Download", idNumberList)
+
     });
+
+
+    $('#fnkey2').click(function () {
+    });
+
+
+    $('#fnkey3').click(function () {
+    });
+
+    const postEqList = function (urlto, idNumbers) {        
+        let post_data = { IdNums: idNumbers };
+        // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+        // そうしないと、C#側で受け取りのパラメータに null が渡る
+        let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
+        $.ajax({
+            type: 'POST',
+            url: urlto,
+            data: jsonstring,
+            processData: true,
+            contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
+            error: function () {
+                console.error("Error sending Json to " + urlto);
+            },
+            complete: function (data) {
+                // timer1 = setInterval(getStatus, 500);
+            }
+        });
+    }
 
     const allSameStage = function () {
         let date0 = [];
@@ -608,8 +640,7 @@ $(function () {
         dlprIndex = ind;
         dialogObj2.dialog('open');
     }
-
-    $('#button4').click(function () {
+    $('#fnkey4').click(function () {
         // test routine for dataView.getItem(ind);        
         let arow;
         selected = getAllSelectedRows()
@@ -668,9 +699,9 @@ $(function () {
     // Filter での扱いを簡単にするために、　id (grid で columnId として扱われる) と field (dataViewでのデータのプロパティ名) を同一にしておくこと
     // Column  id: Date0 から　Date8 は特殊な扱いをしているので例外
 
-    // columns.push({ id: "Sel", name: "Select", width: 80, minWidth: 20, maxWidth: 80, field: "Select", formatter: Slick.Formatters.Checkmark, editor: Slick.Editors.Checkbox, cannotTriggerInsert: true, sortable: true },);
-    // columns.push({ id: "id", name: "ID", field: "cid", width: 40, sortable: true, editor: Slick.Editors.TextNC });
-    columns.push({ id: "Plant", name: "Plant", field: "Plant", width: 40, resizable: true, sortable: true  });
+    //columns.push({ id: "Id", name: "Id", field: "Id", width: 40, sortable: true });
+    columns.push({ id: "Plant", name: "Plant", field: "Plant", width: 40, resizable: true, sortable: true });
+    columns.push({ id: "Location", name: "Location", field: "Location", width: 60, resizable: true, sortable: true });
     columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", width: 80, resizable: true, sortable: true});
     columns.push({ id: "Material", name: "Material", field: "Material", width: 120, resizable: true, sortable: true});
     columns.push({ id: "Description", name: "Description", field: "Description", width: 250, resizable: true, sortable: true});
@@ -688,7 +719,11 @@ $(function () {
     columns.push({ id: "Date7", name: "証明書受領日", field: "CcReceiveDate", resizable: true, sortable: true });
     columns.push({ id: "Date8", name: "証明書登録日", field: "CcUploadDate", resizable: true, sortable: true });
     columns.push({ id: "Tat", name: "TAT", field: "Tat", resizable: true, sortable: true });
-    columns.push({ id: "Finished", name: "完了", field: "Finished", resizable: true, sortable: true });
+    columns.push({ id: "CalInterval", name: "Cal-Interval", field: "CalInterval", resizable: true, sortable: true });
+    columns.push({ id: "PMaker", name: "P.Maker", field: "PMaker", resizable: true, sortable: true });
+    columns.push({ id: "PModel", name: "P.Model", field: "PModel", resizable: true, sortable: true });
+    columns.push({ id: "PName", name: "P.Name", field: "PName", resizable: true, sortable: true });
+    columns.push({ id: "PSN", name: "P.Serial", field: "PSN", resizable: true, sortable: true });
 
  
 
@@ -737,6 +772,7 @@ $(function () {
         // if (columnId === "Plant") return;
         if (columnId === "id" || columnId ==="Finished" ) return;
         if (columnId.indexOf('Date') !== -1) return;
+        if (columnId === "CalResult" || columnId === "Tat" || columnId === "CalInterval") return;
         let cell = $(args.node);
         cell.empty();
         let $atr = $(document.createElement("input"))
@@ -823,20 +859,4 @@ $(function () {
         }
     );
 
-    /*
-    dataView.beginUpdate();
-    dataView.setItems(data, "cid");
-    dataView.setFilterArgs(filterValues);
-    dataView.setFilter(myFilter);
-    dataView.endUpdate();
-    dataView.syncGridSelection(grid, true);
-
-    setDropdownList("#selectPlant", selectionListPlant);
-    setDropdownList("#selectCalPlace", selectionListCalPlaces);
-
-    $('#date1From').datepicker({ numberOfMonths: 3 });
-    $('#date1To').datepicker({ numberOfMonths: 3 });
-    showNumber();
-    updateDropdownList();
-    */
 });

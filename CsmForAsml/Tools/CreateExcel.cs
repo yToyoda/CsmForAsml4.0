@@ -12,6 +12,7 @@ using CsmForAsml.Models;
 
 namespace CsmForAsml.Tools {
     public class CreateExcelFile {
+
         private List<ToolInventory> filteredData;
         public CreateExcelFile() {
             filteredData = new List<ToolInventory>();
@@ -228,6 +229,10 @@ namespace CsmForAsml.Tools {
         private List<CalInProcess> filteredData;
         public CreateCalInPExcelFile() {
             filteredData = new List<CalInProcess>();
+        }
+
+        public CreateCalInPExcelFile(List<CalInProcess> _dataList) {
+            filteredData = _dataList;
         }
 
         public void Add(CalInProcess ci) {
