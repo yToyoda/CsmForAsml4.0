@@ -12,6 +12,7 @@ using CsmForAsml.Models;
 using CsmForAsml.Tools;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.VisualBasic;
+using Microsoft.AspNetCore.Http;
 
 namespace CsmForAsml.Controllers
 {
@@ -197,6 +198,9 @@ namespace CsmForAsml.Controllers
         [HttpPost]
         public async Task<IActionResult> Download([FromBody] IdNumList idlist) {
             // download excel file
+            
+            HttpContext.Session.SetString("Filename", "");
+
             var allCalInP = await _calInProRepo.GetAllRecordsAsync();
 
             var cals = from e in allCalInP
@@ -207,16 +211,20 @@ namespace CsmForAsml.Controllers
             List<CalInProcess> ans = new List<CalInProcess>();
             await GetNotMappedFields(cals, ans);
 
-            var createExcel = new CreateCalInPExcelFile(ans);
-            var excelFile = await createExcel.GetExcelFile();
+            var createExcel = new CreateExcelFile();
+            MemoryStream ms  =  await createExcel.GetCalInProcessExcelFileStream(ans);
+
+            
             string filename = "CalInProcess_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
             //            excelFile.FileName = filename;
             string folder = Startup.AppSettings["PdfFoldername"];
             string filepath = System.IO.Path.Combine(folder, filename);
-
-            using (var sw = new StreamWriter(filepath, false)) {
-                sw.Write(excelFile.byteArray);
-            }
+            var len = ms.Length;
+            byte[] buff = ms.ToArray();
+            FileStream file = new FileStream(filepath, FileMode.Create, System.IO.FileAccess.Write);
+            file.Write(buff,0,(int)len);
+            file.Close();
+            
 
             //return File(excelFile.byteArray, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",filename);
             return View();

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount
-using Microsoft.WindowsAzure.Storage.Blob; // Namespace for Blob storage types
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Azure.KeyVault;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using SysIO = System.IO;
 
 
@@ -22,7 +24,7 @@ namespace CsmForAsml.Tools {
     /// <para>EndRow() をコール後は対象セルは、一つ下の行の Column A となる。</para>
     /// <para>最後のデータ行を追加し終えたら、GetExcelFile で、ExcelFile のストリームを取得できる。</para>
     /// </remarks>
-    public class CreateExcel :IDisposable{
+    public class CreateExcel {
         /// <summary>
         /// デフォールトコンストラクタ
         /// </summary>
@@ -55,7 +57,7 @@ namespace CsmForAsml.Tools {
         /// <summary>
         /// エクセルファイルを作成するための MemoryStream この中にエクセルファイルが作成される
         /// </summary>
-        private SysIO.MemoryStream _ms;
+        private SysIO.MemoryStream _ms { get; set; }
 
         /// <summary>
         /// エクセルの中の SpreadsheetDocument のインスタンス
@@ -112,21 +114,21 @@ namespace CsmForAsml.Tools {
         /// <remarks>テンプレートは、connectionString [KSCM_Bolb] の "templates" という container から読み込む。</remarks>
         /// <param name="filename">"tempates"コンテナの中のテンプレートのファイル名</param>
         /// <param name="sheetname">テンプレート中で使用するシート名</param>
-        public async void LoadTemplate(string filename, string sheetname) {           
-            _ms = new SysIO.MemoryStream(); ;
+        public async Task<long> LoadTemplate(string filename, string sheetname) {
+            _ms = new SysIO.MemoryStream();
+            //var ms2 = new SysIO.MemoryStream();
             string connectionstring = Startup.AppSettings["AzureBlob"];
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionstring);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobClient.GetContainerReference("templates");
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(filename);
-            //SysIO.Stream templateStream = blockBlob.OpenRead();
-            //fileinfo.FileByteStream = blockBlob.OpenRead();
-            SysIO.Stream frs = await blockBlob.OpenReadAsync();
-            frs.CopyTo(_ms);
+
+            //bool cw = _ms.CanWrite;
+            await blockBlob.DownloadToStreamAsync(_ms);
+
             long bytesInStream = _ms.Length;
             bool canread = _ms.CanRead;
             bool canwrite = _ms.CanWrite;
-            frs.Close();
 
             _document = SpreadsheetDocument.Open(_ms, true);
             _wbPart = _document.WorkbookPart;
@@ -143,9 +145,9 @@ namespace CsmForAsml.Tools {
             int nrows = rows.Count();
             Row firstRow = _sheetData.Descendants<Row>().ElementAt(0); // get first row , line 1
             firstRow.DyDescent = 0.3D;
-            for (int i = nrows-1; i > 0; --i) {
-                    Row rowtodelete = _sheetData.Descendants<Row>().ElementAt(i); // get  line i 
-                    rowtodelete.Remove();
+            for (int i = nrows - 1; i > 0; --i) {
+                Row rowtodelete = _sheetData.Descendants<Row>().ElementAt(i); // get  line i 
+                rowtodelete.Remove();
             }
 
             _sharedStringDic = new Dictionary<string, int>();
@@ -162,6 +164,7 @@ namespace CsmForAsml.Tools {
             _colid = "A";
             _currentRow = new Row() { RowIndex = _lineIndex, Spans = new ListValue<StringValue>() { InnerText = "1:20" }, Height = 16.5D, CustomHeight = true, DyDescent = 0.3D };
             StyleDic = new Dictionary<string, uint>();
+            return (bytesInStream);
         }
 
         /// <summary>
