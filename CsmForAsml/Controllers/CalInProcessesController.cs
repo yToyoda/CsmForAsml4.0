@@ -212,18 +212,17 @@ namespace CsmForAsml.Controllers
             await GetNotMappedFields(cals, ans);
 
             var createExcel = new CreateExcelFile();
-            MemoryStream ms  =  await createExcel.GetCalInProcessExcelFileStream(ans);
+            FileInfoClass fi  =  await createExcel.GetCalInProcessExcelFileStream(ans);
 
             
             string filename = "CalInProcess_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
             //            excelFile.FileName = filename;
             string folder = Startup.AppSettings["PdfFoldername"];
             string filepath = System.IO.Path.Combine(folder, filename);
-            var len = ms.Length;
-            byte[] buff = ms.ToArray();
-            FileStream file = new FileStream(filepath, FileMode.Create, System.IO.FileAccess.Write);
-            file.Write(buff,0,(int)len);
-            file.Close();
+            using (FileStream file = new FileStream(filepath, FileMode.Create, System.IO.FileAccess.Write)) {
+                file.Write(fi.byteArray, 0, (int)fi.Length);
+                file.Close();
+            }
             
 
             //return File(excelFile.byteArray, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",filename);

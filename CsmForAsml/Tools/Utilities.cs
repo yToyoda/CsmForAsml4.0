@@ -85,4 +85,12 @@ namespace CsmForAsml.Tools {
         public static string KyosaiUser { get; } = "KyosaiUser";
         public static string[] Roles = { "User", "SuperUser", "KyosaiUser", "DataAdmin", "Administrator", "Supplier" };
     }
+
+    public class FileInfoClass {
+        public string FileName { get; set; }
+        public long Length { get; set; }
+        public byte[] byteArray;
+        public FileInfoClass() { }
+    }
+
 }

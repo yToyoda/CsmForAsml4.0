@@ -99,7 +99,7 @@ namespace CsmForAsml.Tools {
 
         }
 
-        public async Task<MemoryStream> GetCalInProcessExcelFileStream(List<CalInProcess> entries) {
+        public async Task<FileInfoClass> GetCalInProcessExcelFileStream(List<CalInProcess> entries) {
             // using (CreateExcel _crExcel = new CreateExcel()) {
             CreateExcel _crExcel = new CreateExcel();
             Dictionary<string, Int32> sharedStringDic = new Dictionary<string, int>();
@@ -159,7 +159,10 @@ namespace CsmForAsml.Tools {
             var ms= _crExcel.GetExcelFile();
             //ms.CopyTo(iost);
             //return iost;
-            return ms;
+            FileInfoClass fi = new FileInfoClass();
+            fi.byteArray = ms.ToArray();
+            fi.Length = ms.Length;
+            return fi;
             
         }
     }
