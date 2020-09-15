@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CsmForAsml.Models;
+using CsmForAsml.Hubs;
 
 namespace CsmForAsml {
     public class Startup {
@@ -37,6 +38,8 @@ namespace CsmForAsml {
             services.AddSingleton<CsmForAsml2Context, CsmForAsml2Context>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSignalR();
+
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromSeconds(20);
                 options.Cookie.HttpOnly = true;
@@ -69,6 +72,7 @@ namespace CsmForAsml {
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapHub<CsmHub>("/csmhub");
             });
         }
     }

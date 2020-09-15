@@ -1,4 +1,38 @@
 if (!jQuery) { throw new Error("csm4.0 script requires jQuery") }
+"use strict";
+
+let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
+let this_connectionId;
+
+connection.start().then(function () {
+    console.log('Now connected, connection ID=' + connection.connectionId);
+    this_connectionId = connection.connectionId 
+}).catch(function (err) {
+    return console.error(err.toString());
+});
+
+connection.on("ExcelFinished", function (filename) {
+    console.log('ExcelFile Created File name =' + filename);
+    GetWithId("CalInProcesses/ShowExcel", filename);
+    
+});
+
+const GetWithId = function (urlto, idstring) {
+    let url = urlto + "?Filename=" + idstring
+    $.ajax({
+        type: 'GET',
+        url: url,
+        data: {},
+        processData: false,
+        contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
+        error: function () {
+            console.error("Error sending 'GET' to " + url);
+        },
+        complete: function () {
+            console.log("GET requested to " + url);
+        }
+    });
+}
 
 jQuery.browser = {};
 (function () {
@@ -560,7 +594,9 @@ $(function () {
     });
 
     const postEqList = function (urlto, idNumbers) {        
-        let post_data = { IdNums: idNumbers };
+        let post_data = { connectionId: this_connectionId,
+                            IdNums: idNumbers
+        };
         // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
         // そうしないと、C#側で受け取りのパラメータに null が渡る
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
@@ -573,11 +609,15 @@ $(function () {
             error: function () {
                 console.error("Error sending Json to " + urlto);
             },
-            complete: function (data) {
-                timer1 = setInterval(getStatus, 1000);
+            complete: function () {
+                
             }
         });
     }
+
+ 
+
+
 
     const getStatus = function () {
         clearInterval(timer1);

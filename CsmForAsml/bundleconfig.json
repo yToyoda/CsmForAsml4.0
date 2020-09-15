@@ -24,7 +24,8 @@
       "wwwroot/lib/jquery-ui-1.12.1/jquery-ui.min.js",
       "wwwroot/lib/jquery.japanese-input-change/jquery.japanese-input-change.js",      
       "wwwroot/lib/bootstrap/dist/js/bootstrap.min.js",
-      "wwwroot/lib/moment/moment.js"
+      "wwwroot/lib/moment/moment.js",
+      "wwwroot/js/signalr/dist/browser/signalr.js"
     ],
       "minify": {
         "enabled": true,

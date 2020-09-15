@@ -61,7 +61,6 @@
       "library": "slickgrid@2.4.27",
       "destination": "wwwroot/lib/slickgrid/"
     },
-
     {
       "provider": "unpkg",
       "library": "moment@2.27.0",
@@ -71,6 +70,15 @@
         "README.md",
         "moment.js",
         "LICENSE"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/js/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.min.js"
       ]
     }
   ]

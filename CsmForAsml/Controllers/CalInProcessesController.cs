@@ -14,17 +14,21 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.VisualBasic;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using Microsoft.AspNetCore.SignalR;
+using CsmForAsml.Hubs;
 
 namespace CsmForAsml.Controllers
 {
     public class CalInProcessesController : Controller {
         private readonly CsmForAsml2Context _context;
         private readonly CalInProcessRepository _calInProRepo;
+        private readonly IHubContext<CsmHub> _hubContext;
 
         [TempData] string ExcelFilename { get; set; }
-        public CalInProcessesController(CsmForAsml2Context context) {
+        public CalInProcessesController(CsmForAsml2Context context, IHubContext<CsmHub> hubContext) {
             _context = context;
             _calInProRepo = context.CalInProcessRepository;
+            _hubContext = hubContext;
         }
 
         // GET: CalInProcesses
@@ -201,6 +205,7 @@ namespace CsmForAsml.Controllers
         public async Task<IActionResult> Download([FromBody] IdNumList idlist) {
             // download excel file
 
+            string clientId = idlist.connectionId;
             HttpContext.Session.SetString("ExcelFilename", "");
 
             var allCalInP = await _calInProRepo.GetAllRecordsAsync();
@@ -225,24 +230,9 @@ namespace CsmForAsml.Controllers
                 file.Write(fi.byteArray, 0, (int)fi.Length);
                 file.Close();
             }
-            //HttpContext.Session.SetString("ExcelFilename", filename);
-            //ExcelFilename = filename;
-            //folder =  @"C:\Temp";
 
-            
-
+            await _hubContext.Clients.Client(clientId).SendAsync("ExcelFinished", filename);
             return new EmptyResult();
-
-            byte[] buff = new byte[30000];
-            int len;
-            using (FileStream file = new FileStream(filepath, FileMode.Open, System.IO.FileAccess.Read)) {
-                len = file.Read(buff);
-                file.Close();
-            }
-            string kind = "application/vnd.ms-excel";
-            //return File(ms.ToArray(), kind, filename);
-            return File(buff, kind, filename);
-
         }
 
         [HttpGet]
@@ -277,17 +267,17 @@ namespace CsmForAsml.Controllers
         }
 
         [HttpGet]
-        public ActionResult ShowExcel() {
+        public ActionResult ShowExcel(string Filename) {
             //string filename = HttpContext.Session.GetString("ExcelFileName");
             //HttpContext.Session.SetString("ExcelFileName", "");
-            string filename = "CIP.xlsx";
+            //string filename = "CIP.xlsx";
             //MemoryStream ms = new MemoryStream();
             //_blobFileIO.DownloadToStream(_containerName, _excelfolder, filename, ms);
             //ms.Seek(0, SeekOrigin.Begin);
             string kind = "application/octet-stream";
 
             string folder = @"C:\Temp";
-            string filepath = System.IO.Path.Combine(folder, filename);
+            string filepath = System.IO.Path.Combine(folder, Filename);
             MemoryStream ms = new MemoryStream();
 
             using (FileStream file = new FileStream(filepath, FileMode.Open, System.IO.FileAccess.Read)) {
@@ -295,13 +285,14 @@ namespace CsmForAsml.Controllers
                 file.Close();
             }
 
-            return File(ms.ToArray(), kind, filename);
+            return File(ms.ToArray(), kind, Filename);
             // return File(ms, kind, filename);
         }
 
     }
 
     public class IdNumList {
+        public string connectionId { get; set; }
         public List<int> IdNums { get; set; }
     }
 }
