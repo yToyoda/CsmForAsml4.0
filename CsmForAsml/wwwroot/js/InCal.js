@@ -13,8 +13,8 @@ connection.start().then(function () {
 
 connection.on("ExcelFinished", function (filename) {
     console.log('ExcelFile Created File name =' + filename);
-    GetWithId("CalInProcesses/ShowExcel", filename);
-    
+    let url = "CalInProcesses/ShowExcel?Filename=" + filename;    
+    window.open(url, "ExcelWindow");
 });
 
 const GetWithId = function (urlto, idstring) {
@@ -70,7 +70,7 @@ $(function () {
     let headerRowInputIds = [];
     let dlprIndex, dlprDate;       //return value from dialog pannel
     let dlprCalResult, dlprComment; //return value from dialog pannel
-    let timer1; // use as interval timer to check server
+    
     let filterValues = {
         texts: {},
         selection: null,
@@ -615,26 +615,7 @@ $(function () {
         });
     }
 
- 
 
-
-
-    const getStatus = function () {
-        clearInterval(timer1);
-        window.open("/CalInProcesses/ShowExcel", "ExcelWindow");
-        return;
-
-        $.ajax({
-            type: 'GET',
-            url: '/CalInProcesses/ShowExcel',// ← URL は /ControllerName/ActionName
-            data: {},
-            dataType: 'json',
-            cache: false,
-            success: function (resp) {               
-                    //window.open("/CalInProcesses/ShowExcel", "ExcelWindow");
-            }
-        });
-    };
 
     const allSameStage = function () {
         let date0 = [];
@@ -781,12 +762,8 @@ $(function () {
     columns.push({ id: "PModel", name: "P.Model", field: "PModel", resizable: true, sortable: true });
     columns.push({ id: "PName", name: "P.Name", field: "PName", resizable: true, sortable: true });
     columns.push({ id: "PSN", name: "P.Serial", field: "PSN", resizable: true, sortable: true });
-
- 
-
-
+     
     let selectionListPlant = ["JP01", "JP03", "JP04", "JP05", "JP07"];
-
     let selectionListCalPlaces = ["TOKYO", "MIYAGI"];
 
 

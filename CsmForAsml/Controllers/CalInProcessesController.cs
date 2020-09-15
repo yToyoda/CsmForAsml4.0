@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
-using System.IO;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,6 +15,10 @@ using Microsoft.AspNetCore.Http;
 using System.Net;
 using Microsoft.AspNetCore.SignalR;
 using CsmForAsml.Hubs;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using SysIO = System.IO;
+using System.IO;
 
 namespace CsmForAsml.Controllers
 {
@@ -219,44 +222,39 @@ namespace CsmForAsml.Controllers
             await GetNotMappedFields(cals, ans);
 
             var createExcel = new CreateExcelFile();
-            FileInfoClass fi = await createExcel.GetCalInProcessExcelFileStream(ans);
-
-
+            MemoryStream ms  = await createExcel.GetCalInProcessExcelFileStream(ans);           
             string filename = "CalInProcess_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
-            //            excelFile.FileName = filename;
-            string folder = Startup.AppSettings["PdfFoldername"];
-            string filepath = System.IO.Path.Combine(folder, filename);
-            using (FileStream file = new FileStream(filepath, FileMode.Create, System.IO.FileAccess.Write)) {
-                file.Write(fi.byteArray, 0, (int)fi.Length);
-                file.Close();
-            }
 
+            if (Startup.AppSettings["StorageProvider"] == "localfile") {
+                FileInfoClass fi = new FileInfoClass();
+                fi.byteArray = ms.ToArray();
+                fi.Length = ms.Length;
+
+                string folder = Startup.AppSettings["PdfFoldername"];
+                string filepath = SysIO.Path.Combine(folder, filename);
+                using (FileStream file = new FileStream(filepath, FileMode.Create, System.IO.FileAccess.Write)) {
+                    file.Write(fi.byteArray, 0, (int)fi.Length);
+                    file.Close();
+                }
+            } else {
+                string connectionstring = Startup.AppSettings["AzureBlob"];
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionstring);
+                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+                CloudBlobContainer container = blobClient.GetContainerReference("temp2");
+                string user = HttpContext.User.Identity.Name;
+                if ((user ?? "") == "") user = "Yutaka";
+                CloudBlockBlob blockBlob = container.GetBlockBlobReference(user + "/" + filename);
+                await blockBlob.UploadFromStreamAsync(ms);
+            }
+            // notify to client by SignalR
             await _hubContext.Clients.Client(clientId).SendAsync("ExcelFinished", filename);
             return new EmptyResult();
         }
 
-        [HttpGet]
-        public ActionResult GetStatus() {
-            WorkStatus ws = new WorkStatus();
-            ws.Status = "working";
-            ws.Filename = "CalInProcess.xlsx";
-
-            //string pdffname = HttpContext.Session.GetString("PdfFilename");
-            //string excelfname = HttpContext.Session.GetString("ExcelFileName");
-
-
-
-
-            if (ws.Filename != "") {
-                ws.Status = "ExcelFinished";
-                //ws.Filename = excelfname;
-            }
-            return Json(ws);
-        }
 
         [HttpGet]
         public ActionResult ShowPdf() {
-
+            // has not modified
             string filename = HttpContext.Session.GetString("PdfFilename");
             MemoryStream fs = new MemoryStream();
             // _blobFileIO.DownloadToStream(_containerName, _pdffolder, filename, fs);
@@ -267,26 +265,30 @@ namespace CsmForAsml.Controllers
         }
 
         [HttpGet]
-        public ActionResult ShowExcel(string Filename) {
-            //string filename = HttpContext.Session.GetString("ExcelFileName");
-            //HttpContext.Session.SetString("ExcelFileName", "");
-            //string filename = "CIP.xlsx";
-            //MemoryStream ms = new MemoryStream();
-            //_blobFileIO.DownloadToStream(_containerName, _excelfolder, filename, ms);
-            //ms.Seek(0, SeekOrigin.Begin);
+        public async Task<ActionResult> ShowExcel(string Filename) {
             string kind = "application/octet-stream";
-
-            string folder = @"C:\Temp";
-            string filepath = System.IO.Path.Combine(folder, Filename);
             MemoryStream ms = new MemoryStream();
-
-            using (FileStream file = new FileStream(filepath, FileMode.Open, System.IO.FileAccess.Read)) {
-                file.CopyTo(ms);
-                file.Close();
+            if (Startup.AppSettings["StorageProvider"] == "localfile") {
+                string folder = Startup.AppSettings["PdfFoldername"];
+                string filepath = System.IO.Path.Combine(folder, Filename);
+                using (FileStream file = new FileStream(filepath, FileMode.Open, System.IO.FileAccess.Read)) {
+                    file.CopyTo(ms);
+                    file.Close();
+                }
+                // delete the file
+                System.IO.File.Delete(filepath);
+            } else {
+                string connectionstring = Startup.AppSettings["AzureBlob"];
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionstring);
+                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+                CloudBlobContainer container = blobClient.GetContainerReference("temp2");
+                string user = HttpContext.User.Identity.Name;
+                if ((user ?? "") == "") user = "Yutaka";
+                CloudBlockBlob blockBlob = container.GetBlockBlobReference(user + "/" + Filename);
+                await blockBlob.DownloadToStreamAsync(ms);
+                await blockBlob.DeleteIfExistsAsync();
             }
-
             return File(ms.ToArray(), kind, Filename);
-            // return File(ms, kind, filename);
         }
 
     }
