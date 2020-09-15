@@ -13,6 +13,7 @@ using CsmForAsml.Tools;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.VisualBasic;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace CsmForAsml.Controllers
 {
@@ -20,6 +21,7 @@ namespace CsmForAsml.Controllers
         private readonly CsmForAsml2Context _context;
         private readonly CalInProcessRepository _calInProRepo;
 
+        [TempData] string ExcelFilename { get; set; }
         public CalInProcessesController(CsmForAsml2Context context) {
             _context = context;
             _calInProRepo = context.CalInProcessRepository;
@@ -141,7 +143,7 @@ namespace CsmForAsml.Controllers
         /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetData() {
-     
+
 
             var cals = await _calInProRepo.GetAllRecordsAsync();
 
@@ -198,23 +200,23 @@ namespace CsmForAsml.Controllers
         [HttpPost]
         public async Task<IActionResult> Download([FromBody] IdNumList idlist) {
             // download excel file
-            
-            HttpContext.Session.SetString("Filename", "");
+
+            HttpContext.Session.SetString("ExcelFilename", "");
 
             var allCalInP = await _calInProRepo.GetAllRecordsAsync();
 
             var cals = from e in allCalInP
                        join n in idlist.IdNums
-                       on e.Id equals n                       
+                       on e.Id equals n
                        select e;
 
             List<CalInProcess> ans = new List<CalInProcess>();
             await GetNotMappedFields(cals, ans);
 
             var createExcel = new CreateExcelFile();
-            FileInfoClass fi  =  await createExcel.GetCalInProcessExcelFileStream(ans);
+            FileInfoClass fi = await createExcel.GetCalInProcessExcelFileStream(ans);
 
-            
+
             string filename = "CalInProcess_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
             //            excelFile.FileName = filename;
             string folder = Startup.AppSettings["PdfFoldername"];
@@ -223,12 +225,82 @@ namespace CsmForAsml.Controllers
                 file.Write(fi.byteArray, 0, (int)fi.Length);
                 file.Close();
             }
+            //HttpContext.Session.SetString("ExcelFilename", filename);
+            //ExcelFilename = filename;
+            //folder =  @"C:\Temp";
+
             
 
-            //return File(excelFile.byteArray, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",filename);
-            return View();
+            return new EmptyResult();
+
+            byte[] buff = new byte[30000];
+            int len;
+            using (FileStream file = new FileStream(filepath, FileMode.Open, System.IO.FileAccess.Read)) {
+                len = file.Read(buff);
+                file.Close();
+            }
+            string kind = "application/vnd.ms-excel";
+            //return File(ms.ToArray(), kind, filename);
+            return File(buff, kind, filename);
+
         }
+
+        [HttpGet]
+        public ActionResult GetStatus() {
+            WorkStatus ws = new WorkStatus();
+            ws.Status = "working";
+            ws.Filename = "CalInProcess.xlsx";
+
+            //string pdffname = HttpContext.Session.GetString("PdfFilename");
+            //string excelfname = HttpContext.Session.GetString("ExcelFileName");
+
+
+
+
+            if (ws.Filename != "") {
+                ws.Status = "ExcelFinished";
+                //ws.Filename = excelfname;
+            }
+            return Json(ws);
+        }
+
+        [HttpGet]
+        public ActionResult ShowPdf() {
+
+            string filename = HttpContext.Session.GetString("PdfFilename");
+            MemoryStream fs = new MemoryStream();
+            // _blobFileIO.DownloadToStream(_containerName, _pdffolder, filename, fs);
+            fs.Seek(0, SeekOrigin.Begin);
+            var kind = System.Net.Mime.MediaTypeNames.Application.Pdf;
+            HttpContext.Session.SetString("PdfFilename","");
+            return File(fs.ToArray(), kind, filename);
+        }
+
+        [HttpGet]
+        public ActionResult ShowExcel() {
+            //string filename = HttpContext.Session.GetString("ExcelFileName");
+            //HttpContext.Session.SetString("ExcelFileName", "");
+            string filename = "CIP.xlsx";
+            //MemoryStream ms = new MemoryStream();
+            //_blobFileIO.DownloadToStream(_containerName, _excelfolder, filename, ms);
+            //ms.Seek(0, SeekOrigin.Begin);
+            string kind = "application/octet-stream";
+
+            string folder = @"C:\Temp";
+            string filepath = System.IO.Path.Combine(folder, filename);
+            MemoryStream ms = new MemoryStream();
+
+            using (FileStream file = new FileStream(filepath, FileMode.Open, System.IO.FileAccess.Read)) {
+                file.CopyTo(ms);
+                file.Close();
+            }
+
+            return File(ms.ToArray(), kind, filename);
+            // return File(ms, kind, filename);
+        }
+
     }
+
     public class IdNumList {
         public List<int> IdNums { get; set; }
     }

@@ -92,5 +92,9 @@ namespace CsmForAsml.Tools {
         public byte[] byteArray;
         public FileInfoClass() { }
     }
+    public class WorkStatus {
+        public string Status { get; set; }
+        public string Filename { get; set; }
+    }
 
 }

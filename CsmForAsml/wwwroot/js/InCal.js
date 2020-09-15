@@ -36,7 +36,7 @@ $(function () {
     let headerRowInputIds = [];
     let dlprIndex, dlprDate;       //return value from dialog pannel
     let dlprCalResult, dlprComment; //return value from dialog pannel
-
+    let timer1; // use as interval timer to check server
     let filterValues = {
         texts: {},
         selection: null,
@@ -574,10 +574,27 @@ $(function () {
                 console.error("Error sending Json to " + urlto);
             },
             complete: function (data) {
-                // timer1 = setInterval(getStatus, 500);
+                timer1 = setInterval(getStatus, 1000);
             }
         });
     }
+
+    const getStatus = function () {
+        clearInterval(timer1);
+        window.open("/CalInProcesses/ShowExcel", "ExcelWindow");
+        return;
+
+        $.ajax({
+            type: 'GET',
+            url: '/CalInProcesses/ShowExcel',// ← URL は /ControllerName/ActionName
+            data: {},
+            dataType: 'json',
+            cache: false,
+            success: function (resp) {               
+                    //window.open("/CalInProcesses/ShowExcel", "ExcelWindow");
+            }
+        });
+    };
 
     const allSameStage = function () {
         let date0 = [];
