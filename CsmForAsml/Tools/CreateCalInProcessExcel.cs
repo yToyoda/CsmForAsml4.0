@@ -24,7 +24,7 @@ namespace CsmForAsml.Tools {
             _crExcel = new CreateExcel();
         }
 
-        public async Task<MemoryStream> GetExcelStream(List<CalInProcess> entries) {
+        public async Task<MemoryStream> GetExcelStream(IEnumerable<CalInProcess> entries) {
             // using (CreateExcel _crExcel = new CreateExcel()) {
             CreateExcel _crExcel = new CreateExcel();
             Dictionary<string, Int32> sharedStringDic = new Dictionary<string, int>();

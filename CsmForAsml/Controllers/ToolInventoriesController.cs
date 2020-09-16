@@ -22,11 +22,15 @@ namespace CsmForAsml.Controllers {
         private readonly CsmForAsml2Context _context;
         private readonly ToolInventoryRepository _toolRepo;
         private readonly IHubContext<CsmHub> _hubContext;
+        private readonly ICreateExcelFile<ToolInventory> _crExcel;
 
-        public ToolInventoriesController(CsmForAsml2Context context, IHubContext<CsmHub> hubcontext) {
+        public ToolInventoriesController(CsmForAsml2Context context, 
+                                         IHubContext<CsmHub> hubcontext, 
+                                         ICreateExcelFile<ToolInventory> crExcel) {
             _context = context;
             _toolRepo = context.ToolInventoryRepository;
             _hubContext = hubcontext;
+            _crExcel = crExcel;
         }
 
         // GET: ToolInventories
@@ -188,9 +192,9 @@ namespace CsmForAsml.Controllers {
             List<ToolInventory> ans = new List<ToolInventory>();
             await GetNotMappedFieldsToolInv(tools, ans);
 
-            var createExcel = new CreateToolInventoryExcel();
-            MemoryStream ms = await createExcel.GetExcelStream(ans);
-            string filename = "CalInProcess_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
+            //var createExcel = new CreateToolInventoryExcel();
+            MemoryStream ms = await _crExcel.GetExcelStream(ans);
+            string filename = "ToolInventory_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
 
             if (Startup.AppSettings["StorageProvider"] == "localfile") {
 

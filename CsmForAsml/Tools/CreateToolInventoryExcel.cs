@@ -17,7 +17,7 @@ namespace CsmForAsml.Tools {
             _crExcel = crExcel;
         }
         */
-        public async Task<MemoryStream> GetExcelStream(List<ToolInventory> tools) {
+        public async Task<MemoryStream> GetExcelStream(IEnumerable<ToolInventory> tools) {
 
             //using (CreateExcel _crExcel = new CreateExcel()) {
             CreateExcel _crExcel = new CreateExcel();
@@ -25,7 +25,7 @@ namespace CsmForAsml.Tools {
             const string overdue = "OverDue";
             const string dueThisMonth = "DueTM";
             const string dueNextMonth = "DueNM";
-            const string excelTemplate = "CalInProcessTemplateVer05.xlsx";
+            const string excelTemplate = "InventoryTemplateVer02.xlsx";
             const string sheetname = "Sheet1";
 
             _crExcel.StartLine = 2;   // add cell from line = 2

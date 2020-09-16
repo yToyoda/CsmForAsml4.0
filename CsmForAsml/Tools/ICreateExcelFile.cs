@@ -6,6 +6,6 @@ using System.IO;
 
 namespace CsmForAsml.Tools {
     public interface ICreateExcelFile<TModel> {
-        Task<MemoryStream> GetExcelStream(List<TModel> tools);
+        Task<MemoryStream> GetExcelStream(IEnumerable<TModel> tools);
     }
 }
