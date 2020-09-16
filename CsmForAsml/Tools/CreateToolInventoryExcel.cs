@@ -7,20 +7,24 @@ using System.IO;
 
 namespace CsmForAsml.Tools {
     public class CreateToolInventoryExcel : ICreateExcelFile<ToolInventory> {
-        private readonly CreateExcel _crExcel = new CreateExcel();
+        private readonly IExcelUtil _crExcel;
 
         /// <summary>
         /// デフォールトのコンストラクタ
         /// </summary>
         /*
-        public CreateToolInventoryExcel(CreateExcel crExcel) {
-            _crExcel = crExcel;
+        public CreateToolInventoryExcel() {
+            _crExcel = new ExcelUtility();
         }
         */
+        public CreateToolInventoryExcel(IExcelUtil crExcel) {
+            _crExcel = crExcel;
+        }
+        
         public async Task<MemoryStream> GetExcelStream(IEnumerable<ToolInventory> tools) {
 
             //using (CreateExcel _crExcel = new CreateExcel()) {
-            CreateExcel _crExcel = new CreateExcel();
+
             Dictionary<string, Int32> sharedStringDic = new Dictionary<string, int>();
             const string overdue = "OverDue";
             const string dueThisMonth = "DueTM";

@@ -36,6 +36,7 @@ namespace CsmForAsml {
 
             AppSettings = Configuration.GetSection("ConnectionStrings").GetChildren().ToDictionary(x => x.Key, x => x.Value);
 
+            services.AddScoped<IExcelUtil, ExcelUtility>();
             services.AddSingleton<CsmForAsml2Context, CsmForAsml2Context>();
             services.AddScoped<ICreateExcelFile<ToolInventory>, CreateToolInventoryExcel>();
             services.AddScoped<ICreateExcelFile<CalInProcess>, CreateCalInProcessExcel>();

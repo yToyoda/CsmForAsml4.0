@@ -24,12 +24,12 @@ namespace CsmForAsml.Tools {
     /// <para>EndRow() をコール後は対象セルは、一つ下の行の Column A となる。</para>
     /// <para>最後のデータ行を追加し終えたら、GetExcelFile で、ExcelFile のストリームを取得できる。</para>
     /// </remarks>
-    public class CreateExcel {
+    public class ExcelUtility :IExcelUtil{
         /// <summary>
         /// デフォールトコンストラクタ
         /// </summary>
-        public CreateExcel() {
-            StartLine = 2;
+        public ExcelUtility() {
+            //StartLine = 2;
         }
         /// <summary>
         /// Excel Fileの何行目からデータを記入するかを指定する。　デフォールトは 2 (2行目から)
@@ -368,12 +368,7 @@ namespace CsmForAsml.Tools {
             }
         }
 
-        /// <summary>
-        /// ExcelUtilsのリソースを廃棄する
-        /// </summary>
-        public void Dispose() {
-            Dispose(true);
-        }
+       
 
         /// <summary>
         /// ExcelUtilsのリソースを廃棄する

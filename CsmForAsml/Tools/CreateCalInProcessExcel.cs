@@ -18,15 +18,18 @@ namespace CsmForAsml.Tools {
     /// この version では、テンプレートは "EquipmentList_TemplateVer03.xlsx"のシート"Sheet1"を使用することを前提としている    
     /// </remarks>
     public class CreateCalInProcessExcel :ICreateExcelFile<CalInProcess>{
-        private readonly CreateExcel _crExcel ;
+        private readonly IExcelUtil _crExcel ;
 
         public CreateCalInProcessExcel() {
-            _crExcel = new CreateExcel();
+            _crExcel = new ExcelUtility();
+        }
+        public CreateCalInProcessExcel(IExcelUtil excelUtil) {
+            _crExcel = excelUtil;
         }
 
         public async Task<MemoryStream> GetExcelStream(IEnumerable<CalInProcess> entries) {
             // using (CreateExcel _crExcel = new CreateExcel()) {
-            CreateExcel _crExcel = new CreateExcel();
+
             Dictionary<string, Int32> sharedStringDic = new Dictionary<string, int>();
             const string excelTemplate = "CalInProcessTemplateVer05.xlsx";
             const string sheetname = "Sheet1";
