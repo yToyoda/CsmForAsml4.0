@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using CsmForAsml.Models;
 using CsmForAsml.Hubs;
+using CsmForAsml.Tools;
 
 namespace CsmForAsml {
     public class Startup {
@@ -36,6 +37,7 @@ namespace CsmForAsml {
             AppSettings = Configuration.GetSection("ConnectionStrings").GetChildren().ToDictionary(x => x.Key, x => x.Value);
 
             services.AddSingleton<CsmForAsml2Context, CsmForAsml2Context>();
+           
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSignalR();
