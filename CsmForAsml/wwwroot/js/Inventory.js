@@ -31,6 +31,8 @@ $(function () {  //main of slickgrid
     let selectListReloadLevel = 0;
     let headerRowInputIds = [];
     let host = window.location.protocol + "//" + window.location.host;
+    let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
+    let this_connectionId;
  
 
     let filterValues = {
@@ -40,7 +42,18 @@ $(function () {  //main of slickgrid
         dateTo: [null, null, null, null],
     };
 
+    connection.start().then(function () {
+        console.log('Now connected, connection ID=' + connection.connectionId);
+        this_connectionId = connection.connectionId
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
 
+    connection.on("ExcelFinished", function (filename) {
+        console.log('ExcelFile Created File name =' + filename);
+        let url = "ToolInventories/ShowExcel?Filename=" + filename;
+        window.open(url, "ExcelWindow");
+    });
 
     const myFilter = function (item, args) {
         let datenames = ["CalDue", "LatestCalDate", "SafetyDue", "LatestSafetyDate"];
@@ -459,6 +472,22 @@ $(function () {  //main of slickgrid
         updateFilter();
     });
 
+    // fnkey1 Download to Excel 
+    $('#fnkey1').click(function () {
+        let totalNumber = data.length;
+        let arow;
+        let serialNumberList = [];
+        copyselection();
+        for (let i = 0; i < totalNumber; i += 1) {
+            arow = dataView.getItemByIdx(i);
+            if (arow.sel) {
+                serialNumberList.push(arow.SerialNumber);
+            }
+        };
+        postEqList("/ToolInventories/Download", serialNumberList)
+    });
+
+
     // fnkey4  Move to Incal
     $('#fnkey4').click(function () {
         let totalNumber = data.length;
@@ -496,8 +525,10 @@ $(function () {  //main of slickgrid
 
     const postEqList = function (urlto, serialNumbers) {
         //let ser = ["123456", "234567", "345678", "456789"];
-        let post_data = { SerialNums: serialNumbers };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
-                                               // そうしないと、C#側で受け取りのパラメータに null が渡る
+        let post_data = { connectionId: this_connectionId,
+                            SerialNums: serialNumbers
+        };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+             // そうしないと、C#側で受け取りのパラメータに null が渡る
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
                 
         $.ajax({          

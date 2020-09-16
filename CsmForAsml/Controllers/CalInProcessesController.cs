@@ -150,32 +150,21 @@ namespace CsmForAsml.Controllers
         /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetData() {
-
-
             var cals = await _calInProRepo.GetAllRecordsAsync();
-
-
-
             List<CalInProcess> ans = new List<CalInProcess>();
-
             await GetNotMappedFields(cals, ans);
-
             var serializeOptions = new JsonSerializerOptions {
                 //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNamingPolicy = null,
                 WriteIndented = true
             };
             serializeOptions.Converters.Add(new DateTimeConverter());
-
             return Json(ans, serializeOptions);
-
         }
 
         private async Task GetNotMappedFields(IEnumerable<CalInProcess> cals, List<CalInProcess> ans) {
 
             var locations = await _context.LocationRepository.GetAllRecordsAsync();
-            var _materiapRepo = _context.MaterialNeedCalRepository;
-            var _inventoryRepo = _context.ToolInventoryRepository;
             var materials = await _context.MaterialNeedCalRepository.GetAllRecordsAsync();
             var inventories = await _context.ToolInventoryRepository.GetAllRecordsAsync();
 
@@ -221,8 +210,8 @@ namespace CsmForAsml.Controllers
             List<CalInProcess> ans = new List<CalInProcess>();
             await GetNotMappedFields(cals, ans);
 
-            var createExcel = new CreateExcelFile();
-            MemoryStream ms  = await createExcel.GetCalInProcessExcelFileStream(ans);           
+            var createExcel = new CreateCalInProcessExcel();
+            MemoryStream ms  = await createExcel.GetExcelStream(ans);           
             string filename = "CalInProcess_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
 
             if (Startup.AppSettings["StorageProvider"] == "localfile") {
@@ -249,6 +238,8 @@ namespace CsmForAsml.Controllers
             // notify to client by SignalR
             await _hubContext.Clients.Client(clientId).SendAsync("ExcelFinished", filename);
             return new EmptyResult();
+            //string kind = "application/octet-stream";
+            //return File(ms.ToArray(), kind, filename);
         }
 
 

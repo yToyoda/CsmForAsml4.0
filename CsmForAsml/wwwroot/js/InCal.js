@@ -17,23 +17,6 @@ connection.on("ExcelFinished", function (filename) {
     window.open(url, "ExcelWindow");
 });
 
-const GetWithId = function (urlto, idstring) {
-    let url = urlto + "?Filename=" + idstring
-    $.ajax({
-        type: 'GET',
-        url: url,
-        data: {},
-        processData: false,
-        contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
-        error: function () {
-            console.error("Error sending 'GET' to " + url);
-        },
-        complete: function () {
-            console.log("GET requested to " + url);
-        }
-    });
-}
-
 jQuery.browser = {};
 (function () {
     jQuery.browser.msie = false;
@@ -582,7 +565,7 @@ $(function () {
             }
         };
         postEqList("/CalInProcesses/Download", idNumberList)
-
+        // window.open("", "ExcelWindow");
     });
 
 
