@@ -110,6 +110,18 @@ namespace CsmForAsml.Models {
             }
         }
 
+        public CalInProcess GetLatestRecords(Func<CalInProcess, bool> predicate) {
+            var all = _db.CalInProcess.Where(predicate);
+            CalInProcess latest = null;
+            foreach (var x in all) {
+                if (latest == null || x.RegisteredDate > latest.RegisteredDate) {
+                    latest = x;
+                }
+            }
+            return latest;
+        }
+
+
         /// <summary>
         /// 使用しているリソースを廃棄する
         /// </summary>

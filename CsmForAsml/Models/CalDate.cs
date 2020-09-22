@@ -1,4 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
 
 namespace CsmForAsml.Models
@@ -12,5 +15,14 @@ namespace CsmForAsml.Models
         public string PdfFileName { get; set; }
         public string Comment { get; set; }
         public bool? IsCal { get; set; }
+
+        [DisplayName("Cal/Safety")]
+        [NotMapped]
+        public string KindOfCal { get; set; }
+        
+        [DisplayName("URL")]
+        [DataType(DataType.Url)]
+        [NotMapped]
+        public string urlToFile { get; set; }
     }
 }

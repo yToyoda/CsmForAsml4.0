@@ -16,6 +16,10 @@ using CsmForAsml.Models;
 using CsmForAsml.Hubs;
 using CsmForAsml.Tools;
 using Microsoft.CodeAnalysis.Operations;
+using System.Runtime.CompilerServices;
+using System.Reflection.Metadata;
+
+using Microsoft.AspNetCore.Razor.Language.Intermediate;
 
 namespace CsmForAsml.Controllers {
     public class ToolInventoriesController : Controller {
@@ -24,8 +28,8 @@ namespace CsmForAsml.Controllers {
         private readonly IHubContext<CsmHub> _hubContext;
         private readonly ICreateExcelFile<ToolInventory> _crExcel;
 
-        public ToolInventoriesController(CsmForAsml2Context context, 
-                                         IHubContext<CsmHub> hubcontext, 
+        public ToolInventoriesController(CsmForAsml2Context context,
+                                         IHubContext<CsmHub> hubcontext,
                                          ICreateExcelFile<ToolInventory> crExcel) {
             _context = context;
             _toolRepo = context.ToolInventoryRepository;
@@ -164,20 +168,75 @@ namespace CsmForAsml.Controllers {
         /// //  public ActionResult MoveToIncal(SerialNumList serialNumList)
         /// // public ActionResult MoveToIncal( [Bind("serialNumbers")] string[] serialNumbers) {
         /// //　[ValidateAntiForgeryToken]
-
-
         [HttpPost]
-        public ActionResult MoveToIncal([FromBody] SerialNumList serial) {
+        public ActionResult MoveToIncal([FromBody] SerialAndFlagList serial) {
+            const double warningLevel = 0.5;
+            const double daysInYear = 365.25;
+            ToolInventoryRepository tir = _context.ToolInventoryRepository;
+            MaterialNeedCalRepository mncr = _context.MaterialNeedCalRepository;
+            CalInProcessRepository cipr = _context.CalInProcessRepository;
+            CalDateRepository cdr = _context.CalDateRepository;
+            List<CalStat> calstatlist = new List<CalStat>();
             
-            var x = serial.ToString();
+            for (int i = 0; i<serial.SerialNums.Count; ++i) { 
+            //foreach (var num in serial.SerialNums) {
 
-            return Json(serial.ToString());
+                CalStat stat = new CalStat();
+                stat.SerialNumber = serial.SerialNums[i];
+                calstatlist.Add(stat);
+
+                if (serial.NoCheckFlags[i]) {
+                    MoveToInCal(stat.SerialNumber);
+                    stat.MoveToIncal = true;                
+                    break;
+                }
+
+                var cip = cipr.GetLatestRecords(ci => ci.SerialNumber == stat.SerialNumber);
+                if (cip!=null && (cip.CalDate == null || cip.VenShipDate ==null) ) {
+                    stat.MoveToIncal = false;
+                    stat.CommentToUser = "この Serial Number は既に Cal In Process に登録されて校正を待っています。";
+                    break;
+                }
+
+                var inventory = tir.GetRecords(s => s.SerialNumber == stat.SerialNumber).LastOrDefault();
+                var material = mncr.GetRecords(m => m.Material == inventory.Material).LastOrDefault();
+                int calInterval = material.CalInterval ?? 12;
+                int calIntervalInDays = (int)(daysInYear * calInterval / 12.0);
+
+                stat.LatestCalDate = cdr.GetLatestCalDate(stat.SerialNumber);                
+                if (stat.LatestCalDate != null) {
+                    int days = AppResources.JSTNow.Subtract((DateTime)stat.LatestCalDate).Days;
+                    if (days < calIntervalInDays * warningLevel) {
+                        stat.MoveToIncal = false;
+                        stat.CommentToUser = $"この Serial Number の最新校正日からまだ {days} 日しか経っていません。再度校正しますか?";
+                        break;
+                    }
+                }
+                MoveToInCal(stat.SerialNumber);
+                stat.MoveToIncal = true;                 
+            }
+
+            var serializeOptions = new JsonSerializerOptions {
+                //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNamingPolicy = null,
+                WriteIndented = true
+            };
+
+            return Json(calstatlist,serializeOptions);
+        }
+
+        private void MoveToInCal(string serialNumber) {
+            CalInProcessRepository cipr = _context.CalInProcessRepository;
+            CalInProcess entry = new CalInProcess();
+            entry.SerialNumber = serialNumber;
+            entry.RegisteredDate = AppResources.JSTNow;
+            cipr.AddRecord(entry);
         }
 
         [HttpPost]
-        public async Task< ActionResult> Download([FromBody] SerialNumList serial) {
+        public async Task<ActionResult> Download([FromBody] SerialNumList serial) {
 
-    
+
 
             string clientId = serial.connectionId;
             HttpContext.Session.SetString("ExcelFilename", "");
@@ -185,9 +244,9 @@ namespace CsmForAsml.Controllers {
             var allToolInv = await _toolRepo.GetAllRecordsAsync();
 
             var tools = from e in allToolInv
-                       join n in serial.SerialNums
-                       on e.SerialNumber equals n
-                       select e;
+                        join n in serial.SerialNums
+                        on e.SerialNumber equals n
+                        select e;
 
             List<ToolInventory> ans = new List<ToolInventory>();
             await GetNotMappedFieldsToolInv(tools, ans);
@@ -215,7 +274,7 @@ namespace CsmForAsml.Controllers {
                 await blockBlob.UploadFromStreamAsync(ms);
             }
             // notify to client by SignalR
-            if (! String.IsNullOrEmpty (clientId )) {
+            if (!String.IsNullOrEmpty(clientId)) {
                 await _hubContext.Clients.Client(clientId).SendAsync("ExcelFinished", filename);
             } else {
                 throw new Exception("Connection ID is empty");
@@ -233,7 +292,7 @@ namespace CsmForAsml.Controllers {
             var res = from i in tools
                       join m in materials on i.Material equals m.Material
                       join loc in locations on i.Plant equals loc.Plant
-                      select new { Inv = i, Mat = m , Loc = loc};
+                      select new { Inv = i, Mat = m, Loc = loc };
 
             foreach (var r in res) {
                 r.Inv.CalPlace = r.Mat.CalPlace;
@@ -295,5 +354,27 @@ namespace CsmForAsml.Controllers {
         /// </summary>
         public List<string> SerialNums { get; set; }
         public string connectionId { get; set; }
+    }
+
+    public class SerialAndFlag {
+        public string SerialNumber;
+        public bool NoCheckFlag;
+    }
+    public class SerialAndFlagList {
+        /// <summary>
+        /// 管理番号のリスト
+        /// </summary>
+        public string ConnectionId { get; set; }
+        public List<string> SerialNums { get; set; }
+        public List<bool> NoCheckFlags { get; set; }
+    
+    }
+
+    public class CalStat {
+        public string SerialNumber { get; set; }
+        public bool InInCal { get; set; }
+        public DateTime? LatestCalDate { get; set; }
+        public bool MoveToIncal {get;set;}
+        public string CommentToUser { get; set; }
     }
 }

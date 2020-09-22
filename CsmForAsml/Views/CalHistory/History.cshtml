@@ -1,0 +1,61 @@
+﻿@model IEnumerable<CsmForAsml.Models.CalDate>
+
+@{
+    ViewData["Title"] = "History";
+}
+
+<h1>History of Serial Number = @ViewData["Serial"]</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Serial)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CalDate1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CalStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PdfFileName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.KindOfCal)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Serial)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CalDate1)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CalStatus)
+                </td>
+                <td>
+                    <!-- @Html.DisplayFor(modelItem=> item.urlToFile) -->
+                    <a href="@item.urlToFile" target="_blank" name="@item.PdfFileName">@item.PdfFileName</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KindOfCal)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

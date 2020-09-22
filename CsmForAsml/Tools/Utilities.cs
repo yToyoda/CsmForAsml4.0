@@ -76,6 +76,7 @@ namespace CsmForAsml.Tools {
                 return jst;
             }
         }
+
     }
     public static class RoleNames {
         public static string Admin { get; } = "Administrator";

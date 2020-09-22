@@ -493,14 +493,16 @@ $(function () {  //main of slickgrid
         let totalNumber = data.length;
         let arow;
         let serialNumberList = [];
+        let nocheckflaglist = [];
         copyselection();
         for (let i = 0; i < totalNumber; i += 1) {
             arow = dataView.getItemByIdx(i);
             if (arow.sel) {
                 serialNumberList.push(arow.SerialNumber);
+                nocheckflaglist.push(false);
             }
         };
-        postEqList("/ToolInventories/MoveToIncal", serialNumberList)
+        postEqList("/ToolInventories/MoveToIncal", serialNumberList, nocheckflaglist)
     });
 
     const checkDuedate = function (ardata) {
@@ -523,10 +525,10 @@ $(function () {  //main of slickgrid
         }
     }
 
-    const postEqList = function (urlto, serialNumbers) {
-        //let ser = ["123456", "234567", "345678", "456789"];
-        let post_data = { connectionId: this_connectionId,
-                            SerialNums: serialNumbers
+    const postEqList = function (urlto, serialNumbers, nocheckflags) {
+        let post_data = { ConnectionId: this_connectionId,
+                            SerialNums: serialNumbers,
+                            NoCheckFlags : nocheckflags
         };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
              // そうしないと、C#側で受け取りのパラメータに null が渡る
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
@@ -542,6 +544,7 @@ $(function () {  //main of slickgrid
             },
             complete: function (data) {
                 // timer1 = setInterval(getStatus, 500);
+                .0var x = data;
             }
         });
     }
