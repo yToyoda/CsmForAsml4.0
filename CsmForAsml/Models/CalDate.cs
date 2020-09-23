@@ -12,6 +12,8 @@ namespace CsmForAsml.Models
         public string Serial { get; set; }
         public DateTime CalDate1 { get; set; }
         public string CalStatus { get; set; }
+        
+        [DisplayName("Attached Files")]
         public string PdfFileName { get; set; }
         public string Comment { get; set; }
         public bool? IsCal { get; set; }

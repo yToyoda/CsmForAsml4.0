@@ -4,7 +4,8 @@
     ViewData["Title"] = "History";
 }
 
-<h1>History of Serial Number = @ViewData["Serial"]</h1>
+<h1>Serial Number: @ViewData["Serial"]  </h1>
+<h3>Cal History</h3>
 
 <table class="table">
     <thead>
@@ -20,6 +21,7 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PdfFileName)
+                <!-- @Html.DisplayNameFor(model => model.urlToFile) -->
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Comment)
@@ -43,8 +45,9 @@
                     @Html.DisplayFor(modelItem => item.CalStatus)
                 </td>
                 <td>
-                    <!-- @Html.DisplayFor(modelItem=> item.urlToFile) -->
-                    <a href="@item.urlToFile" target="_blank" name="@item.PdfFileName">@item.PdfFileName</a>
+                    <!--  @Html.DisplayFor(modelItem=> item.urlToFile) <<- URLがすべて見えるので好ましくない　-->
+                    <!--　<a href="@item.urlToFile" target="_blank" name="@item.PdfFileName">@item.PdfFileName</a>　-->
+                    @Html.ActionLink(item.PdfFileName, "ShowPdf", "CalHistory", new { id = item.PdfFileName }, null)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Comment)

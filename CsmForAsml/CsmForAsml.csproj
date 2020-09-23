@@ -29,6 +29,8 @@
 
   <ItemGroup>
     <Content Remove="bundleconfig.json" />
+    <Content Remove="Views\CalHistory\Create.cshtml" />
+    <Content Remove="Views\CalHistory\Edit.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,7 +4,7 @@
     "inputFiles": [
       "wwwroot/lib/bootstrap/dist/css/bootstrap.min.css",
       "wwwroot/lib/jquery-ui-1.12.1/jquery-ui.min.css",
-      "wwwroot/lib/slickgrid/slick.grid.css",
+      "wwwroot/css/slick.grid.css",
       "wwwroot/lib/slickgrid/controls/slick.columnpicker.css",
       "wwwroot/css/site.css",
       "wwwroot/css/csm.css"

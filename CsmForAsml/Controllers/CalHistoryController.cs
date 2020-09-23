@@ -4,19 +4,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using SysIO = System.IO;
+
 using CsmForAsml.Models;
 using CsmForAsml.Tools;
+using CsmForAsml.Hubs;
+using System.IO;
 
 namespace CsmForAsml.Controllers
 {
     public class CalHistoryController : Controller
     {
         private readonly CsmForAsml2Context _context;
+        private readonly IHubContext<CsmHub> _hubContext;
 
-        public CalHistoryController(CsmForAsml2Context context)
+        public CalHistoryController(CsmForAsml2Context context, IHubContext<CsmHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         // GET: CalHistory
@@ -24,23 +33,72 @@ namespace CsmForAsml.Controllers
         {
             return View(await _context.CalDate.ToListAsync());
         }
-        public IActionResult History(string Serial) {
-            string ser = "J0251";
+        public async Task<IActionResult> History(string id, string ConId) {
+            string ser = id;
+            //string ser = "J0251";
             ViewData["Serial"] = ser;
             string prefix = Startup.AppSettings["AzureUrlPrefix"];
             string container = Startup.AppSettings["CalCertContainer"];
             var history = _context.CalDateRepository.GetRecords(r => r.Serial == ser);
             foreach (var entry in history) {
                 entry.KindOfCal = "";
-                if (entry.IsCal == true) { entry.KindOfCal = "CAL"; }
+                if (entry.IsCal == true) { entry.KindOfCal = "Cal"; }
                 else if (entry.IsCal == false ) { entry.KindOfCal = "Safety"; }
                 string filename = entry.PdfFileName;
-                if (!String.IsNullOrWhiteSpace(filename)) {
+                if (!string.IsNullOrWhiteSpace(filename)) {
                     string folder = AppResources.GetCalCertFolder(filename);
                    entry.urlToFile = $"{prefix}{container}/{folder}/{filename}";
+                } else {
+                    entry.PdfFileName = "";
                 }
             }
+            await _hubContext.Clients.Client(ConId).SendAsync("HistoryFinished");
             return View(history);
+        }
+
+        public async Task<IActionResult> LatestCalCert(string id, string ConId) {
+            string ser = id;
+            var all = _context.CalDateRepository.GetRecords(r => r.Serial == ser);
+            string filename = null;
+            foreach (var e in all) {
+                if (!string.IsNullOrWhiteSpace(e.PdfFileName)) {
+                    filename = e.PdfFileName;
+                    break;
+                }
+            }
+            MemoryStream ms = new MemoryStream();
+            if (filename == null) {
+                return File(ms.ToArray(), "Application/pdf", "NotFound");
+            }
+
+            string connectionstring = Startup.AppSettings["AzureBlob"];
+            string containerName = Startup.AppSettings["CalCertContainer"];
+            string folder = AppResources.GetCalCertFolder(filename);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionstring);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder + @"/" + filename);
+            
+            await blockBlob.DownloadToStreamAsync(ms);
+            string ty = "application/pdf";
+            return File(ms.ToArray(), ty, filename);
+        }
+
+
+
+        public async Task<IActionResult> ShowPdf(string id) {
+            string filename = id;
+            string connectionstring = Startup.AppSettings["AzureBlob"];
+            string containerName = Startup.AppSettings["CalCertContainer"];
+            string folder = AppResources.GetCalCertFolder(filename);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionstring);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
+            CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder+@"/"+filename);
+            MemoryStream ms = new MemoryStream();
+            await blockBlob.DownloadToStreamAsync(ms);
+            string ty = "application/pdf";
+            return File(ms.ToArray(),ty,filename);
         }
 
         // GET: CalHistory/Details/5
@@ -61,91 +119,15 @@ namespace CsmForAsml.Controllers
             return View(calDate);
         }
 
-        // GET: CalHistory/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: CalHistory/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Serial,CalDate1,CalStatus,PdfFileName,Comment,IsCal")] CalDate calDate)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(calDate);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(calDate);
-        }
-
-        // GET: CalHistory/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var calDate = await _context.CalDate.FindAsync(id);
-            if (calDate == null)
-            {
-                return NotFound();
-            }
-            return View(calDate);
-        }
-
-        // POST: CalHistory/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Serial,CalDate1,CalStatus,PdfFileName,Comment,IsCal")] CalDate calDate)
-        {
-            if (id != calDate.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(calDate);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CalDateExists(calDate.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(calDate);
-        }
-
         // GET: CalHistory/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Delete(int? id) {
+            if (id == null) {
                 return NotFound();
             }
 
             var calDate = await _context.CalDate
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (calDate == null)
-            {
+            if (calDate == null) {
                 return NotFound();
             }
 
@@ -155,13 +137,14 @@ namespace CsmForAsml.Controllers
         // POST: CalHistory/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
+        public async Task<IActionResult> DeleteConfirmed(int id) {
             var calDate = await _context.CalDate.FindAsync(id);
             _context.CalDate.Remove(calDate);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
 
         private bool CalDateExists(int id)
         {

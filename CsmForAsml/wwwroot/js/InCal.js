@@ -3,6 +3,8 @@ if (!jQuery) { throw new Error("csm4.0 script requires jQuery") }
 
 let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
 let this_connectionId;
+let serialList;
+let host = window.location.protocol + "//" + window.location.host;
 
 connection.start().then(function () {
     console.log('Now connected, connection ID=' + connection.connectionId);
@@ -15,6 +17,15 @@ connection.on("ExcelFinished", function (filename) {
     console.log('ExcelFile Created File name =' + filename);
     let url = "CalInProcesses/ShowExcel?Filename=" + filename;    
     window.open(url, "ExcelWindow");
+});
+
+connection.on("HistoryFinished", function () {
+    /*
+    if (serialList.length > 0) {
+        let ser = serialList.pop();
+        window.open(host + "/CalHistory/History/" + ser + "?ConId=" + this_connectionId);        
+    }
+    */
 });
 
 jQuery.browser = {};
@@ -53,7 +64,7 @@ $(function () {
     let headerRowInputIds = [];
     let dlprIndex, dlprDate;       //return value from dialog pannel
     let dlprCalResult, dlprComment; //return value from dialog pannel
-    
+    let currentSelectedRow = null;
     let filterValues = {
         texts: {},
         selection: null,
@@ -568,13 +579,44 @@ $(function () {
         // window.open("", "ExcelWindow");
     });
 
-
+    
     $('#fnkey2').click(function () {
+        //<button id="fnkey2">Cal History</button>
+        let arow;
+
+        if (currentSelectedRow != null) {
+            arow = grid.getDataItem(currentSelectedRow);
+            window.open(host + "/CalHistory/History/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            return;
+        }
+        return;
+        let totalNumber = data.length;
+        
+        serialList = [];
+        copyselection();
+        for (let i = 0; i < totalNumber; i += 1) {
+            arow = dataView.getItemByIdx(i);
+            if (arow.sel) {
+                serialList.push(arow.SerialNumber)
+            }
+        };
+        if (serialList.length > 0) {
+            let ser = serialList.pop();
+            window.open(host + "/CalHistory/History/" + ser + "?ConId=" + this_connectionId);
+        }        
     });
-
-
+    // "HistoryFinished"
     $('#fnkey3').click(function () {
+        //<button id="fnkey3">Latest Cal Cert</button>
+        let arow;
+        if (currentSelectedRow != null) {
+            arow = grid.getDataItem(currentSelectedRow);
+            window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            return;
+        }
+        return;
     });
+
 
     const postEqList = function (urlto, idNumbers) {        
         let post_data = { connectionId: this_connectionId,
@@ -782,6 +824,9 @@ $(function () {
     grid = new Slick.Grid("#myGrid", dataView, columns, options);
     grid.setSelectionModel(new Slick.RowSelectionModel({ selectActiveRow: false }));
     grid.registerPlugin(checkboxSelector);
+    grid.onClick.subscribe(function (e, args) {
+        currentSelectedRow = args.row
+    });
 
     grid.onHeaderRowCellRendered.subscribe(function (e, args) {
         let columnId = args.column.id;
@@ -836,7 +881,7 @@ $(function () {
         grid.render();
     });
 
-    let host = window.location.protocol + "//" + window.location.host;
+    
 
     $.get(host + "/CalInProcesses/GetData").then(
         function (ans) {

@@ -1,2 +1,7 @@
 ﻿2020/09/06   BuildBundlerMinifier NuGet パッケージを追加インストールした　　Bundle と Minification を有効にするため
+2020/09/23   残り(Demo Version への)
+	ToolInventory   - move to InCal  仕上げ
+	CalInProcess    - Product Info
+		            - 日付入力の仕上げ
+
 

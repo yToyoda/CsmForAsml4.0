@@ -33,7 +33,8 @@ $(function () {  //main of slickgrid
     let host = window.location.protocol + "//" + window.location.host;
     let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
     let this_connectionId;
- 
+    let serialList;
+    let currentSelectedRow = null; 
 
     let filterValues = {
         texts: {},
@@ -53,6 +54,10 @@ $(function () {  //main of slickgrid
         console.log('ExcelFile Created File name =' + filename);
         let url = "ToolInventories/ShowExcel?Filename=" + filename;
         window.open(url, "ExcelWindow");
+    });
+
+    connection.on("HistoryFinished", function (filename) {
+        // do nothing
     });
 
     const myFilter = function (item, args) {
@@ -487,6 +492,42 @@ $(function () {  //main of slickgrid
         postEqList("/ToolInventories/Download", serialNumberList)
     });
 
+    $('#fnkey2').click(function () {
+        //<button id="fnkey2">Cal History</button>
+        let arow;
+        if (currentSelectedRow != null) {
+            arow = grid.getDataItem(currentSelectedRow);
+            window.open(host + "/CalHistory/History/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            return;
+        }
+        return;
+            // "HistoryFinished"
+        let totalNumber = data.length;
+        serialList = [];
+        copyselection();
+        for (let i = 0; i < totalNumber; i += 1) {
+            arow = dataView.getItemByIdx(i);
+            if (arow.sel) {
+                serialList.push(arow.SerialNumber)
+            }
+        };
+        if (serialList.length > 0) {
+            let ser = serialList.pop();
+            window.open(host + "/CalHistory/History/" + ser + "?ConId=" + this_connectionId);
+        }
+    });
+
+
+    $('#fnkey3').click(function () {
+        //<button id="fnkey3">Latest Cal Cert</button>
+        let arow;
+        if (currentSelectedRow != null) {
+            arow = grid.getDataItem(currentSelectedRow);
+            window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            return;
+        }
+        return;
+    });
 
     // fnkey4  Move to Incal
     $('#fnkey4').click(function () {
@@ -544,7 +585,7 @@ $(function () {  //main of slickgrid
             },
             complete: function (data) {
                 // timer1 = setInterval(getStatus, 500);
-                .0var x = data;
+                x = data;
             }
         });
     }
@@ -616,6 +657,11 @@ $(function () {  //main of slickgrid
     grid = new Slick.Grid("#myGrid", dataView, columns, options);
     grid.setSelectionModel(new Slick.RowSelectionModel({ selectActiveRow: false }));
     grid.registerPlugin(checkboxSelector);
+
+    grid.onClick.subscribe(function (e, args) {
+        // debugger;
+        currentSelectedRow = args.row
+    });
 
     grid.onHeaderRowCellRendered.subscribe(function (e, args) {
         let columnId = args.column.id;
