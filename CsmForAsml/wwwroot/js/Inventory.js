@@ -60,6 +60,14 @@ $(function () {  //main of slickgrid
         // do nothing
     });
 
+    connection.on("LatestCalCert", function (filename) {
+        if (filename === null || filename === "") {
+            alert("保存されている校正証明書はありませんでした");
+        } else {
+            window.open(host + "/CalHistory/ShowPdf/" + filename);
+        }
+    });
+
     const myFilter = function (item, args) {
         let datenames = ["CalDue", "LatestCalDate", "SafetyDue", "LatestSafetyDate"];
         // by selection
@@ -523,7 +531,8 @@ $(function () {  //main of slickgrid
         let arow;
         if (currentSelectedRow != null) {
             arow = grid.getDataItem(currentSelectedRow);
-            window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            //window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            $.get(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
             return;
         }
         return;

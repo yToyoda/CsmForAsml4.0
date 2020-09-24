@@ -1,32 +1,4 @@
 if (!jQuery) { throw new Error("csm4.0 script requires jQuery") }
-"use strict";
-
-let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
-let this_connectionId;
-let serialList;
-let host = window.location.protocol + "//" + window.location.host;
-
-connection.start().then(function () {
-    console.log('Now connected, connection ID=' + connection.connectionId);
-    this_connectionId = connection.connectionId 
-}).catch(function (err) {
-    return console.error(err.toString());
-});
-
-connection.on("ExcelFinished", function (filename) {
-    console.log('ExcelFile Created File name =' + filename);
-    let url = "CalInProcesses/ShowExcel?Filename=" + filename;    
-    window.open(url, "ExcelWindow");
-});
-
-connection.on("HistoryFinished", function () {
-    /*
-    if (serialList.length > 0) {
-        let ser = serialList.pop();
-        window.open(host + "/CalHistory/History/" + ser + "?ConId=" + this_connectionId);        
-    }
-    */
-});
 
 jQuery.browser = {};
 (function () {
@@ -62,9 +34,14 @@ $(function () {
     let options;
     let selectListReloadLevel = 0;
     let headerRowInputIds = [];
+    let host = window.location.protocol + "//" + window.location.host;
+    let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
+    let this_connectionId;
+    let serialList;
+    let currentSelectedRow = null;
+
     let dlprIndex, dlprDate;       //return value from dialog pannel
     let dlprCalResult, dlprComment; //return value from dialog pannel
-    let currentSelectedRow = null;
     let filterValues = {
         texts: {},
         selection: null,
@@ -76,7 +53,28 @@ $(function () {
 
     let returnDate, returnId;
 
-   
+
+    connection.start().then(function () {
+        console.log('Now connected, connection ID=' + connection.connectionId);
+        this_connectionId = connection.connectionId
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    connection.on("ExcelFinished", function (filename) {
+        console.log('ExcelFile Created File name =' + filename);
+        let url = "CalInProcesses/ShowExcel?Filename=" + filename;
+        window.open(url, "ExcelWindow");
+    });    
+
+    connection.on("LatestCalCert", function (filename) {
+        if (filename === null || filename === "") {
+                alert("保存されている校正証明書はありませんでした");
+        }　else {        
+            window.open(host+"/CalHistory/ShowPdf/"+filename );
+        }
+    });
+
 
     let stage;
 
@@ -176,15 +174,15 @@ $(function () {
         }
         // text filters        
         for (let columnId in args.texts) {
-            if ( (columnId ) && (args.texts[columnId])) {
+            if ((columnId) && (args.texts[columnId])) {
                 let val = item[columnId];  // in order to this statement work, keep 'id:' is equal to 'field:' in column definition
-                if ( !Boolean(val)  || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
+                if (!Boolean(val) || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
                     return false;
                 }
             }
         }
         // date filters
-      
+
         let datestr = item[datenames[args.dateIndex]];
         if (args.dateUndef) {
             if (datestr !== undefined && datestr !== null && datestr !== "") { return false; }
@@ -195,7 +193,7 @@ $(function () {
             if (args.dateTo !== null && (!(datestr) || moment(datestr, "YYYY/MM/DD").isAfter(args.dateTo, "day"))) {
                 return false;
             }
-        }      
+        }
         return true;
     };
 
@@ -287,7 +285,7 @@ $(function () {
             plantList[aRow.Plant] = true;
             calPlaceList[aRow.CalPlace] = true;
             materialList[aRow.Material] = true;
-            serialList[aRow.SerialNumber] = true; 
+            serialList[aRow.SerialNumber] = true;
         }
 
         if (selectListReloadLevel === 0) {
@@ -572,14 +570,14 @@ $(function () {
             arow = dataView.getItemByIdx(i);
             if (arow.sel) {
                 //NumberList.push(String(arow.Id));
-                idNumberList.push( arow.Id);
+                idNumberList.push(arow.Id);
             }
         };
         postEqList("/CalInProcesses/Download", idNumberList)
         // window.open("", "ExcelWindow");
     });
 
-    
+
     $('#fnkey2').click(function () {
         //<button id="fnkey2">Cal History</button>
         let arow;
@@ -591,7 +589,7 @@ $(function () {
         }
         return;
         let totalNumber = data.length;
-        
+
         serialList = [];
         copyselection();
         for (let i = 0; i < totalNumber; i += 1) {
@@ -603,24 +601,28 @@ $(function () {
         if (serialList.length > 0) {
             let ser = serialList.pop();
             window.open(host + "/CalHistory/History/" + ser + "?ConId=" + this_connectionId);
-        }        
+        }
     });
     // "HistoryFinished"
     $('#fnkey3').click(function () {
         //<button id="fnkey3">Latest Cal Cert</button>
         let arow;
+        let stat;
         if (currentSelectedRow != null) {
             arow = grid.getDataItem(currentSelectedRow);
-            window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            //stat = window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            $.get(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+
             return;
         }
         return;
     });
 
 
-    const postEqList = function (urlto, idNumbers) {        
-        let post_data = { connectionId: this_connectionId,
-                            IdNums: idNumbers
+    const postEqList = function (urlto, idNumbers) {
+        let post_data = {
+            connectionId: this_connectionId,
+            IdNums: idNumbers
         };
         // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
         // そうしないと、C#側で受け取りのパラメータに null が渡る
@@ -635,7 +637,7 @@ $(function () {
                 console.error("Error sending Json to " + urlto);
             },
             complete: function () {
-                
+
             }
         });
     }
@@ -702,8 +704,13 @@ $(function () {
         $('#dlpdi2').val(currentRow[`Date${ind}`] || "")
         dlprIndex = ind;
         dialogObj2.dialog('open');
-    }
+    };
+
     $('#fnkey4').click(function () {
+        // <button id="fnkey4">P.Info</button>
+    });
+
+    $('#fnkey5').click(function () {
         // test routine for dataView.getItem(ind);        
         let arow;
         selected = getAllSelectedRows()
@@ -733,11 +740,13 @@ $(function () {
                 }
             }
         }
-
-
         // dialogObj2.dialog('open');
-
     });
+
+    $('#fnkey6').click(function () {
+        //<button id="fnkey6">完了設定</button>
+    });
+
 
     dialogObj2.on('dialogclose', function () {
         // how to update datagrid on slickgrid
@@ -765,9 +774,9 @@ $(function () {
     //columns.push({ id: "Id", name: "Id", field: "Id", width: 40, sortable: true });
     columns.push({ id: "Plant", name: "Plant", field: "Plant", width: 40, resizable: true, sortable: true });
     columns.push({ id: "Location", name: "Location", field: "Location", width: 60, resizable: true, sortable: true });
-    columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", width: 80, resizable: true, sortable: true});
-    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, resizable: true, sortable: true});
-    columns.push({ id: "Description", name: "Description", field: "Description", width: 250, resizable: true, sortable: true});
+    columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", width: 80, resizable: true, sortable: true });
+    columns.push({ id: "Material", name: "Material", field: "Material", width: 120, resizable: true, sortable: true });
+    columns.push({ id: "Description", name: "Description", field: "Description", width: 250, resizable: true, sortable: true });
     //    {id: "CalInt", name: "Cal Interval", field: "CalInt"},
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", resizable: true, sortable: true });
     columns.push({ id: "Date0", name: "登録日", field: "RegisteredDate", resizable: true, sortable: true });
@@ -787,7 +796,7 @@ $(function () {
     columns.push({ id: "PModel", name: "P.Model", field: "PModel", resizable: true, sortable: true });
     columns.push({ id: "PName", name: "P.Name", field: "PName", resizable: true, sortable: true });
     columns.push({ id: "PSN", name: "P.Serial", field: "PSN", resizable: true, sortable: true });
-     
+
     let selectionListPlant = ["JP01", "JP03", "JP04", "JP05", "JP07"];
     let selectionListCalPlaces = ["TOKYO", "MIYAGI"];
 
@@ -806,14 +815,14 @@ $(function () {
         asyncEditorLoading: true,
         forceFitColumns: false,
         enableColumnReorder: true,
-        enableTextSelectionOnCells: true, 
+        enableTextSelectionOnCells: true,
         topPanelHeight: 25,
         showHeaderRow: true,    // この行で表示をオンに
         headerRowHeight: 30,　　//  この行で高さを 30 pixels にする        
         autoHeight: false,
         explicitInitialization: true,
         fullWidthRows: true    // false だと、初期化時に表示されていない Column のフィルター入力が作成されない  
-                               //True だと隠れていても作成されるる
+        //True だと隠れていても作成されるる
     };
 
     headerRowInputIds = [];
@@ -832,14 +841,14 @@ $(function () {
         let columnId = args.column.id;
         if (columnId === "_checkbox_selector") return;
         // if (columnId === "Plant") return;
-        if (columnId === "id" || columnId ==="Finished" ) return;
+        if (columnId === "id" || columnId === "Finished") return;
         if (columnId.indexOf('Date') !== -1) return;
         if (columnId === "CalResult" || columnId === "Tat" || columnId === "CalInterval") return;
         let cell = $(args.node);
         cell.empty();
         let $atr = $(document.createElement("input"))
             .attr("type", "text")
-          //  .attr("id", columnId)
+            //  .attr("id", columnId)
             .data("columnId", columnId)
             // .val(columnFilters[args.column.id])
             .val(filterValues.texts[columnId])
@@ -881,7 +890,7 @@ $(function () {
         grid.render();
     });
 
-    
+
 
     $.get(host + "/CalInProcesses/GetData").then(
         function (ans) {

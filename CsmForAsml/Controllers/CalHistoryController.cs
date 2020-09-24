@@ -33,7 +33,7 @@ namespace CsmForAsml.Controllers
         {
             return View(await _context.CalDate.ToListAsync());
         }
-        public async Task<IActionResult> History(string id, string ConId) {
+        public async Task<IActionResult> History(string id ) {
             string ser = id;
             //string ser = "J0251";
             ViewData["Serial"] = ser;
@@ -52,7 +52,7 @@ namespace CsmForAsml.Controllers
                     entry.PdfFileName = "";
                 }
             }
-            await _hubContext.Clients.Client(ConId).SendAsync("HistoryFinished");
+            //await _hubContext.Clients.Client(ConId).SendAsync("HistoryFinished");
             return View(history);
         }
 
@@ -66,22 +66,34 @@ namespace CsmForAsml.Controllers
                     break;
                 }
             }
-            MemoryStream ms = new MemoryStream();
-            if (filename == null) {
-                return File(ms.ToArray(), "Application/pdf", "NotFound");
-            }
+
+            await _hubContext.Clients.Client(ConId).SendAsync("LatestCalCert",filename);
+
+            return new EmptyResult();
 
             string connectionstring = Startup.AppSettings["AzureBlob"];
             string containerName = Startup.AppSettings["CalCertContainer"];
-            string folder = AppResources.GetCalCertFolder(filename);
+            MemoryStream ms = new MemoryStream();
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionstring);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
-            CloudBlockBlob blockBlob = container.GetBlockBlobReference(folder + @"/" + filename);
-            
+            CloudBlobContainer container;
+            CloudBlockBlob blockBlob;
+
+            if (filename == null) {
+                containerName = "templates";
+                filename = "PdfNotFound.pdf";
+                container = blobClient.GetContainerReference(containerName);
+                blockBlob = container.GetBlockBlobReference(filename);
+            } else {
+                string folder = AppResources.GetCalCertFolder(filename);
+                container = blobClient.GetContainerReference(containerName);
+                blockBlob = container.GetBlockBlobReference(folder + @"/" + filename);
+            }
             await blockBlob.DownloadToStreamAsync(ms);
             string ty = "application/pdf";
-            return File(ms.ToArray(), ty, filename);
+            return File(ms.ToArray(), ty);
+            //return File(ms.ToArray(), ty, filename);
+
         }
 
 
@@ -98,7 +110,8 @@ namespace CsmForAsml.Controllers
             MemoryStream ms = new MemoryStream();
             await blockBlob.DownloadToStreamAsync(ms);
             string ty = "application/pdf";
-            return File(ms.ToArray(),ty,filename);
+            //return File(ms.ToArray(),ty,filename);
+            return File(ms.ToArray(), ty);
         }
 
         // GET: CalHistory/Details/5

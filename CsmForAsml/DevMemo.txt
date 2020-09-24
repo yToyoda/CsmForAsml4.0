@@ -4,4 +4,6 @@
 	CalInProcess    - Product Info
 		            - 日付入力の仕上げ
 
+国民の祝日の取得
+					https://holidays-jp.github.io/
 
