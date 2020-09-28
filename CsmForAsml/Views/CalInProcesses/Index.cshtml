@@ -1,11 +1,8 @@
 ﻿@model IEnumerable<CsmForAsml.Models.CalInProcess>
-
 @{
     ViewData["Title"] = "Cals in Process";
 }
-
 <h1>Cals in Process</h1>
-
 <div class="filterPannel">
     <div class="flex">
         <div id="b1">
@@ -158,17 +155,17 @@
     </div>
     <div class="row" style="margin-left: 20px;">
         <div class="col-md-2 pad2">
-            <button id="fnkey1">Download</button>
+            <button id="fnkey2" class="bgyellow">Cal History</button>
         </div>
         <div class="col-md-2 pad2">
-            <button id="fnkey2">Cal History</button>
-        </div>
-        <div class="col-md-2 pad2">
-            <button id="fnkey3">Latest Cal Cert</button>
+            <button id="fnkey3" class="bgyellow">Latest Cal Cert</button>
         </div>
 
         <div class="col-md-2 pad2">
-            <button id="fnkey4">P.Info</button>
+            <button id="fnkey4" class="bgyellow">P.Info</button>
+        </div>
+        <div class="col-md-2 pad2">
+            <button id="fnkey1">Download</button>
         </div>
         <div class="col-md-2 pad2">
             <button id="fnkey5">Set Event Dates</button>
@@ -293,6 +290,23 @@
 </div>
 <!--  end of modal input pannel for event and date  from here -->
 
+<!--  modal input pannl "dp-productInfo" start from here -->
+<div id="dp-productInfo" title="Set ProductInfo" style="display:none" class="fsl">
+    <br>
+    <p id="lblSerial" class="fsl">Serial</p>
+    <p id="lblMaterial" class="fsl">Material</p>
+    <p class="dialog-panel__message fsl" role="document">
+        このツールの製品情報の入力
+    </p>
+    <div class="fsl">
+        <p class="fsl">Product Maker <input type="text" id="PMaker" size="40" maxlength="60"></p>
+        <p class="fsl">Product Model <input type="text" id="PModel" size="40" maxlength="60"></p>
+        <p class="fsl">Product Name  <input type="text" id="PName" size="40" maxlength="60"></p>
+        <p class="fsl">Serial Number <input type="text" id="PSerial" size="40" maxlength="60"></p>
+    </div>
+</div>
+<!--  end of "dp-productInfo" -->
+
 @section scripts{
     <!--
         <script src="~/lib/slickgrid/slick.core.min.js"></script>
@@ -304,7 +318,7 @@
         <script src="~/lib/slickgrid/plugins/slick.checkboxselectcolumn.js"></script>
         <script src="~/lib/slickgrid/controls/slick.pager.js"></script>
         <script src="~/lib/slickgrid/controls/slick.columnpicker.js"></script>
-        //　all of above js files were bundled to "slick.min.js"
+        //　all of js files, listed above were bundled to "slick.min.js"
     -->
     <script src="~/js/slick.min.js"></script>
     <script src="~/js/InCal.js"></script>

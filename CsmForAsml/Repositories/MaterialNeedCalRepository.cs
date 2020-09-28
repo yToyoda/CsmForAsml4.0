@@ -53,12 +53,12 @@ namespace CsmForAsml.Models
         /// <summary>
         /// 指定したIDに対する MaterialNeedCal を取得する
         /// </summary>
-        /// <param name="reportId">MaterialNeedCal の Id (報告書ID)。 内部で int にキャストされる</param>
-        /// <returns>指定した ID の MaterialNeedCal</returns>
+        /// <param name="Material">MaterialNeedCal の Key である Material(string) </param>
+        /// <returns>MaterialNeedCal</returns>
         /// <seealso cref="MaterialNeedCal"/>
-        public MaterialNeedCal GetRecord(object reportId)
+        public MaterialNeedCal GetRecord(object Material)
         {
-            return _db.MaterialNeedCal.Find((int)reportId);
+            return _db.MaterialNeedCal.Find(Material);
         }
 
 

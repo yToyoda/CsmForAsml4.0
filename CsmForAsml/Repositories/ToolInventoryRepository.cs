@@ -47,12 +47,12 @@ namespace CsmForAsml.Models
         /// <summary>
         /// 指定したIDに対する ToolInventory を取得する
         /// </summary>
-        /// <param name="reportId">ToolInventory の Id (報告書ID)。 内部で int にキャストされる</param>
-        /// <returns>指定した ID の ToolInventory</returns>
+        /// <param name="Serial">ToolInventory の Id である Serial (number) </param>
+        /// <returns>指定した Serial の ToolInventory</returns>
         /// <seealso cref="ToolInventory"/>
-        public ToolInventory GetRecord(object reportId)
+        public ToolInventory GetRecord(object Serial)
         {
-            return _db.ToolInventory.Find((int)reportId);
+            return _db.ToolInventory.Find( Serial);
         }
 
 

@@ -205,5 +205,29 @@ namespace CsmForAsml.Controllers
             return (date == null) ? "" : date.Value.ToShortDateString();
         }
 
+        public ActionResult SavePInfo([FromBody] MProdInfo PInfoData) {
+            MaterialNeedCalRepository matrep = _context.MaterialNeedCalRepository;
+            MaterialNeedCal entry = matrep.GetRecord(PInfoData.Material);
+            entry.PMaker = PInfoData.PMaker;
+            entry.PModel = PInfoData.PModel;
+            entry.PName = PInfoData.PName;
+            matrep.UpdateRecord(entry);
+            return Json("Ok");
+        }
+
+    }
+
+    public class MProdInfo {
+        public string Material { get; set; }
+        public string PMaker { get; set; }
+        public string PModel { get; set; }
+        public string PName { get; set; }
+
+        /*
+                Material: currentRow.Material,
+                PMaker: currentRow.PMaker,
+                PModel: currentRow.PModel,
+                PName: currentRow.PName,
+        */
     }
 }

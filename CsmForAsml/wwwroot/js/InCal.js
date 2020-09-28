@@ -63,27 +63,30 @@ $(function () {
 
     connection.on("ExcelFinished", function (filename) {
         console.log('ExcelFile Created File name =' + filename);
-        let url = "CalInProcesses/ShowExcel?Filename=" + filename;
+        let url = host + "CalInProcesses/ShowExcel?Filename=" + filename;
         window.open(url, "ExcelWindow");
-    });    
+    });
 
     connection.on("LatestCalCert", function (filename) {
         if (filename === null || filename === "") {
-                alert("保存されている校正証明書はありませんでした");
-        }　else {        
-            window.open(host+"/CalHistory/ShowPdf/"+filename );
+            alert("保存されている校正証明書はありませんでした");
+        } else {
+            window.open(host + "/CalHistory/ShowPdf/" + filename);
         }
     });
 
+    connection.on("PInfoSaved", function () {
+        alert("変更をデータベースに保存しました");
+    });
 
     let stage;
-
+    let dialogPInfo = $('#dp-productInfo');
     let dialogObj = $('#dialog-pannel');
+    let dialogObj2 = $('#dialog-pannel2');
 
     let dialogButtons = [
         {
             text: "キャンセル",
-            // icon: "ui-icon-cancel",
             click: function () {
                 // returnvalue = null
                 $(this).dialog("close");
@@ -92,17 +95,96 @@ $(function () {
         {
             text: "Ok",
             width: 150,
-            // icon: "ui-icon-heart",
             click: function () {
-                // returnvalue = "OK";
                 // $('#return-value').text(returnId + " : " + returnDate);
                 $(this).dialog("close");
             }
         },
     ]
 
-    let dialogObj2 = $('#dialog-pannel2');
+    let dpPinfoButtons = [
+        {
+            text: "キャンセル",
+            click: function () {
+                // returnvalue = null
+                $(this).dialog("close");
+            }
+        },
+        {
+            text: "Save",
+            width: 150,
+            click: function () {
+                $(this).dialog("close");
+                // $('#return-value').text(returnId + " : " + returnDate);
+                validateAndSave();
+                
+            }
+        },
+    ]
 
+    const validateAndSave = function () {
+        let changed = false; 
+        let serchanged = false;
+        if ($('#PMaker').val() != currentRow.PMaker) {
+            currentRow.PMaker = $('#PMaker').val();
+            changed = true;
+        }
+        if ($('#PModel').val() != currentRow.PModel) {
+            currentRow.PModel = $('#PModel').val();
+            changed = true;
+        }
+        if ($('#PName').val() != currentRow.PName) {
+            currentRow.PName = $('#PName').val();
+            changed = true;
+        };
+        if ($('#PSerial').val() != currentRow.PSN) {
+            currentRow.PSN = $('#PSerial').val();
+            serchanged = true;
+        };
+        if (changed || serchanged) {
+            /*
+            let row = dataView.getItemByIdx(currentRowIndex);
+            row.PMaker = currentRow.PMaker;
+            row.PModel = currentRow.PModel;
+            row.PName = currentRow.PName;
+            row.PSN = currentRow.PSN;
+            dataView.updateItem(currentRowIndex, row);　
+            */
+            dataView.updateItem(currentRow.Id, currentRow);
+            dataView.refresh();
+            /*
+            let row = dataView.getRowById(currentRow.Id);
+            grid.invalidateRow(row);
+            
+            //grid.updateRow(row);
+            grid.render();
+            //postChange()            
+            */
+            let post_data = {
+                connectionId: this_connectionId,
+                Id: currentRow.Id,
+                Serial: currentRow.SerialNumber,
+                Material: currentRow.Material,
+                PMaker: currentRow.PMaker,
+                PModel: currentRow.PModel,
+                PName: currentRow.PName,
+                PSerial: currentRow.PSN,
+                ChangedP: changed,
+                ChangedS: serchanged
+            };
+            
+            // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+            // そうしないと、C#側で受け取りのパラメータに null が渡る
+            postToHost(host +"/CalInProcesses/SavePInfo", post_data)
+        }
+    };
+   /*
+        <p class="fsl">Product Maker <input type="text" id="PMaker" size="40" maxlength="60"></p>
+        <p class="fsl">Product Model <input type="text" id="PModel" size="40" maxlength="60"></p>
+        <p class="fsl">Product Name  <input type="text" id="PName" size="40" maxlength="60"></p>
+        <p class="fsl">Serial Number <input type="text" id="PSerial" size="40" maxlength="60"></p>
+
+     * */
 
     let enArray = {
         0: [1, 0, 0, 0, 0, 0, 0, 1],
@@ -122,13 +204,22 @@ $(function () {
         5: [true, true, true, , , , false, ,],　　//  CC 受領日
     }
 
+    dialogPInfo.dialog({
+        dialogClass: "customdiag-aqua",
+        buttons: dpPinfoButtons,
+        modal: true,
+        show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 600,
+    })
+
     dialogObj.dialog({
         dialogClass: "customdiag-aqua",
         buttons: dialogButtons,
         modal: true,
         show: { effect: "blind", duration: 100 },
         autoOpen: false,
-        width: 400,
+        width: 500,
     })
 
     dialogObj2.dialog({
@@ -139,6 +230,7 @@ $(function () {
         autoOpen: false,
         width: 400,
     })
+
 
     const judgeStage = function (arow) {
         let inPat = [];
@@ -573,59 +665,43 @@ $(function () {
                 idNumberList.push(arow.Id);
             }
         };
-        postEqList("/CalInProcesses/Download", idNumberList)
-        // window.open("", "ExcelWindow");
+
+        let post_data = {
+            connectionId: this_connectionId,
+            IdNums: idNumberList
+        };
+        // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+        // そうしないと、C#側で受け取りのパラメータに null が渡る
+        postToHost(host +"/CalInProcesses/Download", post_data)
     });
 
 
     $('#fnkey2').click(function () {
         //<button id="fnkey2">Cal History</button>
-        let arow;
-
+     
         if (currentSelectedRow != null) {
-            arow = grid.getDataItem(currentSelectedRow);
-            window.open(host + "/CalHistory/History/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-            return;
+            currentRow = grid.getDataItem(currentSelectedRow);
+            currentRowIndex = dataView.getIdxById(currentRow.Id);
+            window.open(host + "/CalHistory/History/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
         }
-        return;
-        let totalNumber = data.length;
 
-        serialList = [];
-        copyselection();
-        for (let i = 0; i < totalNumber; i += 1) {
-            arow = dataView.getItemByIdx(i);
-            if (arow.sel) {
-                serialList.push(arow.SerialNumber)
-            }
-        };
-        if (serialList.length > 0) {
-            let ser = serialList.pop();
-            window.open(host + "/CalHistory/History/" + ser + "?ConId=" + this_connectionId);
-        }
     });
     // "HistoryFinished"
     $('#fnkey3').click(function () {
-        //<button id="fnkey3">Latest Cal Cert</button>
-        let arow;
+        //<button id="fnkey3">Latest Cal Cert</button>        
         let stat;
         if (currentSelectedRow != null) {
-            arow = grid.getDataItem(currentSelectedRow);
+            currentRow = grid.getDataItem(currentSelectedRow);
+            currentRowIndex = dataView.getIdxById(currentRow.Id);
             //stat = window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-            $.get(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-
+            $.get(host + "/CalHistory/LatestCalCert/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
             return;
         }
         return;
     });
 
 
-    const postEqList = function (urlto, idNumbers) {
-        let post_data = {
-            connectionId: this_connectionId,
-            IdNums: idNumbers
-        };
-        // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
-        // そうしないと、C#側で受け取りのパラメータに null が渡る
+    const postToHost = function (urlto, post_data) {
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
         $.ajax({
             type: 'POST',
@@ -641,8 +717,6 @@ $(function () {
             }
         });
     }
-
-
 
     const allSameStage = function () {
         let date0 = [];
@@ -706,8 +780,23 @@ $(function () {
         dialogObj2.dialog('open');
     };
 
-    $('#fnkey4').click(function () {
-        // <button id="fnkey4">P.Info</button>
+    $('#fnkey4').click(function () {       
+        if (currentSelectedRow != null) {
+            currentRow = grid.getDataItem(currentSelectedRow);
+            currentRowIndex = dataView.getIdxById(currentRow.Id);
+            //$('<p>' + arow.SerialNumber + '</p>').appendTo('#lblSerial');
+            $('#lblSerial').text('ASML 管理番号: ' + currentRow.SerialNumber);
+            $('#lblMaterial').text('Material 番号: ' + currentRow.Material);
+            if (currentRow.PMaker == null) currentRow.PMaker = "";
+            if (currentRow.PModel == null) currentRow.PModel = "";
+            if (currentRow.PName == null) currentRow.PName = "";
+            if (currentRow.PSN == null) currentRow.PSN = "";
+            $('#PMaker').val(currentRow.PMaker);
+            $('#PModel').val(currentRow.PModel);
+            $('#PName').val(currentRow.PName);
+            $('#PSerial').val(currentRow.PSN);
+            dialogPInfo.dialog('open');
+        }
     });
 
     $('#fnkey5').click(function () {
@@ -752,8 +841,9 @@ $(function () {
         // how to update datagrid on slickgrid
         let x = dataView.getItemByIdx(currentRowIndex)
         x[`Date${dlprIndex}`] = dlprDate;
-        dataView.updateItem(currentRowIndex, x);
-        // dataView.refresh();
+        //dataView.updateItem(currentRowIndex, x);
+        dataView.updateItem(x.Id, x);
+        dataView.refresh();
         if (selected.length > 0) {
             let ind = selected.pop();
             showDiag2(ind);

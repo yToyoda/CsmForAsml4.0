@@ -113,19 +113,32 @@
     </div>
     <div class="row" style="margin-left: 20px;">
         <div class="col-md-2" style="padding:2px 2px 2px 2px">
-            <button id="fnkey1">Download</button>
+            <button id="fnkey1">Product Info</button>
         </div>
         <div class="col-md-2" style="padding:2px 2px 2px 2px">
-            <button id="fnkey2">Cal History</button>
-        </div>
-        <div class="col-md-2" style="padding:2px 2px 2px 2px">
-            <button id="fnkey3">Latest Cal Cert</button>
+            <button id="fnkey2">Details</button>
         </div>
         <div class="col-md-offset-2 col-md-2" style="padding:2px 2px 2px 2px">
-            <button id="fnkey4">Move to Incal</button>
+            <button id="fnkey3">Edit</button>
         </div>
     </div>
 </div>
+
+<!--  modal input pannl "dp-productInfo" start from here -->
+<div id="dp-productInfo" title="Set ProductInfo" style="display:none" class="fsl">
+    <br>
+    <p id="lblMaterial" class="fsl">Material</p>
+    <p class="dialog-panel__message fsl" role="document">
+        この Material の製品情報の入力
+    </p>
+    <div class="fsl">
+        <p class="fsl">Product Maker <input type="text" id="PMakerM" size="40" maxlength="60"></p>
+        <p class="fsl">Product Model <input type="text" id="PModelM" size="40" maxlength="60"></p>
+        <p class="fsl">Product Name  <input type="text" id="PNameM" size="40" maxlength="60"></p>
+    </div>
+</div>
+<!--  end of "dp-productInfo" -->
+
 
 @section scripts{
     <!--

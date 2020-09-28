@@ -26,19 +26,50 @@ $(function () {  //main of slickgrid
     let columnpicker;
     let options;
     let selectListReloadLevel = 0;
+    let currentRow;
+    let currentSelectedRow;
+    let currentRowIndex;
     let headerRowInputIds = [];
     let host = window.location.protocol + "//" + window.location.host;
 
     let filterValues = {
         texts: {},
         needCal: null,
-        needSafety : null,
+        needSafety: null,
         selection: null,
         dateFrom: null,
         dateTo: null
     };
 
     let d0 = moment();
+
+    let dpProductInfo = $('#dp-productInfo');
+
+    let dpPinfoButtons = [
+        {
+            text: "キャンセル",
+            click: function () {
+                $(this).dialog("close");
+            }
+        },
+        {
+            text: "Save",
+            width: 150,
+            click: function () {
+                $(this).dialog("close");
+                validateAndSave();
+            }
+        },
+    ]
+
+    dpProductInfo.dialog({
+        dialogClass: "customdiag-aqua",
+        buttons: dpPinfoButtons,
+        modal: true,
+        show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 600,
+    })
 
     const myFilter = function (item, args) {
         // by selection
@@ -62,9 +93,9 @@ $(function () {  //main of slickgrid
 
         // text filters        
         for (let columnId in args.texts) {
-            if (　(columnId) && ( args.texts[columnId] ) ) {
+            if ((columnId) && (args.texts[columnId])) {
                 let val = item[columnId];  // in order to this statement work, keep 'id:' is equal to 'field:' in column definition
-                if ( ! Boolean(val)  || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
+                if (!Boolean(val) || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
                     return false;
                 }
             }
@@ -266,7 +297,7 @@ $(function () {  //main of slickgrid
             filterValues.needSafety = false;
         } else {
             filterValues.needSafety = null;
-        }       
+        }
         selectListReloadLevel = 2;
         updateFilter();
     });
@@ -341,14 +372,86 @@ $(function () {  //main of slickgrid
         updateFilter();
     });
 
- 
+    $('#fnkey1').click(function () {
+        currentRow = grid.getDataItem(currentSelectedRow);
+        currentRowIndex = dataView.getIdxById(currentRow.id);
+        //$('<p>' + arow.SerialNumber + '</p>').appendTo('#lblSerial');
+        $('#lblMaterial').text('Material 番号: ' + currentRow.Material);
+        if (currentRow.PMaker == null) currentRow.PMaker = "";
+        if (currentRow.PModel == null) currentRow.PModel = "";
+        if (currentRow.PName == null) currentRow.PName = "";
+        $('#PMakerM').val(currentRow.PMaker);
+        $('#PModelM').val(currentRow.PModel);
+        $('#PNameM').val(currentRow.PName);
+        dpProductInfo.dialog('open');
+    });
+
+    const validateAndSave = function () {
+        let changed = false;
+        if ($('#PMakerM').val() != currentRow.PMaker) {
+            currentRow.PMaker = $('#PMakerM').val();
+            changed = true;
+        }
+        if ($('#PModelM').val() != currentRow.PModel) {
+            currentRow.PModel = $('#PModelM').val();
+            changed = true;
+        }
+        if ($('#PNameM').val() != currentRow.PName) {
+            currentRow.PName = $('#PNameM').val();
+            changed = true;
+        };
+
+        if (changed ) {
+            dataView.updateItem(currentRow.id, currentRow);
+            dataView.refresh();
+
+            let post_data = {
+                Material: currentRow.Material,
+                PMaker: currentRow.PMaker,
+                PModel: currentRow.PModel,
+                PName: currentRow.PName,
+            };
+
+            // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+            // そうしないと、C#側で受け取りのパラメータに null が渡る
+            postToHost(host + "/MaterialNeedCals/SavePInfo", post_data)
+        }
+
+    };
+
+    $('#fnkey2').click(function () {
+        currentRow = grid.getDataItem(currentSelectedRow);
+        window.open(host + "/MaterialNeedCals/Details/"+currentRow.Material)
+    });
+
+    $('#fnkey3').click(function () {
+        currentRow = grid.getDataItem(currentSelectedRow);
+        window.open(host + "/MaterialNeedCals/Edit/" + currentRow.Material)
+    });
+
+    const postToHost = function (urlto, post_data) {
+        let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
+        $.ajax({
+            type: 'POST',
+            url: urlto,
+            data: jsonstring,
+            processData: true,
+            contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
+            error: function () {
+                console.error("Error sending Json to " + urlto);
+            },
+            complete: function () {
+                alert("変更を保存しました");
+            }
+        });
+    }
     // main routine execution start from here
 
     checkboxSelector = new Slick.CheckboxSelectColumn({
         cssClass: "slick-cell-checkboxsel"
     });
 
-    columns.push(checkboxSelector.getColumnDefinition());   
+    columns.push(checkboxSelector.getColumnDefinition());
     columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
     columns.push({ id: "MaterialDescription", name: "Description", field: "MaterialDescription", width: 260, sortable: true });
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
@@ -359,11 +462,12 @@ $(function () {  //main of slickgrid
     columns.push({ id: "CalInterval", name: "Cal Interval", field: "CalInterval", sortable: true });
     columns.push({ id: "SafetyInterval", name: "Safety Interval", field: "SafetyInterval", sortable: true });
     columns.push({ id: "PMaker", name: "P.Maker", field: "PMaker", sortable: true });
-    columns.push({ id: "PName", name: "P.Name", field: "PName", sortable: true });
+
     columns.push({ id: "PModel", name: "P.Model", field: "PModel", sortable: true });
+    columns.push({ id: "PName", name: "P.Name", field: "PName", sortable: true });
     columns.push({ id: "Status", name: "Status", field: "Status", sortable: true });
     columns.push({ id: "ChangeDate", name: "ChangeDate", field: "ChangeDate", sortable: true });
-   
+
     options = {
         columnPicker: {
             columnTitle: "Columns",
@@ -391,14 +495,17 @@ $(function () {  //main of slickgrid
     grid.setSelectionModel(new Slick.RowSelectionModel({ selectActiveRow: false }));
     grid.registerPlugin(checkboxSelector);
 
+    grid.onClick.subscribe(function (e, args) {
+        currentSelectedRow = args.row
+    });
 
     grid.onHeaderRowCellRendered.subscribe(function (e, args) {
         let columnId = args.column.id;
         let cell = $(args.node);
         //if (columnId === "Plant") return;
         if (columnId === "id") return;
-        if (columnId === "NeedCal" || columnId ==="NeedSafety" || columnId === "CalInterval" ) return;
-        
+        if (columnId === "NeedCal" || columnId === "NeedSafety" || columnId === "CalInterval") return;
+
         cell.empty();
         if (columnId === "_checkbox_selector") {
             // let lb = $(document.createTextNode("C"));
@@ -431,7 +538,7 @@ $(function () {  //main of slickgrid
 
 
     $(grid.getHeaderRow()).japaneseInputChange('input[type=text]', filterValChanged);
-    $(grid.getHeaderRow()).keyup( filterValChanged);
+    $(grid.getHeaderRow()).keyup(filterValChanged);
 
     pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
     columnpicker = new Slick.Controls.ColumnPicker(columns, grid, options);
@@ -477,17 +584,17 @@ $(function () {  //main of slickgrid
         dataView.sort(comparer, args.sortAsc);
     });
 
-    
+
     $.get(host + "/MaterialNeedCals/GetData").then(
         function (ans) {
             console.log("Data received ");
-            let length = ans.length;            
+            let length = ans.length;
 
             data = ans;
             //add :id to each row
             for (let index = 0; index < length; index += 1) {
                 let d = data[index];
-                d['id'] =  index;
+                d['id'] = index;
             }
 
 
@@ -495,7 +602,7 @@ $(function () {  //main of slickgrid
             // execute following code after setup
             // initialize the model after all the events have been hooked up
             dataView.beginUpdate();
-            dataView.setItems(data,"id");
+            dataView.setItems(data, "id");
             dataView.setFilterArgs(filterValues);
             dataView.setFilter(myFilter);
             dataView.endUpdate();

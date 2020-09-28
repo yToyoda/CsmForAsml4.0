@@ -19,6 +19,8 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using SysIO = System.IO;
 using System.IO;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace CsmForAsml.Controllers
 {
@@ -238,8 +240,6 @@ namespace CsmForAsml.Controllers
             // notify to client by SignalR
             await _hubContext.Clients.Client(clientId).SendAsync("ExcelFinished", filename);
             return new EmptyResult();
-            //string kind = "application/octet-stream";
-            //return File(ms.ToArray(), kind, filename);
         }
 
 
@@ -282,10 +282,46 @@ namespace CsmForAsml.Controllers
             return File(ms.ToArray(), kind, Filename);
         }
 
+        [HttpPost]
+        public async Task<ActionResult> SavePInfo ([FromBody] PInfo PInfoData) {          
+            string clientId = PInfoData.connectionId;
+            if (PInfoData.ChangedP) {
+                MaterialNeedCalRepository matrep = _context.MaterialNeedCalRepository;
+                var materialEntry =  matrep.GetRecord(PInfoData.Material);
+                materialEntry.PMaker = PInfoData.PMaker;
+                materialEntry.PModel = PInfoData.PModel;
+                materialEntry.PName = PInfoData.PName;
+                matrep.UpdateRecord(materialEntry);
+            }
+            if (PInfoData.ChangedS) {
+                ToolInventoryRepository toolrep = _context.ToolInventoryRepository;
+                ToolInventory toolInvEntry = toolrep.GetRecord(PInfoData.Serial);
+                toolInvEntry.PSN = PInfoData.PSerial;
+                toolrep.UpdateRecord(toolInvEntry);
+            }
+            await _hubContext.Clients.Client(clientId).SendAsync("PInfoSaved");
+            return new EmptyResult();
+        }
+
     }
 
     public class IdNumList {
         public string connectionId { get; set; }
         public List<int> IdNums { get; set; }
     }
+
+    public class PInfo {
+        public string connectionId { get; set; }
+        public int Id { get; set; }
+        public string Serial { get; set; }
+        public string Material { get; set; }
+        public string PMaker { get; set; }
+        public string PModel { get; set; }
+        public string PName { get; set; }
+        public string PSerial { get; set; }
+        public bool ChangedP { get; set; }
+        public bool ChangedS { get; set; }
+
+    }
+
 }
