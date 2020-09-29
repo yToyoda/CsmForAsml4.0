@@ -590,47 +590,32 @@ $(function () {  //main of slickgrid
         }
     }
 
-    const postEqList = function (urlto, serialNumbers, nocheckflags) {
-        let post_data = {
-            ConnectionId: this_connectionId,
-            SerialNums: serialNumbers,
-            NoCheckFlags: nocheckflags
-        };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
-        // そうしないと、C#側で受け取りのパラメータに null が渡る
-        let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
-
-        $.ajax({
-            type: 'POST',
-            url: urlto,
-            data: jsonstring,
-            processData: true,
-            contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
-            error: function () {
-                console.error("Error sending Json to " + urlto);
-            },
-            complete: function (ret) {
-                data = ret.responseJSON;
-                for (let i = 0; i < data.length; ++i) {
-                    let x = data[i];
-                    let x0 = x.SerialNumber;
-                    let x1 = x.MoveToIncal;
-                    let x2 = x.InInCal;
-                    let x3 = x.CommentToUser;
-                }
-            }
-        });
-    };
-
     const returnFromIncal = function (ret) {
         data = ret.responseJSON;
-
+        let moved = [];
+        let inInCal = [];
+        let calDateClose = [];
+        
         for (let i = 0; i < data.length; ++i) {
+            /*
             let x = data[i];
             let x0 = x.SerialNumber;
             let x1 = x.MoveToIncal;
             let x2 = x.InInCal;
             let x3 = x.CommentToUser;
+            */
+            if (data[i].MoveToIncal === true) {
+                moved.push(data[i]);
+            } else if (data[i].inInCal === true) {
+                inInCal.push(data[i]);
+            } else {
+                calDateClose.push(data[i]);
+            }
+            if (inCal.length >) {
+
+            }
         };
+        // 作成必要
     };
 
     
