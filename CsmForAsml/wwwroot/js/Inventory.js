@@ -34,7 +34,7 @@ $(function () {  //main of slickgrid
     let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
     let this_connectionId;
     let serialList;
-    let currentSelectedRow = null; 
+    let currentSelectedRow = null;
 
     let filterValues = {
         texts: {},
@@ -48,12 +48,6 @@ $(function () {  //main of slickgrid
         this_connectionId = connection.connectionId
     }).catch(function (err) {
         return console.error(err.toString());
-    });
-
-    connection.on("ExcelFinished", function (filename) {
-        console.log('ExcelFile Created File name =' + filename);
-        let url = "ToolInventories/ShowExcel?Filename=" + filename;
-        window.open(url, "ExcelWindow");
     });
 
     connection.on("HistoryFinished", function (filename) {
@@ -80,7 +74,7 @@ $(function () {  //main of slickgrid
         for (let columnId in args.texts) {
             if ((columnId) && (args.texts[columnId])) {
                 let val = item[columnId];  // in order to this statement work, keep 'id:' is equal to 'field:' in column definition
-                if (!Boolean(val)  || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
+                if (!Boolean(val) || val.toUpperCase().indexOf(args.texts[columnId]) === -1) {
                     return false;
                 }
             }
@@ -497,8 +491,22 @@ $(function () {  //main of slickgrid
                 serialNumberList.push(arow.SerialNumber);
             }
         };
-        postEqList("/ToolInventories/Download", serialNumberList)
+
+        let postData = {
+            ConnectionId: this_connectionId,
+            SerialNums: serialNumberList
+        };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+        // そうしないと、C#側で受け取りのパラメータに null が渡る
+        postToHost(host + "/ToolInventories/Download", postData, receiveFilename)
     });
+
+    const receiveFilename = function (ret){
+        let filename = ret.responseJSON;
+        let url = host + "/ToolInventories/ShowExcel?Filename=" + filename;
+        window.open(url, "ExcelWindow");
+    }
+
+
 
     $('#fnkey2').click(function () {
         //<button id="fnkey2">Cal History</button>
@@ -509,7 +517,7 @@ $(function () {  //main of slickgrid
             return;
         }
         return;
-            // "HistoryFinished"
+        // "HistoryFinished"
         let totalNumber = data.length;
         serialList = [];
         copyselection();
@@ -552,7 +560,14 @@ $(function () {  //main of slickgrid
                 nocheckflaglist.push(false);
             }
         };
-        postEqList("/ToolInventories/MoveToIncal", serialNumberList, nocheckflaglist)
+        let postData = {
+            ConnectionId: this_connectionId,
+            SerialNums: serialNumberList,
+            NoCheckFlags: nocheckflaglist
+        };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+        // そうしないと、C#側で受け取りのパラメータに null が渡る
+
+        postToHost(host + "/ToolInventories/MoveToIncal", postData, returnFromIncal);
     });
 
     const checkDuedate = function (ardata) {
@@ -570,37 +585,70 @@ $(function () {  //main of slickgrid
                 status = "Due TM";
             } else if (caldue.isBefore(d2, "day")) {
                 status = "Due NM";
-            }; 
+            };
             ardata[i].CalDueStatus = status;
         }
     }
 
     const postEqList = function (urlto, serialNumbers, nocheckflags) {
-        let post_data = { ConnectionId: this_connectionId,
-                            SerialNums: serialNumbers,
-                            NoCheckFlags : nocheckflags
+        let post_data = {
+            ConnectionId: this_connectionId,
+            SerialNums: serialNumbers,
+            NoCheckFlags: nocheckflags
         };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
-             // そうしないと、C#側で受け取りのパラメータに null が渡る
+        // そうしないと、C#側で受け取りのパラメータに null が渡る
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
-                
-        $.ajax({          
-            type: 'POST',         
+
+        $.ajax({
+            type: 'POST',
             url: urlto,
-            data: jsonstring,           
+            data: jsonstring,
             processData: true,
             contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
             error: function () {
                 console.error("Error sending Json to " + urlto);
             },
-            complete: function (data) {
-                // timer1 = setInterval(getStatus, 500);
-                x = data;
+            complete: function (ret) {
+                data = ret.responseJSON;
+                for (let i = 0; i < data.length; ++i) {
+                    let x = data[i];
+                    let x0 = x.SerialNumber;
+                    let x1 = x.MoveToIncal;
+                    let x2 = x.InInCal;
+                    let x3 = x.CommentToUser;
+                }
             }
         });
-    }
+    };
 
+    const returnFromIncal = function (ret) {
+        data = ret.responseJSON;
+
+        for (let i = 0; i < data.length; ++i) {
+            let x = data[i];
+            let x0 = x.SerialNumber;
+            let x1 = x.MoveToIncal;
+            let x2 = x.InInCal;
+            let x3 = x.CommentToUser;
+        };
+    };
+
+    
     // events from fnkey area
-
+    const postToHost = function (urlto, post_data, success) {
+        let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
+        $.ajax({
+            type: 'POST',
+            url: urlto,
+            data: jsonstring,
+            processData: true,
+            contentType: 'application/json charset=utf-8',    // content-typeをJSONに指定する
+            error: function () {
+                console.error("Error sending Json to " + urlto);
+            },
+            complete: success ,
+        });
+    }
 
 
     // main routine execution start from here

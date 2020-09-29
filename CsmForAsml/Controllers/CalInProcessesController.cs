@@ -237,9 +237,12 @@ namespace CsmForAsml.Controllers
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(user + "/" + filename);
                 await blockBlob.UploadFromStreamAsync(ms);
             }
-            // notify to client by SignalR
-            await _hubContext.Clients.Client(clientId).SendAsync("ExcelFinished", filename);
-            return new EmptyResult();
+            var serializeOptions = new JsonSerializerOptions {
+                PropertyNamingPolicy = null,
+                WriteIndented = true
+            };
+
+            return Json(filename, serializeOptions);
         }
 
 

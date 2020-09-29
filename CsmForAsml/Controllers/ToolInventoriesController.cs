@@ -188,28 +188,30 @@ namespace CsmForAsml.Controllers {
                 if (serial.NoCheckFlags[i]) {
                     MoveToInCal(stat.SerialNumber);
                     stat.MoveToIncal = true;                
-                    break;
+                    continue;
                 }
 
                 var cip = cipr.GetLatestRecords(ci => ci.SerialNumber == stat.SerialNumber);
                 if (cip!=null && (cip.CalDate == null || cip.VenShipDate ==null) ) {
                     stat.MoveToIncal = false;
+                    stat.InInCal = true;
                     stat.CommentToUser = "この Serial Number は既に Cal In Process に登録されて校正を待っています。";
-                    break;
+                    continue;
                 }
 
-                var inventory = tir.GetRecords(s => s.SerialNumber == stat.SerialNumber).LastOrDefault();
-                var material = mncr.GetRecords(m => m.Material == inventory.Material).LastOrDefault();
-                int calInterval = material.CalInterval ?? 12;
-                int calIntervalInDays = (int)(daysInYear * calInterval / 12.0);
+                var inventory = tir.GetRecord(stat.SerialNumber);
+                var material = mncr.GetRecord( inventory.Material);
+                int calInterval = material.CalInterval ?? 12;    // calInterval is in months
+                int calIntervalInDays = (int)(daysInYear / 12.0 ) * calInterval;
 
-                stat.LatestCalDate = cdr.GetLatestCalDate(stat.SerialNumber);                
-                if (stat.LatestCalDate != null) {
-                    int days = AppResources.JSTNow.Subtract((DateTime)stat.LatestCalDate).Days;
-                    if (days < calIntervalInDays * warningLevel) {
+                DateTime? LatestCalDate = cdr.GetLatestCalDate(stat.SerialNumber);                
+                if (LatestCalDate != null) {
+                    int days = AppResources.JSTNow.Subtract((DateTime)LatestCalDate).Days;
+                    double percentdays = (double) days / (double) calIntervalInDays;
+                    if (percentdays < warningLevel ) {
                         stat.MoveToIncal = false;
-                        stat.CommentToUser = $"この Serial Number の最新校正日からまだ {days} 日しか経っていません。再度校正しますか?";
-                        break;
+                        stat.CommentToUser = $"この Material {inventory.Material} の校正周期は {calInterval} ヵ月です。この Serial の　最新校正日は{LatestCalDate:d}でそこから {days} 日、校正周期の {percentdays:p1} しか経っていません。再度校正のため In-Cal に移動しますか?";
+                        continue;
                     }
                 }
                 MoveToInCal(stat.SerialNumber);
@@ -273,15 +275,13 @@ namespace CsmForAsml.Controllers {
                 CloudBlockBlob blockBlob = container.GetBlockBlobReference(user + "/" + filename);
                 await blockBlob.UploadFromStreamAsync(ms);
             }
-            // notify to client by SignalR
-            if (!String.IsNullOrEmpty(clientId)) {
-                await _hubContext.Clients.Client(clientId).SendAsync("ExcelFinished", filename);
-            } else {
-                throw new Exception("Connection ID is empty");
-            }
-            return new EmptyResult();
-            //string kind = "application/octet-stream";
-            //return File(ms.ToArray(), kind, filename);
+
+            var serializeOptions = new JsonSerializerOptions {
+                PropertyNamingPolicy = null,
+                WriteIndented = true
+            };
+
+            return Json(filename, serializeOptions);
         }
 
         private async Task GetNotMappedFieldsToolInv(IEnumerable<ToolInventory> tools, List<ToolInventory> ans) {
@@ -355,11 +355,7 @@ namespace CsmForAsml.Controllers {
         public List<string> SerialNums { get; set; }
         public string connectionId { get; set; }
     }
-
-    public class SerialAndFlag {
-        public string SerialNumber;
-        public bool NoCheckFlag;
-    }
+       
     public class SerialAndFlagList {
         /// <summary>
         /// 管理番号のリスト
@@ -372,9 +368,8 @@ namespace CsmForAsml.Controllers {
 
     public class CalStat {
         public string SerialNumber { get; set; }
-        public bool InInCal { get; set; }
-        public DateTime? LatestCalDate { get; set; }
-        public bool MoveToIncal {get;set;}
-        public string CommentToUser { get; set; }
+        public bool MoveToIncal {get;set;} = false;
+        public bool InInCal { get; set; } = false;
+        public string CommentToUser { get; set; } = "";
     }
 }

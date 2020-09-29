@@ -61,12 +61,6 @@ $(function () {
         return console.error(err.toString());
     });
 
-    connection.on("ExcelFinished", function (filename) {
-        console.log('ExcelFile Created File name =' + filename);
-        let url = host + "CalInProcesses/ShowExcel?Filename=" + filename;
-        window.open(url, "ExcelWindow");
-    });
-
     connection.on("LatestCalCert", function (filename) {
         if (filename === null || filename === "") {
             alert("保存されている校正証明書はありませんでした");
@@ -672,9 +666,14 @@ $(function () {
         };
         // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
         // そうしないと、C#側で受け取りのパラメータに null が渡る
-        postToHost(host +"/CalInProcesses/Download", post_data)
+        postToHost(host +"/CalInProcesses/Download", post_data, receiveFilename)
     });
 
+    const receiveFilename = function (ret) {
+        let filename = ret.responseJSON;
+        let url = host + "/CalInProcesses/ShowExcel?Filename=" + filename;
+        window.open(url, "ExcelWindow");
+    }
 
     $('#fnkey2').click(function () {
         //<button id="fnkey2">Cal History</button>
@@ -701,7 +700,7 @@ $(function () {
     });
 
 
-    const postToHost = function (urlto, post_data) {
+    const postToHost = function (urlto, post_data, completeFunction) {
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
         $.ajax({
             type: 'POST',
@@ -712,9 +711,7 @@ $(function () {
             error: function () {
                 console.error("Error sending Json to " + urlto);
             },
-            complete: function () {
-
-            }
+            complete: completeFunction,
         });
     }
 
