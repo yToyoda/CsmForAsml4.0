@@ -659,14 +659,16 @@ $(function () {
                 idNumberList.push(arow.Id);
             }
         };
-
-        let post_data = {
-            connectionId: this_connectionId,
-            IdNums: idNumberList
+        if (idNumberList.length > 0) {
+            let post_data = {
+                IdNums: idNumberList
+            };
+            // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+            // そうしないと、C#側で受け取りのパラメータに null が渡る
+            postToHost(host + "/CalInProcesses/Download", post_data, receiveFilename)
+        } else {
+            alert("Download する行に ✔ を入れてから、このボタンを押してください");
         };
-        // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
-        // そうしないと、C#側で受け取りのパラメータに null が渡る
-        postToHost(host +"/CalInProcesses/Download", post_data, receiveFilename)
     });
 
     const receiveFilename = function (ret) {
@@ -683,8 +685,8 @@ $(function () {
             currentRowIndex = dataView.getIdxById(currentRow.Id);
             window.open(host + "/CalHistory/History/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
         }
-
     });
+
     // "HistoryFinished"
     $('#fnkey3').click(function () {
         //<button id="fnkey3">Latest Cal Cert</button>        

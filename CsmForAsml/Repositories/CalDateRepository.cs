@@ -33,7 +33,7 @@ namespace CsmForAsml.Models
         /// 指定した条件に合致する CalDate (複数)を取得する
         /// </summary>
         /// <param name="predicate">条件式 通常ラムダ式で指定</param>
-        /// <returns>条件に合致する CalDate (複数)</returns>
+        /// <returns>条件に合致する 降順にソートされた　CalDate (複数)</returns>
         /// <seealso cref="CalDate"/>
         public IEnumerable<CalDate> GetRecords(Func<CalDate, bool> predicate) {
             var rec= _db.CalDate.Where(predicate).OrderByDescending(cd => cd.CalDate1);            

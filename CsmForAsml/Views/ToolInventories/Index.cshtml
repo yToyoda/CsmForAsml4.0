@@ -256,6 +256,38 @@
     </div>
 </div>
 
+<!--  modal input panel for event and date  from here -->
+<div id="dpMovedToInCal" title="登録しました" style="display:none" class="fsl">
+    <br>
+    <p id="d-message01A" class="dialog-panel__message fsl" role="document">
+        以下の Serial Number は In-Cal に登録されました。
+    </p>
+    <div class="fsl">
+        <ul id="serialField">
+        </ul>
+    </div>
+</div>
+<!--  end of modal input panel "dialog-panel"   -->
+<!--  modal input panel for event and date  from here -->
+<div id="dpRefusedToMove" title="登録できません" style="display:none">
+
+    <p id="dlpSerial4" class="fsl"></p>
+    <br />
+    <p id="d-message04" class="dialog-panel__message fsm" role="document">
+        上記 Serial Number は既に In-Cal　に登録されて校正待ちです。　重ねて In-Cal に登録することはできません。
+    </p>
+
+</div>
+<!--  end of modal input panel "dialog-panel"   -->
+<!--  modal input panel for event and date  from here -->
+<div id="dpDoYouMove" title="In-Cal に登録しますか" style="display:none">
+
+    <p id="dlpSerial5" class="fsl"></p>
+    <br />
+    <p id="d-message05" class="dialog-panel__message fsm" role="document"></p>
+</div>
+<!--  end of modal input panel "dialog-panel"   -->
+
 @section scripts{
     <!--
         <script src="~/lib/slickgrid/slick.core.min.js"></script>

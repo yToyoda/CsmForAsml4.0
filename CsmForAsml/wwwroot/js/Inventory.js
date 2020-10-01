@@ -36,12 +36,84 @@ $(function () {  //main of slickgrid
     let serialList;
     let currentSelectedRow = null;
 
+    let moved = [];
+    let inInCal = [];
+    let calDateClose = [];
+    let forcemove = [];
+    let retserial;
+
+    let dpMovedToInCal = $('#dpMovedToInCal');
+    let dpRefusedToMove = $('#dpRefusedToMove');
+    let dpDoYouMove = $('#dpDoYouMove');
+
+    let buttonsYesNo = [
+        {
+            text: "No",
+            width: 150,
+            click: function () {
+                $(this).dialog("close");
+                initiateDialog();
+            }
+        },
+
+        {
+            text: "Yes",
+            width: 150,
+            click: function () {
+                $(this).dialog("close");
+                forcemove.push(retserial);
+                initiateDialog();
+            }
+        },
+    ];
+
+    let buttonOk = [
+        {
+            text: "Ok",
+            width: 200,
+            click: function () {
+                $(this).dialog("close");
+                initiateDialog();
+            }
+        },
+    ];
+
+    dpMovedToInCal.dialog({
+        dialogClass: "customdiag-aqua",
+        buttons: buttonOk,
+        modal: true,
+        show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 600,
+    })
+
+
+    dpRefusedToMove.dialog({
+        dialogClass: "customdiag-aqua",
+        buttons: buttonOk,
+        modal: true,
+        show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 400,
+    });
+
+    dpDoYouMove.dialog({
+        dialogClass: "customdiag-aqua",
+        buttons: buttonsYesNo,
+        modal: true,
+        show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 400,
+    });
+
+
     let filterValues = {
         texts: {},
         selection: null,
         dateFrom: [null, null, null, null],
         dateTo: [null, null, null, null],
     };
+
 
     connection.start().then(function () {
         console.log('Now connected, connection ID=' + connection.connectionId);
@@ -492,15 +564,19 @@ $(function () {  //main of slickgrid
             }
         };
 
-        let postData = {
-            ConnectionId: this_connectionId,
-            SerialNums: serialNumberList
-        };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
-        // そうしないと、C#側で受け取りのパラメータに null が渡る
-        postToHost(host + "/ToolInventories/Download", postData, receiveFilename)
+        if (serialNumberList.length > 0) {
+
+            let postData = {
+                SerialNums: serialNumberList
+            };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+            // そうしないと、C#側で受け取りのパラメータに null が渡る
+            postToHost(host + "/ToolInventories/Download", postData, receiveFilename)
+        } else {
+            alert("Download する行に ✔ を入れてから、このボタンを押してください");
+        }
     });
 
-    const receiveFilename = function (ret){
+    const receiveFilename = function (ret) {
         let filename = ret.responseJSON;
         let url = host + "/ToolInventories/ShowExcel?Filename=" + filename;
         window.open(url, "ExcelWindow");
@@ -514,22 +590,6 @@ $(function () {  //main of slickgrid
         if (currentSelectedRow != null) {
             arow = grid.getDataItem(currentSelectedRow);
             window.open(host + "/CalHistory/History/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-            return;
-        }
-        return;
-        // "HistoryFinished"
-        let totalNumber = data.length;
-        serialList = [];
-        copyselection();
-        for (let i = 0; i < totalNumber; i += 1) {
-            arow = dataView.getItemByIdx(i);
-            if (arow.sel) {
-                serialList.push(arow.SerialNumber)
-            }
-        };
-        if (serialList.length > 0) {
-            let ser = serialList.pop();
-            window.open(host + "/CalHistory/History/" + ser + "?ConId=" + this_connectionId);
         }
     });
 
@@ -541,9 +601,7 @@ $(function () {  //main of slickgrid
             arow = grid.getDataItem(currentSelectedRow);
             //window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
             $.get(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-            return;
         }
-        return;
     });
 
     // fnkey4  Move to Incal
@@ -552,6 +610,8 @@ $(function () {  //main of slickgrid
         let arow;
         let serialNumberList = [];
         let nocheckflaglist = [];
+
+        /*  skip this sectio for test
         copyselection();
         for (let i = 0; i < totalNumber; i += 1) {
             arow = dataView.getItemByIdx(i);
@@ -560,6 +620,13 @@ $(function () {  //main of slickgrid
                 nocheckflaglist.push(false);
             }
         };
+        */
+        //serialNumberList = ["1000319532", "1000056385", "1000010007", "1000018095", "1000065080", "H03487", "U0940448","1000034387"];
+        //nocheckflaglist = [false, false, false, false, false, false, false, false];
+        serialNumberList = ["1000091806", "1000010007", "H03487","1000228961", "U0940448", "1000034387"];
+        nocheckflaglist = [false, false, false, false, false, false];
+        
+
         let postData = {
             ConnectionId: this_connectionId,
             SerialNums: serialNumberList,
@@ -569,6 +636,29 @@ $(function () {  //main of slickgrid
 
         postToHost(host + "/ToolInventories/MoveToIncal", postData, returnFromIncal);
     });
+
+    const resendToInCal = function () {
+        // forece move to Incal 
+        let arow;
+        let serialNumberList = [];
+        let nocheckflaglist = [];
+
+        while (forcemove.length > 0) {
+            arow = forcemove.pop();
+            serialNumberList.push(arow.SerialNumber);
+            nocheckflaglist.push(true);
+        };
+
+        let postData = {
+            ConnectionId: this_connectionId,
+            SerialNums: serialNumberList,
+            NoCheckFlags: nocheckflaglist
+        };   // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
+        // そうしないと、C#側で受け取りのパラメータに null が渡る
+
+        postToHost(host + "/ToolInventories/MoveToIncal", postData, returnFromIncal);
+
+    }
 
     const checkDuedate = function (ardata) {
         let d0 = moment();
@@ -592,30 +682,74 @@ $(function () {  //main of slickgrid
 
     const returnFromIncal = function (ret) {
         data = ret.responseJSON;
-        let moved = [];
-        let inInCal = [];
-        let calDateClose = [];
-        
-        for (let i = 0; i < data.length; ++i) {
-            /*
-            let x = data[i];
-            let x0 = x.SerialNumber;
-            let x1 = x.MoveToIncal;
-            let x2 = x.InInCal;
-            let x3 = x.CommentToUser;
-            */
-            if (data[i].MoveToIncal === true) {
-                moved.push(data[i]);
-            } else if (data[i].inInCal === true) {
-                inInCal.push(data[i]);
-            } else {
-                calDateClose.push(data[i]);
-            }
-            if (inCal.length >) {
+        moved = [];
+        inInCal = [];
+        calDateClose = [];
+        forcemove = [];
 
+        if (data.length > 0) {
+            for (let i = 0; i < data.length; ++i) {
+
+                if (data[i].MoveToIncal === true) {
+                    moved.push(data[i]);
+                } else if (data[i].InInCal === true) {
+                    inInCal.push(data[i]);
+                } else {
+                    calDateClose.push(data[i]);
+                }
             }
-        };
-        // 作成必要
+            const listParent = document.getElementById('serialField');
+            while (listParent.firstChild) {
+                listParent.removeChild(listParent.firstChild);
+            }
+            initiateDialog();
+        }
+    }
+
+    const initiateDialog = function () {
+        if (inInCal.length > 0) {
+            let x = inInCal.shift();
+            $('#dlpSerial4').text(x.SerialNumber);
+            dpRefusedToMove.dialog('open');
+            return
+        }
+        if (calDateClose.length > 0) {
+            retserial = calDateClose.shift();
+            $('#dlpSerial5').text(retserial.SerialNumber);
+            $('#d-message05').text(retserial.CommentToUser);
+            dpDoYouMove.dialog('open');
+            return;
+        }        
+        if (moved.length > 0) {
+            let j = 0;
+            let textline = "";
+            for (let i = 0; i < moved.length; ++i) {
+                textline = textline + moved[i].SerialNumber + "　";
+                if (j == 4) {
+                    let fld = $('#serialField')
+                    let li = document.createElement("li");
+                    li.textContent = textline;
+                    document.getElementById('serialField').appendChild(li);
+                    j = 0;
+                    textline = "";
+                } else {
+                    ++j;
+                }
+            }
+            if (textline != "") {
+                let li = document.createElement("li");
+                li.textContent = textline;
+                li.className = 'lsl'
+                document.getElementById("serialField").appendChild(li);
+            }
+            moved = [];
+            dpMovedToInCal.dialog('open');
+            return;
+        }
+        // final processing,  全ての配列が 0 個になった時にここに来る
+        if (forcemove.length > 0) {
+            resendToInCal();
+        }
     };
 
     

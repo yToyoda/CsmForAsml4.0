@@ -4,6 +4,17 @@
 	CalInProcess    - Product Info         dialog complete 9/26
 		            - 日付入力の仕上げ
 
+2020/10/01  
+   Move to InCal のデバッグのため
+   　Inventory.js     $('#fnkey4').click(function ()  の本来の処理コメントアウトし、テスト用シリアルを送るよう改造
+   　ToolInventoriesController.cs  
+		MoveToIncal の中で　RegistorToInCal(stat.SerialNumber)　の呼び出しをコメントアウトしている (2箇所)
+
+	テスト終了時に上記をもとに戻す
+
+SignalR は、ここまでの所は必須ではないが、後に使うため、例とし残した。
+　　CalHistoryController.cs    LatestCalCert からの結果通知
+
 国民の祝日の取得
 					https://holidays-jp.github.io/
 

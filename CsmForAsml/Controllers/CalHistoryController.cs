@@ -58,41 +58,12 @@ namespace CsmForAsml.Controllers
 
         public async Task<IActionResult> LatestCalCert(string id, string ConId) {
             string ser = id;
-            var all = _context.CalDateRepository.GetRecords(r => r.Serial == ser);
-            string filename = null;
-            foreach (var e in all) {
-                if (!string.IsNullOrWhiteSpace(e.PdfFileName)) {
-                    filename = e.PdfFileName;
-                    break;
-                }
-            }
+            var e = _context.CalDateRepository.GetRecords(r => r.Serial == ser).FirstOrDefault();
+            string filename = e.PdfFileName ?? "";
 
             await _hubContext.Clients.Client(ConId).SendAsync("LatestCalCert",filename);
 
             return new EmptyResult();
-
-            string connectionstring = Startup.AppSettings["AzureBlob"];
-            string containerName = Startup.AppSettings["CalCertContainer"];
-            MemoryStream ms = new MemoryStream();
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionstring);
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container;
-            CloudBlockBlob blockBlob;
-
-            if (filename == null) {
-                containerName = "templates";
-                filename = "PdfNotFound.pdf";
-                container = blobClient.GetContainerReference(containerName);
-                blockBlob = container.GetBlockBlobReference(filename);
-            } else {
-                string folder = AppResources.GetCalCertFolder(filename);
-                container = blobClient.GetContainerReference(containerName);
-                blockBlob = container.GetBlockBlobReference(folder + @"/" + filename);
-            }
-            await blockBlob.DownloadToStreamAsync(ms);
-            string ty = "application/pdf";
-            return File(ms.ToArray(), ty);
-            //return File(ms.ToArray(), ty, filename);
 
         }
 

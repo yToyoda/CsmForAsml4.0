@@ -25,15 +25,17 @@ namespace CsmForAsml.Controllers {
     public class ToolInventoriesController : Controller {
         private readonly CsmForAsml2Context _context;
         private readonly ToolInventoryRepository _toolRepo;
-        private readonly IHubContext<CsmHub> _hubContext;
+        //private readonly IHubContext<CsmHub> _hubContext;
         private readonly ICreateExcelFile<ToolInventory> _crExcel;
 
+        //public ToolInventoriesController(CsmForAsml2Context context,
+        //                                 IHubContext<CsmHub> hubcontext,
+        //                                 ICreateExcelFile<ToolInventory> crExcel) {
         public ToolInventoriesController(CsmForAsml2Context context,
-                                         IHubContext<CsmHub> hubcontext,
                                          ICreateExcelFile<ToolInventory> crExcel) {
             _context = context;
             _toolRepo = context.ToolInventoryRepository;
-            _hubContext = hubcontext;
+            //_hubContext = hubcontext;
             _crExcel = crExcel;
         }
 
@@ -186,7 +188,7 @@ namespace CsmForAsml.Controllers {
                 calstatlist.Add(stat);
 
                 if (serial.NoCheckFlags[i]) {
-                    MoveToInCal(stat.SerialNumber);
+                    // RegistorToInCal(stat.SerialNumber);
                     stat.MoveToIncal = true;                
                     continue;
                 }
@@ -214,7 +216,7 @@ namespace CsmForAsml.Controllers {
                         continue;
                     }
                 }
-                MoveToInCal(stat.SerialNumber);
+                // RegistorToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
                 stat.MoveToIncal = true;                 
             }
 
@@ -227,7 +229,7 @@ namespace CsmForAsml.Controllers {
             return Json(calstatlist,serializeOptions);
         }
 
-        private void MoveToInCal(string serialNumber) {
+        private void RegistorToInCal(string serialNumber) {
             CalInProcessRepository cipr = _context.CalInProcessRepository;
             CalInProcess entry = new CalInProcess();
             entry.SerialNumber = serialNumber;
@@ -240,7 +242,7 @@ namespace CsmForAsml.Controllers {
 
 
 
-            string clientId = serial.connectionId;
+            // string clientId = serial.connectionId;
             HttpContext.Session.SetString("ExcelFilename", "");
 
             var allToolInv = await _toolRepo.GetAllRecordsAsync();
@@ -353,14 +355,14 @@ namespace CsmForAsml.Controllers {
         /// 管理番号のリスト
         /// </summary>
         public List<string> SerialNums { get; set; }
-        public string connectionId { get; set; }
+        //public string connectionId { get; set; }
     }
        
     public class SerialAndFlagList {
         /// <summary>
         /// 管理番号のリスト
         /// </summary>
-        public string ConnectionId { get; set; }
+        //public string ConnectionId { get; set; }
         public List<string> SerialNums { get; set; }
         public List<bool> NoCheckFlags { get; set; }
     
