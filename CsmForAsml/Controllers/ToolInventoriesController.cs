@@ -188,7 +188,7 @@ namespace CsmForAsml.Controllers {
                 calstatlist.Add(stat);
 
                 if (serial.NoCheckFlags[i]) {
-                    // RegistorToInCal(stat.SerialNumber);
+                    // RegisterToInCal(stat.SerialNumber);
                     stat.MoveToIncal = true;                
                     continue;
                 }
@@ -216,7 +216,7 @@ namespace CsmForAsml.Controllers {
                         continue;
                     }
                 }
-                // RegistorToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
+                // RegisterToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
                 stat.MoveToIncal = true;                 
             }
 
@@ -229,7 +229,7 @@ namespace CsmForAsml.Controllers {
             return Json(calstatlist,serializeOptions);
         }
 
-        private void RegistorToInCal(string serialNumber) {
+        private void RegisterToInCal(string serialNumber) {
             CalInProcessRepository cipr = _context.CalInProcessRepository;
             CalInProcess entry = new CalInProcess();
             entry.SerialNumber = serialNumber;

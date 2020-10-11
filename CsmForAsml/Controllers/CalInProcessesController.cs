@@ -247,18 +247,6 @@ namespace CsmForAsml.Controllers
 
 
         [HttpGet]
-        public ActionResult ShowPdf() {
-            // has not modified
-            string filename = HttpContext.Session.GetString("PdfFilename");
-            MemoryStream fs = new MemoryStream();
-            // _blobFileIO.DownloadToStream(_containerName, _pdffolder, filename, fs);
-            fs.Seek(0, SeekOrigin.Begin);
-            var kind = System.Net.Mime.MediaTypeNames.Application.Pdf;
-            HttpContext.Session.SetString("PdfFilename","");
-            return File(fs.ToArray(), kind, filename);
-        }
-
-        [HttpGet]
         public async Task<ActionResult> ShowExcel(string Filename) {
             string kind = "application/octet-stream";
             MemoryStream ms = new MemoryStream();
@@ -283,6 +271,53 @@ namespace CsmForAsml.Controllers
                 await blockBlob.DeleteIfExistsAsync();
             }
             return File(ms.ToArray(), kind, Filename);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> SaveChanges([FromBody] EventUpdate UpdateData) {
+            int Id = UpdateData.Id;
+            int stage = UpdateData.StageNum;
+            MaterialNeedCalRepository mrep = _context.MaterialNeedCalRepository;
+
+            var entry = _calInProRepo.GetRecord(Id);
+            switch (stage) {
+                case 0:  //ASML 発送日
+                    if (UpdateData.EventDate!=null ) entry.UserShipDate = UpdateData.EventDate;
+                    break;
+                case 1:  // Vendor 受領日
+                    if (UpdateData.EventDate != null) entry.VenReceiveDate = UpdateData.EventDate;
+                    // calculate return date and send back
+                    var matentry = mrep.GetRecord(entry.Material);
+                    var StdTAT = matentry.Std_TAT;
+                    if (StdTAT != null) {
+                        entry.PlanedShipDate = AppResources.DateAfterNWorkDays((DateTime) entry.VenReceiveDate, (int) StdTAT);
+                        // client に変更を通知
+                    }                    
+                    break;
+                case 2:  // 校正日
+                    if (UpdateData.EventDate != null) entry.CalDate = UpdateData.EventDate;
+                    if (UpdateData.Flag != null) entry.CalResult = UpdateData.Flag;
+                    if (!string.IsNullOrWhiteSpace(UpdateData.Comment)) entry.VenComment = UpdateData.Comment;
+                    break;
+                case 3:   // Vendor 発送日
+                    if (UpdateData.EventDate != null) entry.VenShipDate = UpdateData.EventDate;
+                    break;
+                case 4:   // asml 受領日
+                    if (UpdateData.EventDate != null) entry.UserReceiveDate = UpdateData.EventDate;
+                    break;
+                case 5:  //  CC 受領日
+                    if (UpdateData.EventDate != null) entry.CcReceiveDate = UpdateData.EventDate;
+                    break;
+            }
+            _calInProRepo.UpdateRecord(entry);
+
+            string filename ="EE";
+            var serializeOptions = new JsonSerializerOptions {
+                PropertyNamingPolicy = null,
+                WriteIndented = true
+            };
+
+            return Json(filename, serializeOptions);
         }
 
         [HttpPost]
@@ -324,7 +359,14 @@ namespace CsmForAsml.Controllers
         public string PSerial { get; set; }
         public bool ChangedP { get; set; }
         public bool ChangedS { get; set; }
+    }
 
+    public class EventUpdate {
+        public int Id { get; set; }
+        public int  StageNum { get; set; }
+        public DateTime? EventDate { get; set; }
+        public bool? Flag { get; set; }
+        public string Comment { get; set; }
     }
 
 }

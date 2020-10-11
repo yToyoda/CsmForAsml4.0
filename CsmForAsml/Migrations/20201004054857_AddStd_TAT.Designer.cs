@@ -4,14 +4,16 @@ using CsmForAsml.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CsmForAsml.Migrations
 {
     [DbContext(typeof(CsmForAsml2Context))]
-    partial class CsmForAsml2ContextModelSnapshot : ModelSnapshot
+    [Migration("20201004054857_AddStd_TAT")]
+    partial class AddStd_TAT
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -21,5 +21,6 @@ namespace CsmForAsml.Models
         public string PModel { get; set; }
         public decimal? PriceToUser { get; set; }
         public decimal? PriceFromVendor { get; set; }
+        public int? Std_TAT { get; set; }
     }
 }

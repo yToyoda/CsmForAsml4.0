@@ -10,11 +10,19 @@
    　ToolInventoriesController.cs  
 		MoveToIncal の中で　RegistorToInCal(stat.SerialNumber)　の呼び出しをコメントアウトしている (2箇所)
 
-	テスト終了時に上記をもとに戻す
+	テスト終了時に上記を元に戻すこと
 
 SignalR は、ここまでの所は必須ではないが、後に使うため、例とし残した。
 　　CalHistoryController.cs    LatestCalCert からの結果通知
 
 国民の祝日の取得
 					https://holidays-jp.github.io/
+
+2020/10/11 開発残項目
+
+InCal - save changes 完成
+機能テスト
+
+LogIn / LogIn権限の設定
+UserRole による機能制限
 

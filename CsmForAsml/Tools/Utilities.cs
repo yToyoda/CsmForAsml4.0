@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CsmForAsml.Models;
 
 namespace CsmForAsml.Tools {
     public class Utilities {
@@ -10,6 +11,7 @@ namespace CsmForAsml.Tools {
     public static class AppResources {
         public static string TableMark = "[-TABLE-]";
         public static string PDFfileName;
+        public static Dictionary<DateTime,string> HolidayDic { get; set; }
         
         public static string calCertFolder = Startup.AppSettings["PdfFolder"];
         public static string GetCalCertPath(string calCertFilename) {
@@ -76,6 +78,29 @@ namespace CsmForAsml.Tools {
                 return jst;
             }
         }
+        public static DateTime DateAfterNWorkDays(DateTime fromDay, int nWorkDays) {
+            DateTime answer = fromDay;
+            if (HolidayDic == null) HolidayDic = LoadHolidays();
+            string holidayname;
+            for (int i = 0; i < nWorkDays; ++i) {
+                answer = answer.AddDays(1);
+                while (answer.DayOfWeek == DayOfWeek.Saturday || answer.DayOfWeek == DayOfWeek.Sunday || HolidayDic.TryGetValue(answer, out holidayname)) {
+                    answer = answer.AddDays(1);
+                }
+            }
+            return answer;
+        }
+
+        public static Dictionary<DateTime,string> LoadHolidays() {
+            CsmForAsml2Context context = new CsmForAsml2Context();
+            var holidays = context.Holidays.ToList();
+            Dictionary<DateTime, string> answer = new Dictionary<DateTime, string>();
+            foreach (var holiday in holidays) {
+                answer.Add( holiday.Date, holiday.HolidayName);
+            }
+            return answer;
+        }
+
 
     }
     public static class RoleNames {

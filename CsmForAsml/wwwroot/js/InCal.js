@@ -39,7 +39,9 @@ $(function () {
     let this_connectionId;
     let serialList;
     let currentSelectedRow = null;
-
+    let dateFieldNames = ["RegisteredDate", "UserShipDate", "VenReceiveDate", "CalDate", "PlanedShipDate",
+        "VenShipDate", "UserReceiveDate", "CcReceiveDate", "CcUploadDate"];
+    let dateFieldNamesJP = ["登録日", "ASML発送日", "受領日", "校正実施日", "予定出荷日", "返送出荷日", "ASML受領日", "証明書受領日", "証明書登録日"];
     let dlprIndex, dlprDate;       //return value from dialog pannel
     let dlprCalResult, dlprComment; //return value from dialog pannel
     let filterValues = {
@@ -77,13 +79,16 @@ $(function () {
     let dialogPInfo = $('#dp-productInfo');
     let dialogObj = $('#dialog-pannel');
     let dialogObj2 = $('#dialog-pannel2');
+    let returnvalue;
 
     let dialogButtons = [
         {
             text: "キャンセル",
             click: function () {
                 // returnvalue = null
+                returnvalue = "Cancel";
                 $(this).dialog("close");
+                //initiateDialog()
             }
         },
         {
@@ -91,7 +96,9 @@ $(function () {
             width: 150,
             click: function () {
                 // $('#return-value').text(returnId + " : " + returnDate);
+                returnvalue = "OK";
                 $(this).dialog("close");
+                //initiateDialog()
             }
         },
     ]
@@ -100,7 +107,7 @@ $(function () {
         {
             text: "キャンセル",
             click: function () {
-                // returnvalue = null
+                returnvalue = "Cancel";
                 $(this).dialog("close");
             }
         },
@@ -108,10 +115,8 @@ $(function () {
             text: "Save",
             width: 150,
             click: function () {
+                returnvalue = "OK";
                 $(this).dialog("close");
-                // $('#return-value').text(returnId + " : " + returnDate);
-                validateAndSave();
-                
             }
         },
     ]
@@ -136,24 +141,8 @@ $(function () {
             serchanged = true;
         };
         if (changed || serchanged) {
-            /*
-            let row = dataView.getItemByIdx(currentRowIndex);
-            row.PMaker = currentRow.PMaker;
-            row.PModel = currentRow.PModel;
-            row.PName = currentRow.PName;
-            row.PSN = currentRow.PSN;
-            dataView.updateItem(currentRowIndex, row);　
-            */
             dataView.updateItem(currentRow.Id, currentRow);
             dataView.refresh();
-            /*
-            let row = dataView.getRowById(currentRow.Id);
-            grid.invalidateRow(row);
-            
-            //grid.updateRow(row);
-            grid.render();
-            //postChange()            
-            */
             let post_data = {
                 connectionId: this_connectionId,
                 Id: currentRow.Id,
@@ -172,14 +161,18 @@ $(function () {
             postToHost(host +"/CalInProcesses/SavePInfo", post_data)
         }
     };
-   /*
-        <p class="fsl">Product Maker <input type="text" id="PMaker" size="40" maxlength="60"></p>
-        <p class="fsl">Product Model <input type="text" id="PModel" size="40" maxlength="60"></p>
-        <p class="fsl">Product Name  <input type="text" id="PName" size="40" maxlength="60"></p>
-        <p class="fsl">Serial Number <input type="text" id="PSerial" size="40" maxlength="60"></p>
 
-     * */
+    //  stage　を判定するための配列
+    let stageDates = {
+        0: [false, , , , , , , ,],                // ０ASML 発送日  
+        1: [true, false, , , , , , ,],　　　       // 1 Vendor 受領日
+        2: [true, true, false, , , , , ,],        // 2 校正日
+        3: [true, true, true, , false, , , ,],    // 3 Vendor 発送日
+        4: [true, true, true, , true, false, , ,],  // 4 asml 受領日
+        5: [true, true, true, , , , false, ,],      // 5 CC 受領日
+    }
 
+    //  stage 毎に　Dialog の入力を enable する Mask 
     let enArray = {
         0: [1, 0, 0, 0, 0, 0, 0, 1],
         1: [0, 1, 1, 1, 0, 0, 1, 2],
@@ -187,15 +180,6 @@ $(function () {
         3: [0, 1, 1, 1, 0, 0, 3, 5],
         4: [1, 0, 0, 0, 1, 0, 4, 6],
         5: [1, 1, 1, 1, 1, 1, 5, 7],
-    }
-
-    let stageDates = {
-        0: [false, , , , , , , ,],
-        1: [true, false, , , , , , ,],
-        2: [true, true, false, , , , , ,],
-        3: [true, true, true, , false, , , ,],
-        4: [true, true, true, , true, false, , ,],   // asml 受領日
-        5: [true, true, true, , , , false, ,],　　//  CC 受領日
     }
 
     dialogPInfo.dialog({
@@ -217,12 +201,12 @@ $(function () {
     })
 
     dialogObj2.dialog({
-        // dialogClass: "customdiag-aqua",
+        dialogClass: "customdiag-aqua",
         buttons: dialogButtons,
         modal: true,
         show: { effect: "blind", duration: 100 },
         autoOpen: false,
-        width: 400,
+        width: 500,
     })
 
 
@@ -231,12 +215,12 @@ $(function () {
         let st = 0;
         let match;
         for (let i = 1; i < 9; i += 1) {
-            inPat[i] = Boolean(arow[`Date${i}`])
+            inPat[i] = Boolean(arow[dateFieldNames[i]]);
         }
         for (st = 0; st < 6; st += 1) {
             match = true;
             for (let i = 0; i < 8; i += 1) {
-                if (stageDates[st][i] !== null && stageDates[st][i] !== undefined)
+                if (stageDates[st][i] !== undefined && stageDates[st][i] !== null)
                     if (inPat[i + 1] !== stageDates[st][i]) match = false;
             }
             if (match) {
@@ -316,17 +300,30 @@ $(function () {
         grid.setSelectedRows(selectedrows);
     }
 
+    const getAllSelectedRowIndexes = function () {   // work with global var oData , selected
+        copyselection();  // add selected items to array
+        // check selected row and push to selected
+        oData = dataView.getItems();
+        let indexes = [];
+        for (let ind = oData.length - 1; ind >= 0; ind -= 1) {
+            if (oData[ind].sel) {
+                indexes.push(ind);
+            }
+        }
+        return indexes;
+    }
+
     const getAllSelectedRows = function () {   // work with global var oData , selected
         copyselection();  // add selected items to array
         // check selected row and push to selected
         oData = dataView.getItems();
-        let sela = [];
-        for (let ind = oData.length - 1; ind >= 0; ind -= 1) {
+        let rows = [];
+        for (let ind = 0; ind < oData.length ;  ind += 1) {
             if (oData[ind].sel) {
-                sela.push(ind);
+                rows.push(oData[ind]);
             }
         }
-        return sela;
+        return rows;
     }
 
     const testFilter = function (item, args) {
@@ -645,19 +642,33 @@ $(function () {
         updateFilter();
     });
 
+    $('input[name="dlprd1"]:radio').change(function () {
+        dlprIndex = $(this).val();
+        $('#dlpDateLabel1').text(dateFieldNamesJP[dlprIndex]);        
+    });
+
+    $('input[name="dlprd2"]:radio').change(function () {
+        dlprIndex = $(this).val();
+        $('#dlpdi2').val(currentRow[dateFieldNames[dlprIndex]] || "")
+        $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
+        if (dlprIndex === "3") { // 校正実施日
+            $('#calRes2').css('display', 'block');
+        } else {
+            $('#calRes2').css('display', 'none');
+        }
+
+    });
+
     // events from fnkey area
 
     $('#fnkey1').click(function () {
         let totalNumber = data.length;
-        let arow;
         let idNumberList = [];
-        copyselection();
-        for (let i = 0; i < totalNumber; i += 1) {
-            arow = dataView.getItemByIdx(i);
-            if (arow.sel) {
-                //NumberList.push(String(arow.Id));
-                idNumberList.push(arow.Id);
-            }
+        let arow;
+        selected = getAllSelectedRowIndexes()
+        for (let ind of selected) {
+            arow = oData[ind];
+            idNumberList.push(arow.Id);
         };
         if (idNumberList.length > 0) {
             let post_data = {
@@ -725,11 +736,11 @@ $(function () {
             let x = oData[ind];
             if (date0.length === 0) {
                 for (let i = 1; i < 9; i += 1) {
-                    date0[i] = Boolean(x[`Date${i}`]);
+                    date0[i] = Boolean(x[dateFieldNames[i]]);
                 }
             } else {
                 for (let i = 1; i < 9; i += 1) {
-                    if (date0[i] !== Boolean(x[`Date${i}`])) {
+                    if (date0[i] !== Boolean(x[dateFieldNames[i]])) {
                         match = false;
                         return match;
                     };
@@ -745,18 +756,12 @@ $(function () {
         updateFilter();
     }
 
-    $('input[name="dlprd1"]:radio').change(function () {
-        dlprIndex = $(this).val();
-    });
 
     $('#dlpdi1').change(function () {
         dlprDate = $(this).val();
     });
 
-    $('input[name="dlprd2"]:radio').change(function () {
-        dlprIndex = $(this).val();
-        $('#dlpdi2').val(currentRow[`Date${dlprIndex}`] || "")
-    });
+
 
     $('#dlpdi2').change(function () {
         dlprDate = $(this).val();
@@ -767,15 +772,26 @@ $(function () {
         currentRow = oData[index];
         stage = judgeStage(currentRow);
         let ind = prepareDialog(stage);
+        // if (stage === 2) { $('#calRes2').css('display','block')}
         $('#dlpSerial').text("Serial : " + currentRow.SerialNumber);
-        $('#dlpdl1').text(currentRow[`Date${1}`] || "");
-        $('#dlpdl2').text(currentRow[`Date${2}`] || "");
-        $('#dlpdl3').text(currentRow[`Date${3}`] || "");
-        $('#dlpdl4').text(currentRow[`Date${5}`] || "");
-        $('#dlpdl5').text(currentRow[`Date${6}`] || "");
-        $('#dlpdl6').text(currentRow[`Date${7}`] || "");
-        $('#dlpdi2').val(currentRow[`Date${ind}`] || "")
+        for (let i = 1; i <= 3; ++i) {
+            $('#dlpdl'+i).text(currentRow[dateFieldNames[i]] || "");
+        }
+        for (let i = 4; i <= 6; ++i) {
+            $('#dlpdl' + i).text(currentRow[dateFieldNames[i + 1]] || "");
+        }
+        $('#dlpdi2').val(currentRow[dateFieldNames[ind]] || "")
         dlprIndex = ind;
+       // if (ind === 2) { $('#calRes2').css('display', 'block') }
+        $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
+        if (dlprIndex == 3) { // 校正実施日
+            $('#calRes2').css('display', 'block');
+           // $('input[name="dlprd2"]:radio').val(3);
+        } else {
+            $('#calRes2').css('display', 'none');
+        }
+        
+        $('#dlpDateLabel').text(dateFieldNamesJP[ind]);
         dialogObj2.dialog('open');
     };
 
@@ -801,7 +817,7 @@ $(function () {
     $('#fnkey5').click(function () {
         // test routine for dataView.getItem(ind);        
         let arow;
-        selected = getAllSelectedRows()
+        selected = getAllSelectedRowIndexes()
         let n = selected.length;
         let ind;
         if (n === 0) {
@@ -809,37 +825,43 @@ $(function () {
             alert("変更したい行をチェックしてから、このボタンを押してください"); // or confirm (OK, Cancel)
             return;
         } else if (n === 1) {
-            currentRowIndex = selected.pop();
-            showDiag2(currentRowIndex);
-
+            initiateDialog();
         } else {
             if (allSameStage()) {
                 // apply entered to all selected equipment
                 selectChecked();
                 stage = judgeStage(oData[selected[0]]);
                 let ind = prepareDialog(stage);
+                $('#dlpDateLabel1').text(dateFieldNamesJP[ind]);;
                 $('#dateInput').val("");
                 dialogObj.dialog('open');
+                selected = [];
                 // save entered data
             } else {
-                if (selected.length > 0) {
-                    let ind = selected.pop();
-                    showDiag2(ind);
-                }
+                initiateDialog();
             }
         }
         // dialogObj2.dialog('open');
     });
 
+    const initiateDialog = function () {
+        if (selected.length > 0) {
+            currentRowIndex = selected.pop();
+            showDiag2(currentRowIndex);
+        }
+    }
+
     $('#fnkey6').click(function () {
         //<button id="fnkey6">完了設定</button>
     });
 
-
+    
     dialogObj2.on('dialogclose', function () {
         // how to update datagrid on slickgrid
+        returnvalue;
         let x = dataView.getItemByIdx(currentRowIndex)
-        x[`Date${dlprIndex}`] = dlprDate;
+        /*
+        x[dateFieldNames[dlprIndex]] = dlprDate;
         //dataView.updateItem(currentRowIndex, x);
         dataView.updateItem(x.Id, x);
         dataView.refresh();
@@ -847,8 +869,10 @@ $(function () {
             let ind = selected.pop();
             showDiag2(ind);
         }
+        */
+        initiateDialog();
     });
-
+    
 
     // main routine execution start from here
 

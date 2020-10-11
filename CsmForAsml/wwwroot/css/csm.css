@@ -342,12 +342,12 @@ input[name="tab_item"] {
 
 .customdiag-aqua {
     background: aquamarine;
-    width: 400px;
+    
     font-size: medium;
 }
 
 .dialog-panel__message {
-    padding-left: 60px;
+    padding-left: 20px;
 }
 
 
@@ -357,6 +357,11 @@ input[name="tab_item"] {
 }
 
 #r2:checked ~ .calResultBlock {
+    display: block;
+}
+
+
+#rr2:checked ~ .calResultBlock {
     display: block;
 }
 

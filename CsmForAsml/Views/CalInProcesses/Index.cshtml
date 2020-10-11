@@ -189,21 +189,33 @@
         <input type="radio" id="r2" name="dlprd1" value="3">校正実施日<br>
         <input type="radio" id="r3" name="dlprd1" value="5">返送出荷日<br>
         <input type="radio" id="r4" name="dlprd1" value="6">ASML受領日<br>
-        <input type="radio" id="r5" name="dlprd1" value="7">CC受領日<br>
+        <input type="radio" id="r5" name="dlprd1" value="7">証明書受領日<br>
     </div>
-    <br>
+    <br />
     <p id="d-message2" class="dialog-panel__message fsm" role="document">
         上のイベントの日付を選んでください
     </p>
 
-    <label>日付</label>
-    <input type="text" id="dlpdi1" class="datepicker" />
+    <label class="col-md-offset-2 col-md-4 fsl" id="dlpDateLabel1">日付</label>
+    <input type="text" id="dlpdi1" width="160" class="datepicker fsl" />
 
-    <br>
+    <br />
+</div>
+
+<div id="dialog-pannel3" title="校正結果入力">
     <div class="calResultBlock" style="font-size: medium;">
+        <div id="dlpSerial1" class="col-md-12 fsl"></div>
+        <div class="row">
+            <div class="col-md-4 fsm">
+                <input type="radio" id="rr2" name="dlprd2" value="3">校正実施日<br>
+            </div>
+            <label class="col-md-4 fsm" id="dlpdl3"></label>
+        </div>
+        <br />
         <div class="row">
             校正結果
             <select id="dlpCalResult1">
+                <option value="non"></option>
                 <option value="GD">合格</option>
                 <option value="NG">不合格</option>
                 <option value="NOCAL">校正対象外</option>
@@ -214,82 +226,87 @@
         <textarea name="comments" id="dlpcci1" cols="38" rows="4"></textarea>
     </div>
 </div>
-
 <!--  end of modal input pannel for event and date  from here -->
 <!--  modal input pannel for event and date  from here -->
-<div id="dialog-pannel2" title="日付・結果入力" style="display:none">
+<div id="dialog-pannel2" title="日付・結果入力">
     <br>
-    <p id="dlpSerial" class="fsl"></p>
-    <p class="dialog-panel__message fsm" role="document">
-        イベントを選んでください
-    </p>
+    <div id="dlpSerial" class="col-md-12 fsl"></div>
+    <br>
+    <div class="col-md-12 fsl">
+        日付をセットするイベントを選んでください
+    </div>
 
     <div class="row">
-        <div class="col-md-6 fsm">
+        <div class="col-md-4 fsm">
             <input type="radio" id="rr0" name="dlprd2" value="1" checked="checked">ASML発送日
         </div>
-        <label class="col-md-6 fsm" id="dlpdl1"></label>
+        <label class="col-md-4 fsm" id="dlpdl1"></label>
     </div>
 
     <div class="row">
-        <div class="col-md-6 fsm">
+        <div class="col-md-4 fsm">
             <input type="radio" id="rr1" name="dlprd2" value="2">受領日<br>
         </div>
-        <label class="col-md-6 fsm" id="dlpdl2"></label>
+        <label class="col-md-4 fsm" id="dlpdl2"></label>
     </div>
 
     <div class="row">
-        <div class="col-md-6 fsm">
+        <div class="col-md-4 fsm">
             <input type="radio" id="rr2" name="dlprd2" value="3">校正実施日<br>
         </div>
-        <label class="col-md-6 fsm" id="dlpdl3"></label>
+        <label class="col-md-4 fsm" id="dlpdl3"></label>
     </div>
 
     <div class="row">
-        <div class="col-md-6 fsm">
+        <div class="col-md-4 fsm">
             <input type="radio" id="rr3" name="dlprd2" value="5">返送出荷日<br>
         </div>
-        <label class="col-md-6 fsm" id="dlpdl4"></label>
+        <label class="col-md-4 fsm" id="dlpdl4"></label>
     </div>
 
     <div class="row">
-        <div class="col-md-6 fsm">
+        <div class="col-md-4 fsm">
             <input type="radio" id="rr4" name="dlprd2" value="6">ASML受領日<br>
         </div>
-        <label class="col-md-6 fsm" id="dlpdl5"></label>
+        <label class="col-md-4 fsm" id="dlpdl5"></label>
     </div>
 
     <div class="row">
-        <div class="col-md-6 fsm">
-            <input type="radio" id="rr5" name="dlprd2" value="7">CC受領日<br>
+        <div class="col-md-4 fsm">
+            <input type="radio" id="rr5" name="dlprd2" value="7">証明書受領日<br>
         </div>
-        <label class="col-md-6 fsm" id="dlpdl6"></label>
+        <label class="col-md-4 fsm" id="dlpdl6"></label>
     </div>
-
-    <p id="d-message22" class="dialog-panel__message fsm" role="document">
-        上のイベントの日付を選んでください
+    <br>
+    <p id="d-message22" class="dialog-panel__message fsl" role="document">
+        イベントの日付を入力してください
     </p>
 
-    <label>日付</label>
-    <input type="text" id="dlpdi2" class="datepicker" />
+    <label class="col-md-offset-2 col-md-4 fsl" id="dlpDateLabel2">日付</label>
+    <input type="text" id="dlpdi2" width="160" class="datepicker fsl" />
 
     <br>
-    <div class="calResultBlock" style="font-size: medium;">
+    <div class="calResultBlock2" id="calRes2" style="font-size: medium; display:none">
         <div class="row">
-            校正結果
-            <select id="dlpCalResult2">
+            <div class="col-md-4 fsl">
+                校正結果
+            </div>
+            <select id="dlpCalResult2" class="col-md-4 fsl">
+                <option value="non"></option>
                 <option value="GD">合格</option>
                 <option value="NG">不合格</option>
                 <option value="NOCAL">校正対象外</option>
                 <option value="none">未実施</option>
             </select>
         </div>
-        <p>コメント</p>
-        <textarea name="comments" id="dlpcci2" cols="38" rows="4"></textarea>
+        <div class="col-md-10 row fsl">
+            コメント
+        </div>
+        <textarea name="comments" id="dlpcci2" cols="54" rows="4"></textarea>
+
     </div>
 </div>
 <!--  end of modal input pannel for event and date  from here -->
-
 <!--  modal input pannl "dp-productInfo" start from here -->
 <div id="dp-productInfo" title="Set ProductInfo" style="display:none" class="fsl">
     <br>
