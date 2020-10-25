@@ -79,6 +79,8 @@ $(function () {
     let dialogPInfo = $('#dp-productInfo');
     let dialogObj = $('#dialog-pannel');
     let dialogObj2 = $('#dialog-pannel2');
+    let dialogCalResult = $('#dp-calResult');
+
     let returnvalue;
 
     let dialogButtons = [
@@ -208,6 +210,17 @@ $(function () {
         autoOpen: false,
         width: 500,
     })
+
+    dialogCalResult.dialog({
+        dialogClass: "customdiag-aqua",
+        buttons: dialogButtons,
+        modal: true,
+        show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 500,
+    })
+
+
 
 
     const judgeStage = function (arow) {
@@ -652,12 +665,32 @@ $(function () {
         $('#dlpdi2').val(currentRow[dateFieldNames[dlprIndex]] || "")
         $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
         if (dlprIndex === "3") { // 校正実施日
+            showCalResult2();
             $('#calRes2').css('display', 'block');
         } else {
             $('#calRes2').css('display', 'none');
         }
 
     });
+
+    const showCalResult2 = function () {
+        $('#dlpCalResult2').val("--");
+        if (currentRow.CalResultString != "") {
+            $('#dlpCalResult2').val(currentRow.CalResultString);
+        }
+        //if (currentRow.VenComment) {
+        $('#dlpcci2').text(currentRow.VenComment);
+        //}
+    }
+
+    const showCalResult = function () {
+        $('#dlpCalResult').val("--");
+        if (currentRow.CalResultString != "") {
+            $('#dlpCalResult').val(currentRow.CalResultString);
+        }
+        //$('#calResultComm').text("");
+        $('#calResultComm').text(currentRow.VenComment);        
+    }
 
     // events from fnkey area
 
@@ -785,8 +818,8 @@ $(function () {
        // if (ind === 2) { $('#calRes2').css('display', 'block') }
         $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
         if (dlprIndex == 3) { // 校正実施日
+            showCalResult2();
             $('#calRes2').css('display', 'block');
-           // $('input[name="dlprd2"]:radio').val(3);
         } else {
             $('#calRes2').css('display', 'none');
         }
@@ -896,7 +929,7 @@ $(function () {
     columns.push({ id: "Date1", name: "ASML発送日", field: "UserShipDate", resizable: true, sortable: true });
     columns.push({ id: "Date2", name: "受領日", field: "VenReceiveDate", resizable: true, sortable: true });
     columns.push({ id: "Date3", name: "校正実施日", field: "CalDate", resizable: true, sortable: true });
-    columns.push({ id: "CalResult", name: "校正結果", field: "CalResult", width: 60, resizable: true, sortable: true });
+    columns.push({ id: "CalResult", name: "校正結果", field: "CalResultString", width: 60, resizable: true, sortable: true });
     columns.push({ id: "VenComment", name: "コメント", field: "VenComment", width: 120, resizable: true, sortable: true });
     columns.push({ id: "Date4", name: "予定出荷日", field: "PlanedShipDate", resizable: true, sortable: true });
     columns.push({ id: "Date5", name: "返送出荷日", field: "VenShipDate", resizable: true, sortable: true });

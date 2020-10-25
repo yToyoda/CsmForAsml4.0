@@ -28,6 +28,8 @@ namespace CsmForAsml.Models
         public string TatStatus { get; set; }
 
         [NotMapped]
+        public string CalResultString { get; set; }
+        [NotMapped]
         public string Material { get; set; }
         [NotMapped] 
         public string Description { get; set; }

@@ -178,6 +178,12 @@ namespace CsmForAsml.Controllers
                       select new { Cal = calinp, Inv = inv, Mat = mat, Loc = loc };
 
             foreach (var r in res) {
+                r.Cal.CalResultString = "";
+                if (r.Cal.CalResult == true) {
+                    r.Cal.CalResultString = "GD";
+                } else if (r.Cal.CalResult == false) {
+                    r.Cal.CalResultString = "NG";
+                }
                 r.Cal.Material = r.Inv.Material;
                 r.Cal.Description = r.Mat.MaterialDescription;
                 r.Cal.CalPlace = r.Mat.CalPlace;

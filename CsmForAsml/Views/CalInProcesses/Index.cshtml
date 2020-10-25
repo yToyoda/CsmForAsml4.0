@@ -202,31 +202,27 @@
     <br />
 </div>
 
-<div id="dialog-pannel3" title="校正結果入力">
-    <div class="calResultBlock" style="font-size: medium;">
-        <div id="dlpSerial1" class="col-md-12 fsl"></div>
-        <div class="row">
-            <div class="col-md-4 fsm">
-                <input type="radio" id="rr2" name="dlprd2" value="3">校正実施日<br>
-            </div>
-            <label class="col-md-4 fsm" id="dlpdl3"></label>
-        </div>
-        <br />
-        <div class="row">
-            校正結果
-            <select id="dlpCalResult1">
-                <option value="non"></option>
-                <option value="GD">合格</option>
-                <option value="NG">不合格</option>
-                <option value="NOCAL">校正対象外</option>
-                <option value="none">未実施</option>
-            </select>
-        </div>
-        <p>コメント</p>
-        <textarea name="comments" id="dlpcci1" cols="38" rows="4"></textarea>
+<!--  modal input pannl "dp-calResult" start from here -->
+<div id="dp-calResult" title="Set Cal Result" style="display:none" class="fsl">
+    <label id="lblcrSerial" class="fsl">Serial</label>
+    <br />
+    <label class="fsl" id="caldateIn">校正実施日</label>
+    <br />
+    <div class="row fsl">
+        校正結果
+        <select id="dlpCalResult">
+            <option value="--">--</option>
+            <option value="GD">合格</option>
+            <option value="NG">不合格</option>
+            <option value="NOCAL">校正対象外</option>
+            <option value="none">未実施</option>
+        </select>
     </div>
+    <br />
+    <p class="fsl">コメント</p>
+    <textarea name="comments" id="calResultComm" cols="40" rows="4"></textarea>
 </div>
-<!--  end of modal input pannel for event and date  from here -->
+<!--  end of "dp-calResult" -->
 <!--  modal input pannel for event and date  from here -->
 <div id="dialog-pannel2" title="日付・結果入力">
     <br>
@@ -292,6 +288,7 @@
                 校正結果
             </div>
             <select id="dlpCalResult2" class="col-md-4 fsl">
+                <option value="--">--</option>
                 <option value="non"></option>
                 <option value="GD">合格</option>
                 <option value="NG">不合格</option>
