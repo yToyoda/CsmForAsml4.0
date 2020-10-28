@@ -27,6 +27,7 @@ $(function () {
     let currentRow;
     let currentRowIndex;
     let selected = [];
+    let copiedSelected = [];
     let columns = [];
     let checkboxSelector;
     let pager;
@@ -53,6 +54,7 @@ $(function () {
         dateIndex: 1
     };
 
+    let updateList = []; // List of date / event update, notify to host
     let returnDate, returnId;
 
 
@@ -90,7 +92,6 @@ $(function () {
                 // returnvalue = null
                 returnvalue = "Cancel";
                 $(this).dialog("close");
-                //initiateDialog()
             }
         },
         {
@@ -100,7 +101,6 @@ $(function () {
                 // $('#return-value').text(returnId + " : " + returnDate);
                 returnvalue = "OK";
                 $(this).dialog("close");
-                //initiateDialog()
             }
         },
     ]
@@ -124,7 +124,7 @@ $(function () {
     ]
 
     const validateAndSave = function () {
-        let changed = false; 
+        let changed = false;
         let serchanged = false;
         if ($('#PMaker').val() != currentRow.PMaker) {
             currentRow.PMaker = $('#PMaker').val();
@@ -157,10 +157,10 @@ $(function () {
                 ChangedP: changed,
                 ChangedS: serchanged
             };
-            
+
             // 受け取り側 C#のクラスのProperty名と一致した Property名を付けること
             // そうしないと、C#側で受け取りのパラメータに null が渡る
-            postToHost(host +"/CalInProcesses/SavePInfo", post_data)
+            postToHost(host + "/CalInProcesses/SavePInfo", post_data)
         }
     };
 
@@ -331,7 +331,7 @@ $(function () {
         // check selected row and push to selected
         oData = dataView.getItems();
         let rows = [];
-        for (let ind = 0; ind < oData.length ;  ind += 1) {
+        for (let ind = 0; ind < oData.length; ind += 1) {
             if (oData[ind].sel) {
                 rows.push(oData[ind]);
             }
@@ -657,7 +657,7 @@ $(function () {
 
     $('input[name="dlprd1"]:radio').change(function () {
         dlprIndex = $(this).val();
-        $('#dlpDateLabel1').text(dateFieldNamesJP[dlprIndex]);        
+        $('#dlpDateLabel1').text(dateFieldNamesJP[dlprIndex]);
     });
 
     $('input[name="dlprd2"]:radio').change(function () {
@@ -689,12 +689,13 @@ $(function () {
             $('#dlpCalResult').val(currentRow.CalResultString);
         }
         //$('#calResultComm').text("");
-        $('#calResultComm').text(currentRow.VenComment);        
+        $('#calResultComm').text(currentRow.VenComment);
     }
 
     // events from fnkey area
 
     $('#fnkey1').click(function () {
+        // download Excel file
         let totalNumber = data.length;
         let idNumberList = [];
         let arow;
@@ -723,7 +724,7 @@ $(function () {
 
     $('#fnkey2').click(function () {
         //<button id="fnkey2">Cal History</button>
-     
+
         if (currentSelectedRow != null) {
             currentRow = grid.getDataItem(currentSelectedRow);
             currentRowIndex = dataView.getIdxById(currentRow.Id);
@@ -801,34 +802,9 @@ $(function () {
     });
 
 
-    const showDiag2 = function (index) {
-        currentRow = oData[index];
-        stage = judgeStage(currentRow);
-        let ind = prepareDialog(stage);
-        // if (stage === 2) { $('#calRes2').css('display','block')}
-        $('#dlpSerial').text("Serial : " + currentRow.SerialNumber);
-        for (let i = 1; i <= 3; ++i) {
-            $('#dlpdl'+i).text(currentRow[dateFieldNames[i]] || "");
-        }
-        for (let i = 4; i <= 6; ++i) {
-            $('#dlpdl' + i).text(currentRow[dateFieldNames[i + 1]] || "");
-        }
-        $('#dlpdi2').val(currentRow[dateFieldNames[ind]] || "")
-        dlprIndex = ind;
-       // if (ind === 2) { $('#calRes2').css('display', 'block') }
-        $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
-        if (dlprIndex == 3) { // 校正実施日
-            showCalResult2();
-            $('#calRes2').css('display', 'block');
-        } else {
-            $('#calRes2').css('display', 'none');
-        }
-        
-        $('#dlpDateLabel').text(dateFieldNamesJP[ind]);
-        dialogObj2.dialog('open');
-    };
 
-    $('#fnkey4').click(function () {       
+    $('#fnkey4').click(function () {
+        // enter product information
         if (currentSelectedRow != null) {
             currentRow = grid.getDataItem(currentSelectedRow);
             currentRowIndex = dataView.getIdxById(currentRow.Id);
@@ -850,9 +826,11 @@ $(function () {
     $('#fnkey5').click(function () {
         // test routine for dataView.getItem(ind);        
         let arow;
-        selected = getAllSelectedRowIndexes()
+        selected = getAllSelectedRowIndexes()   // selected は選択された行のオリジナルデータの　index の配列
+        copiedSelected = selected;
         let n = selected.length;
         let ind;
+        updateList = [];  // initialize updateList
         if (n === 0) {
             // warning for nothing is selected
             alert("変更したい行をチェックしてから、このボタンを押してください"); // or confirm (OK, Cancel)
@@ -864,11 +842,10 @@ $(function () {
                 // apply entered to all selected equipment
                 selectChecked();
                 stage = judgeStage(oData[selected[0]]);
-                let ind = prepareDialog(stage);
-                $('#dlpDateLabel1').text(dateFieldNamesJP[ind]);;
+                dlprIndex = prepareDialog(stage);
+                $('#dlpDateLabel1').text(dateFieldNamesJP[dlprIndex]);;
                 $('#dateInput').val("");
                 dialogObj.dialog('open');
-                selected = [];
                 // save entered data
             } else {
                 initiateDialog();
@@ -877,35 +854,166 @@ $(function () {
         // dialogObj2.dialog('open');
     });
 
-    const initiateDialog = function () {
-        if (selected.length > 0) {
-            currentRowIndex = selected.pop();
-            showDiag2(currentRowIndex);
-        }
-    }
-
     $('#fnkey6').click(function () {
         //<button id="fnkey6">完了設定</button>
     });
 
-    
-    dialogObj2.on('dialogclose', function () {
-        // how to update datagrid on slickgrid
-        returnvalue;
-        let x = dataView.getItemByIdx(currentRowIndex)
-        /*
-        x[dateFieldNames[dlprIndex]] = dlprDate;
-        //dataView.updateItem(currentRowIndex, x);
-        dataView.updateItem(x.Id, x);
-        dataView.refresh();
-        if (selected.length > 0) {
-            let ind = selected.pop();
-            showDiag2(ind);
+
+    const initiateDialog = function () {
+        if (copiedSelected.length > 0) {
+            currentRowIndex = copiedSelected.shift();
+            showDiag2(currentRowIndex);
+        } else {
+            // send updateList to host server
+            let post_data = {
+                UpdateList: updateList
+            };
+            postToHost(host + "/CalInProcesses/SaveChanges", post_data, updateComplete)
         }
-        */
+    }
+
+    const showDiag2 = function (index) {
+        currentRow = oData[index];
+        stage = judgeStage(currentRow);
+        let ind = prepareDialog(stage);
+        // if (stage === 2) { $('#calRes2').css('display','block')}
+        $('#dlpSerial').text("Serial : " + currentRow.SerialNumber);
+        for (let i = 1; i <= 3; ++i) {
+            $('#dlpdl' + i).text(currentRow[dateFieldNames[i]] || "");
+        }
+        for (let i = 4; i <= 6; ++i) {
+            $('#dlpdl' + i).text(currentRow[dateFieldNames[i + 1]] || "");
+        }
+        $('#dlpdi2').val(currentRow[dateFieldNames[ind]] || "")
+
+        dlprIndex = ind;
+        $('input[name="dlprd1"]:radio').val(dlprIndex);
+
+        // if (ind === 2) { $('#calRes2').css('display', 'block') }
+        $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
+        if (dlprIndex == 3) { // 校正実施日
+            showCalResult2();
+            $('#calRes2').css('display', 'block');
+        } else {
+            $('#calRes2').css('display', 'none');
+        }
+
+        $('#dlpDateLabel').text(dateFieldNamesJP[ind]);
+        dialogObj2.dialog('open');
+    };
+
+    const showDpCalResult = function (index) {
+        currentRow = oData[index];
+        //    currentRowIndex = dataView.getIdxById(currentRow.Id);
+        //$('<p>' + arow.SerialNumber + '</p>').appendTo('#lblSerial');
+        $('#lblcrSerial').text('Serial: ' + currentRow.SerialNumber);
+        $('#caldateIn').text('校正実施日: ' + currentRow.CalDate);
+        if (currentRow.CalResult) {
+            $('#calResult3').val(currentRow.CalResult);
+        } else {
+            $('#calResult3').val("--");
+        }
+        $('#calResultComm').text(currentRow.VenComment);
+
+        dialogCalResult.dialog('open');
+    }
+
+    
+    dialogObj.on('dialogclose', function () {
+        let stg, indate;   
+        let update;
+        if (returnvalue === "OK") {
+            stg = dateFieldNames[dlprIndex];
+            indate = $('#dlpdi1').val();
+            
+            for (let i of selected) {
+                update = {StageNum: dlprIndex, EventDate: indate};
+                let arow = dataView.getItemByIdx(i);
+                arow[stg] = indate;
+                let index = arow.Id;
+                dataView.updateItem(arow.Id, arow);　
+                if (stg !== "CalDate") {
+                    update.Id = arow.Id;
+                    updateList.push(update);
+                }
+            }
+            if (stg === "CalDate") {
+                // input cal results
+                if (copiedSelected.length > 0) {
+                    index = copiedSelected.shift();
+                    showDpCalResult(index);
+                }
+            } else {
+                // send updateList to host server
+                let post_data = {
+                    UpdateList: updateList
+                };
+                postToHost(host + "/CalInProcesses/SaveChanges", post_data, updateComplete)
+
+            }
+
+        }
+    });
+
+    dialogCalResult.on('dialogclose', function () {
+        if (returnvalue === "OK") {
+            // store entered result into updateList
+            // currentRow
+            currentRow.CalResult = $('#calResult3').val();
+            currentRow.VenComment = $('#calResultComm').text();
+            dataView.updateItem(currentRow.Id, currentRow);  // update dataView
+            let update = { Id: currentRow.Id, StageNum: 3, EventDate: currentRow.CalDate, CalResult: currentRow.CalResult, Comment: currentRow.VenComment };
+            updateList.push(update);
+        }
+        if (copiedSelected.length > 0) {
+            index = copiedSelected.shift();
+            showDpCalResult(index);
+        } else {
+            // send updateList to host server
+            let post_data = {
+                UpdateList: updateList
+            };
+            postToHost(host + "/CalInProcesses/SaveChanges", post_data, updateComplete)
+        }
+    });
+
+    const updateComplete = function (ret) {
+        alert("Update が完了しました。")
+        // popup or dialog to tell update complete
+    }
+
+    dialogObj2.on('dialogclose', function () {
+        if (returnvalue === "OK") {
+            // store entered result into updateList
+            // currentRow is set at showDiag2
+            currentRow[dateFieldNames[dlprIndex]] = $('#dlpdi2').val();
+            if (dlprIndex === 3) {
+                currentRow.VenComment = $('#dlpcci2').text;
+                if (currentRow.VenComment === null) currentRow.VenComment = "";
+
+                currentRow.CalResultString = $('#dlpCalResult2').val();
+                currentRow.CalResult = null;
+                if (currentRow.CalResultString === "GD") {
+                    currentRow.CalResult = true;
+                } else if (currentRow.CalResultString === "NG") {
+                    currentRow.CalResult = false;
+                } else if (currentRow.CalResultString === "NOCAL") {
+                    if (currentRow.VenComment.indexOf("NoCal") === -1) {
+                        currentRow.VenComment = "NoCal:" + currentRow.VenComment;
+                    }
+                }
+            }
+            dataView.updateItem(currentRow.Id, currentRow);  // update dataView
+            let update = { Id: currentRow.Id, StageNum: dlprIndex, EventDate: currentRow.CalDate };
+            if (dlprIndex === 3) {
+                update.CalResult = currentRow.CalResult;
+                update.Comment = currentRow.VenComment;
+            }
+            updateList.push(update);
+        }
         initiateDialog();
     });
-    
+
 
     // main routine execution start from here
 

@@ -22,8 +22,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace CsmForAsml.Controllers
-{
+namespace CsmForAsml.Controllers {
     public class CalInProcessesController : Controller {
         private readonly CsmForAsml2Context _context;
         private readonly CalInProcessRepository _calInProRepo;
@@ -219,7 +218,7 @@ namespace CsmForAsml.Controllers
             await GetNotMappedFields(cals, ans);
 
             var createExcel = new CreateCalInProcessExcel();
-            MemoryStream ms  = await createExcel.GetExcelStream(ans);           
+            MemoryStream ms = await createExcel.GetExcelStream(ans);
             string filename = "CalInProcess_" + AppResources.JSTNow.ToString("yyyyMMdd-hhmmss") + ".xlsx";
 
             if (Startup.AppSettings["StorageProvider"] == "localfile") {
@@ -280,44 +279,46 @@ namespace CsmForAsml.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> SaveChanges([FromBody] EventUpdate UpdateData) {
-            int Id = UpdateData.Id;
-            int stage = UpdateData.StageNum;
-            MaterialNeedCalRepository mrep = _context.MaterialNeedCalRepository;
+        public async Task<ActionResult> SaveChanges([FromBody] Updates Updates) {
+            foreach (var UpdateData in Updates.UpdateList) {
+                int Id = UpdateData.Id;
+                int stage = UpdateData.StageNum;
+                MaterialNeedCalRepository mrep = _context.MaterialNeedCalRepository;
 
-            var entry = _calInProRepo.GetRecord(Id);
-            switch (stage) {
-                case 0:  //ASML 発送日
-                    if (UpdateData.EventDate!=null ) entry.UserShipDate = UpdateData.EventDate;
-                    break;
-                case 1:  // Vendor 受領日
-                    if (UpdateData.EventDate != null) entry.VenReceiveDate = UpdateData.EventDate;
-                    // calculate return date and send back
-                    var matentry = mrep.GetRecord(entry.Material);
-                    var StdTAT = matentry.Std_TAT;
-                    if (StdTAT != null) {
-                        entry.PlanedShipDate = AppResources.DateAfterNWorkDays((DateTime) entry.VenReceiveDate, (int) StdTAT);
-                        // client に変更を通知
-                    }                    
-                    break;
-                case 2:  // 校正日
-                    if (UpdateData.EventDate != null) entry.CalDate = UpdateData.EventDate;
-                    if (UpdateData.Flag != null) entry.CalResult = UpdateData.Flag;
-                    if (!string.IsNullOrWhiteSpace(UpdateData.Comment)) entry.VenComment = UpdateData.Comment;
-                    break;
-                case 3:   // Vendor 発送日
-                    if (UpdateData.EventDate != null) entry.VenShipDate = UpdateData.EventDate;
-                    break;
-                case 4:   // asml 受領日
-                    if (UpdateData.EventDate != null) entry.UserReceiveDate = UpdateData.EventDate;
-                    break;
-                case 5:  //  CC 受領日
-                    if (UpdateData.EventDate != null) entry.CcReceiveDate = UpdateData.EventDate;
-                    break;
+                var entry = _calInProRepo.GetRecord(Id);
+                switch (stage) {
+                    case 0:  //ASML 発送日
+                        if (UpdateData.EventDate != null) entry.UserShipDate = UpdateData.EventDate;
+                        break;
+                    case 1:  // Vendor 受領日
+                        if (UpdateData.EventDate != null) entry.VenReceiveDate = UpdateData.EventDate;
+                        // calculate return date and send back
+                        var matentry = mrep.GetRecord(entry.Material);
+                        var StdTAT = matentry.Std_TAT;
+                        if (StdTAT != null) {
+                            entry.PlanedShipDate = AppResources.DateAfterNWorkDays((DateTime)entry.VenReceiveDate, (int)StdTAT);
+                            // client に変更を通知
+                        }
+                        break;
+                    case 2:  // 校正日
+                        if (UpdateData.EventDate != null) entry.CalDate = UpdateData.EventDate;
+                        if (UpdateData.CalResult != null) entry.CalResult = UpdateData.CalResult;
+                        if (!string.IsNullOrWhiteSpace(UpdateData.Comment)) entry.VenComment = UpdateData.Comment;
+                        break;
+                    case 3:   // Vendor 発送日
+                        if (UpdateData.EventDate != null) entry.VenShipDate = UpdateData.EventDate;
+                        break;
+                    case 4:   // asml 受領日
+                        if (UpdateData.EventDate != null) entry.UserReceiveDate = UpdateData.EventDate;
+                        break;
+                    case 5:  //  CC 受領日
+                        if (UpdateData.EventDate != null) entry.CcReceiveDate = UpdateData.EventDate;
+                        break;
+                }
+                _calInProRepo.UpdateRecord(entry);
             }
-            _calInProRepo.UpdateRecord(entry);
 
-            string filename ="EE";
+            string filename = "EE";
             var serializeOptions = new JsonSerializerOptions {
                 PropertyNamingPolicy = null,
                 WriteIndented = true
@@ -327,11 +328,11 @@ namespace CsmForAsml.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> SavePInfo ([FromBody] PInfo PInfoData) {          
+        public async Task<ActionResult> SavePInfo([FromBody] PInfo PInfoData) {
             string clientId = PInfoData.connectionId;
             if (PInfoData.ChangedP) {
                 MaterialNeedCalRepository matrep = _context.MaterialNeedCalRepository;
-                var materialEntry =  matrep.GetRecord(PInfoData.Material);
+                var materialEntry = matrep.GetRecord(PInfoData.Material);
                 materialEntry.PMaker = PInfoData.PMaker;
                 materialEntry.PModel = PInfoData.PModel;
                 materialEntry.PName = PInfoData.PName;
@@ -369,10 +370,14 @@ namespace CsmForAsml.Controllers
 
     public class EventUpdate {
         public int Id { get; set; }
-        public int  StageNum { get; set; }
+        public int StageNum { get; set; }
         public DateTime? EventDate { get; set; }
-        public bool? Flag { get; set; }
+        public bool? CalResult { get; set; }
         public string Comment { get; set; }
+    }
+
+    public class Updates {
+      public List<EventUpdate> UpdateList;
     }
 
 }
