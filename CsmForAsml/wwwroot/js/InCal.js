@@ -940,7 +940,7 @@ $(function () {
             if (stg === "CalDate") {
                 // input cal results
                 if (copiedSelected.length > 0) {
-                    index = copiedSelected.shift();
+                    let index = copiedSelected.shift();
                     showDpCalResult(index);
                 }
             } else {
@@ -959,20 +959,21 @@ $(function () {
         if (returnvalue === "OK") {
             // store entered result into updateList
             // currentRow
-            currentRow.CalResult = $('#calResult3').val();
+            //currentRow.CalResult = $('#calResult3').val();  debug
+            currentRow.CalResult = true; //debug
             currentRow.VenComment = $('#calResultComm').text();
             dataView.updateItem(currentRow.Id, currentRow);  // update dataView
             let update = { Id: currentRow.Id, StageNum: 3, EventDate: currentRow.CalDate, CalResult: currentRow.CalResult, Comment: currentRow.VenComment };
             updateList.push(update);
         }
         if (copiedSelected.length > 0) {
-            index = copiedSelected.shift();
+            let index = copiedSelected.shift();
             showDpCalResult(index);
         } else {
             // send updateList to host server
             let post_data = {
                 UpdateList: updateList
-            };
+            };            
             postToHost(host + "/CalInProcesses/SaveChanges", post_data, updateComplete)
         }
     });

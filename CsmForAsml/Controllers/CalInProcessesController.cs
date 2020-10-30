@@ -280,42 +280,49 @@ namespace CsmForAsml.Controllers {
 
         [HttpPost]
         public async Task<ActionResult> SaveChanges([FromBody] Updates Updates) {
+            MaterialNeedCalRepository mrep = _context.MaterialNeedCalRepository;
+
             foreach (var UpdateData in Updates.UpdateList) {
+                DateTime eventDate = DateTime.MinValue;
                 int Id = UpdateData.Id;
                 int stage = UpdateData.StageNum;
-                MaterialNeedCalRepository mrep = _context.MaterialNeedCalRepository;
 
-                var entry = _calInProRepo.GetRecord(Id);
-                switch (stage) {
-                    case 0:  //ASML 発送日
-                        if (UpdateData.EventDate != null) entry.UserShipDate = UpdateData.EventDate;
-                        break;
-                    case 1:  // Vendor 受領日
-                        if (UpdateData.EventDate != null) entry.VenReceiveDate = UpdateData.EventDate;
-                        // calculate return date and send back
-                        var matentry = mrep.GetRecord(entry.Material);
-                        var StdTAT = matentry.Std_TAT;
-                        if (StdTAT != null) {
-                            entry.PlanedShipDate = AppResources.DateAfterNWorkDays((DateTime)entry.VenReceiveDate, (int)StdTAT);
-                            // client に変更を通知
-                        }
-                        break;
-                    case 2:  // 校正日
-                        if (UpdateData.EventDate != null) entry.CalDate = UpdateData.EventDate;
-                        if (UpdateData.CalResult != null) entry.CalResult = UpdateData.CalResult;
-                        if (!string.IsNullOrWhiteSpace(UpdateData.Comment)) entry.VenComment = UpdateData.Comment;
-                        break;
-                    case 3:   // Vendor 発送日
-                        if (UpdateData.EventDate != null) entry.VenShipDate = UpdateData.EventDate;
-                        break;
-                    case 4:   // asml 受領日
-                        if (UpdateData.EventDate != null) entry.UserReceiveDate = UpdateData.EventDate;
-                        break;
-                    case 5:  //  CC 受領日
-                        if (UpdateData.EventDate != null) entry.CcReceiveDate = UpdateData.EventDate;
-                        break;
-                }
-                _calInProRepo.UpdateRecord(entry);
+                bool res = (UpdateData.EventDate != null) && DateTime.TryParse(UpdateData.EventDate, out eventDate);                
+                if (res) {
+                    var entry = _calInProRepo.GetRecord(Id);
+                    switch (stage) {
+                        case 1:  //ASML 発送日
+                            if (UpdateData.EventDate != null) entry.UserShipDate = eventDate;
+                            break;
+                        case 2:  // Vendor 受領日
+                            if (UpdateData.EventDate != null) entry.VenReceiveDate = eventDate;
+                            // calculate return date and send back
+                            var matentry = mrep.GetRecord(entry.Material);
+                            var StdTAT = matentry.Std_TAT;
+                            if (StdTAT != null) {
+                                entry.PlanedShipDate = AppResources.DateAfterNWorkDays((DateTime)entry.VenReceiveDate, (int)StdTAT);
+                                // client に変更を通知
+                            }
+                            break;
+                        case 3:  // 校正日
+                            if (UpdateData.EventDate != null) entry.CalDate = eventDate;
+                            if (UpdateData.CalResult != null) entry.CalResult = UpdateData.CalResult;
+                            if (!string.IsNullOrWhiteSpace(UpdateData.Comment)) entry.VenComment = UpdateData.Comment;
+                            break;
+                        case 4:   // Vendor 発送日
+                            if (UpdateData.EventDate != null) entry.VenShipDate = eventDate;
+                            break;
+                        case 5:   // asml 受領日
+                            if (UpdateData.EventDate != null) entry.UserReceiveDate = eventDate;
+                            break;
+                        case 6:  //  CC 受領日
+                            if (UpdateData.EventDate != null) entry.CcReceiveDate = eventDate;
+                            break;
+                        default:
+                            break;
+                    }
+                    _calInProRepo.UpdateRecord(entry);
+                }                
             }
 
             string filename = "EE";
@@ -371,13 +378,13 @@ namespace CsmForAsml.Controllers {
     public class EventUpdate {
         public int Id { get; set; }
         public int StageNum { get; set; }
-        public DateTime? EventDate { get; set; }
+        public string EventDate { get; set; }
         public bool? CalResult { get; set; }
         public string Comment { get; set; }
     }
 
     public class Updates {
-      public List<EventUpdate> UpdateList;
+      public List<EventUpdate> UpdateList { get; set; }
     }
 
 }
