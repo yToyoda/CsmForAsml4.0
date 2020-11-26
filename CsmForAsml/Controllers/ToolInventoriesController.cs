@@ -18,10 +18,11 @@ using CsmForAsml.Tools;
 using Microsoft.CodeAnalysis.Operations;
 using System.Runtime.CompilerServices;
 using System.Reflection.Metadata;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 
 namespace CsmForAsml.Controllers {
+    [Authorize]
     public class ToolInventoriesController : Controller {
         private readonly CsmForAsml2Context _context;
         private readonly ToolInventoryRepository _toolRepo;
@@ -179,16 +180,19 @@ namespace CsmForAsml.Controllers {
             CalInProcessRepository cipr = _context.CalInProcessRepository;
             CalDateRepository cdr = _context.CalDateRepository;
             List<CalStat> calstatlist = new List<CalStat>();
-            
+            // UpdateCalStatList calstatlist = new UpdateCalStatList();
+
+
             for (int i = 0; i<serial.SerialNums.Count; ++i) { 
             //foreach (var num in serial.SerialNums) {
 
                 CalStat stat = new CalStat();
                 stat.SerialNumber = serial.SerialNums[i];
                 calstatlist.Add(stat);
+                //calstatlist.ResultList.Add(stat);
 
                 if (serial.NoCheckFlags[i]) {
-                    // RegisterToInCal(stat.SerialNumber);
+                    RegisterToInCal(stat.SerialNumber);
                     stat.MoveToIncal = true;                
                     continue;
                 }
@@ -202,22 +206,28 @@ namespace CsmForAsml.Controllers {
                 }
 
                 var inventory = tir.GetRecord(stat.SerialNumber);
-                var material = mncr.GetRecord( inventory.Material);
-                int calInterval = material.CalInterval ?? 12;    // calInterval is in months
-                int calIntervalInDays = (int)(daysInYear / 12.0 ) * calInterval;
+                if (inventory != null) {
+                    var material = mncr.GetRecord(inventory.Material);
+                    int calInterval = material.CalInterval ?? 12;    // calInterval is in months
+                    int calIntervalInDays = (int)(daysInYear / 12.0) * calInterval;
 
-                DateTime? LatestCalDate = cdr.GetLatestCalDate(stat.SerialNumber);                
-                if (LatestCalDate != null) {
-                    int days = AppResources.JSTNow.Subtract((DateTime)LatestCalDate).Days;
-                    double percentdays = (double) days / (double) calIntervalInDays;
-                    if (percentdays < warningLevel ) {
-                        stat.MoveToIncal = false;
-                        stat.CommentToUser = $"この Material {inventory.Material} の校正周期は {calInterval} ヵ月です。この Serial の　最新校正日は{LatestCalDate:d}でそこから {days} 日、校正周期の {percentdays:p1} しか経っていません。再度校正のため In-Cal に移動しますか?";
-                        continue;
+                    DateTime? LatestCalDate = cdr.GetLatestCalDate(stat.SerialNumber);
+                    if (LatestCalDate != null) {
+                        int days = AppResources.JSTNow.Subtract((DateTime)LatestCalDate).Days;
+                        double percentdays = (double)days / (double)calIntervalInDays;
+                        if (percentdays < warningLevel) {
+                            stat.MoveToIncal = false;
+                            stat.CommentToUser = $"この Material {inventory.Material} の校正周期は {calInterval} ヵ月です。この Serial の　最新校正日は{LatestCalDate:d}でそこから {days} 日、校正周期の {percentdays:p1} しか経っていません。再度校正のため In-Cal に移動しますか?";
+                            continue;
+                        }
                     }
+                    // RegisterToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
+                    stat.MoveToIncal = true;
+                } else {
+                    stat.MoveToIncal = false;
+                    stat.InInCal = false;
+                    stat.CommentToUser = "この Serial Number は InventoryList にありません。";
                 }
-                // RegisterToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
-                stat.MoveToIncal = true;                 
             }
 
             var serializeOptions = new JsonSerializerOptions {
@@ -373,5 +383,12 @@ namespace CsmForAsml.Controllers {
         public bool MoveToIncal {get;set;} = false;
         public bool InInCal { get; set; } = false;
         public string CommentToUser { get; set; } = "";
+    }
+
+    public class UpdateCalStatList {
+        public UpdateCalStatList() {
+            ResultList = new List<CalStat>();
+        }
+        public List<CalStat> ResultList { get; set; }
     }
 }

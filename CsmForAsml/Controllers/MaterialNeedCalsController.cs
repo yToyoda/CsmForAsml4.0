@@ -9,10 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsmForAsml.Controllers
 {
+    [Authorize]
     public class MaterialNeedCalsController : Controller
     {
         private readonly CsmForAsml2Context _context;

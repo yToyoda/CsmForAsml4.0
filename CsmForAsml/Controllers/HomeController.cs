@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CsmForAsml.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsmForAsml.Controllers {
     public class HomeController : Controller {

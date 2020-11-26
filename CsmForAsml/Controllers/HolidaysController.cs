@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
+using Microsoft.AspNetCore.Authorization;
 
-namespace CsmForAsml.Controllers
-{
+namespace CsmForAsml.Controllers 
+{ 
+[Authorize]
     public class HolidaysController : Controller
     {
         private readonly CsmForAsml2Context _context;

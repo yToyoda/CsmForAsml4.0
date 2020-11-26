@@ -82,6 +82,7 @@ $(function () {
     let dialogObj = $('#dialog-pannel');
     let dialogObj2 = $('#dialog-pannel2');
     let dialogCalResult = $('#dp-calResult');
+    let dialogSaveStatus = $('#SaveStatus');
 
     let returnvalue;
 
@@ -220,8 +221,14 @@ $(function () {
         width: 500,
     })
 
-
-
+    dialogSaveStatus.dialog({
+        dialogClass: "customdiag-ygreen",
+        buttons: dialogButtons,
+        modal: true,
+        //  show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 500,
+    })
 
     const judgeStage = function (arow) {
         let inPat = [];
@@ -656,15 +663,17 @@ $(function () {
     });
 
     $('input[name="dlprd1"]:radio').change(function () {
-        dlprIndex = $(this).val();
+        let ind = $(this).val();
+        dlprIndex = parseInt(ind, 10);
         $('#dlpDateLabel1').text(dateFieldNamesJP[dlprIndex]);
     });
 
     $('input[name="dlprd2"]:radio').change(function () {
-        dlprIndex = $(this).val();
+        let ind = $(this).val();
+        dlprIndex = parseInt(ind,10);
         $('#dlpdi2').val(currentRow[dateFieldNames[dlprIndex]] || "")
         $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
-        if (dlprIndex === "3") { // 校正実施日
+        if (dlprIndex === 3) { // 校正実施日
             showCalResult2();
             $('#calRes2').css('display', 'block');
         } else {
@@ -836,7 +845,9 @@ $(function () {
             alert("変更したい行をチェックしてから、このボタンを押してください"); // or confirm (OK, Cancel)
             return;
         } else if (n === 1) {
-            initiateDialog();
+            // initiateDialog();
+            currentRowIndex = copiedSelected.shift();
+            showDiag2(currentRowIndex);
         } else {
             if (allSameStage()) {
                 // apply entered to all selected equipment
@@ -848,7 +859,9 @@ $(function () {
                 dialogObj.dialog('open');
                 // save entered data
             } else {
-                initiateDialog();
+                //initiateDialog();
+                currentRowIndex = copiedSelected.shift();
+                showDiag2(currentRowIndex);
             }
         }
         // dialogObj2.dialog('open');
@@ -937,11 +950,11 @@ $(function () {
                     updateList.push(update);
                 }
             }
-            if (stg === "CalDate") {
-                // input cal results
+            if (dlprIndex === 3) {  
+                // dlprIndex show CalDate
                 if (copiedSelected.length > 0) {
                     let index = copiedSelected.shift();
-                    showDpCalResult(index);
+                    showDpCalResult(index); //
                 }
             } else {
                 // send updateList to host server
@@ -979,15 +992,64 @@ $(function () {
     });
 
     const updateComplete = function (ret) {
-        alert("Update が完了しました。")
-        // popup or dialog to tell update complete
+        let resultLists = ret.responseJSON;
+        let rlist = resultLists.ResultList;
+        let len = rlist.length;
+        let ml = document.getElementById("messagesList");
+        while (ml.firstChild) {  // remove all list if exist
+            ml.removeChild(ml.firstChild);
+        }
+        let mlf = document.getElementById("messagesListFail");
+        while (mlf.firstChild) {
+            mlf.removeChild(mlf.firstChild);
+        }
+        document.getElementById('FailP').style.display = "none";
+        document.getElementById('FailM').style.display = "none";
+        let arow;
+        let result;
+        let li = [];
+        let lc = 0;
+        for (let i = 0; i < len; ++i){
+            result = rlist[i];
+            li[lc] = document.createElement("li");
+            let id = result.Id;
+            arow = dataView.getItemById(id)
+            if (result.Status === "OK") {
+                li[lc].textContent = `Serial:${arow.SerialNumber} ${dateFieldNamesJP[result.StageNum]}  ${arow[dateFieldNames[result.StageNum]]}`
+                li[lc].setAttribute("Class", "fsl");
+                ml.appendChild(li[lc]);
+                if (result.StageNum === 2) {
+                    lc += 1;
+                    li[lc] = document.createElement("li");
+                    arow.PlanedShipDate = result.OptionalDate;
+                    let idx = dataView.getIdxById(id);
+                    dataView.updateItem(id, arow);
+                    li[lc].textContent = `--　　　　　　　 ${dateFieldNamesJP[4]}  ${arow.PlanedShipDate}`　　　　　　// inserted 日本語空白 x8 for disply
+                    li[lc].setAttribute("Class", "fsl");
+                    ml.appendChild(li[lc]);
+                }
+            } else {
+                document.getElementById('FailP').style.display = "block";
+                document.getElementById('FailM').style.display = "block";
+                li[lc].textContent = `Serial:${arow.SerialNumber} ${dateFieldNamesJP[result.StageNum]}  ${result.Status}`
+                li[lc].setAttribute("Class", "fsl");
+                mlf.appendChild(li[i]);
+            }
+            lc += 1;
+        }
+        dialogSaveStatus.dialog('open');
+        //let y = ret;
+        //
+        // resultList に基づき、予定出荷日を Update
+        // もしエラーがあれば表示
     }
 
     dialogObj2.on('dialogclose', function () {
         if (returnvalue === "OK") {
             // store entered result into updateList
             // currentRow is set at showDiag2
-            currentRow[dateFieldNames[dlprIndex]] = $('#dlpdi2').val();
+            let eventDate = $('#dlpdi2').val();
+            currentRow[dateFieldNames[dlprIndex]] = eventDate;
             if (dlprIndex === 3) {
                 currentRow.VenComment = $('#dlpcci2').text;
                 if (currentRow.VenComment === null) currentRow.VenComment = "";
@@ -1005,14 +1067,24 @@ $(function () {
                 }
             }
             dataView.updateItem(currentRow.Id, currentRow);  // update dataView
-            let update = { Id: currentRow.Id, StageNum: dlprIndex, EventDate: currentRow.CalDate };
+            let update = { Id: currentRow.Id, StageNum: dlprIndex, EventDate: eventDate };
             if (dlprIndex === 3) {
                 update.CalResult = currentRow.CalResult;
                 update.Comment = currentRow.VenComment;
             }
             updateList.push(update);
         }
-        initiateDialog();
+        // initiateDialog();
+        if (copiedSelected.length > 0) {
+            currentRowIndex = copiedSelected.shift();
+            showDiag2(currentRowIndex);
+        } else {
+            // send updateList to host server
+            let post_data = {
+                UpdateList: updateList
+            };
+            postToHost(host + "/CalInProcesses/SaveChanges", post_data, updateComplete)
+        }
     });
 
 

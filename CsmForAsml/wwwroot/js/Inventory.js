@@ -79,7 +79,7 @@ $(function () {  //main of slickgrid
     ];
 
     dpMovedToInCal.dialog({
-        dialogClass: "customdiag-aqua",
+        dialogClass: "customdiag-ygreen",
         buttons: buttonOk,
         modal: true,
         show: { effect: "blind", duration: 100 },
@@ -89,7 +89,7 @@ $(function () {  //main of slickgrid
 
 
     dpRefusedToMove.dialog({
-        dialogClass: "customdiag-aqua",
+        dialogClass: "customdiag-ygreen",
         buttons: buttonOk,
         modal: true,
         show: { effect: "blind", duration: 100 },
@@ -98,7 +98,7 @@ $(function () {  //main of slickgrid
     });
 
     dpDoYouMove.dialog({
-        dialogClass: "customdiag-aqua",
+        dialogClass: "customdiag-ygreen",
         buttons: buttonsYesNo,
         modal: true,
         show: { effect: "blind", duration: 100 },
@@ -606,8 +606,8 @@ $(function () {  //main of slickgrid
 
     // fnkey4  Move to Incal
     $('#fnkey4').click(function () {
-        let totalNumber = data.length;
-        let arow;
+        //let totalNumber = data.length;
+        //let arow;
         let serialNumberList = [];
         let nocheckflaglist = [];
 

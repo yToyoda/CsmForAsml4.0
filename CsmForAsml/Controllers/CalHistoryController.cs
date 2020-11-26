@@ -14,9 +14,11 @@ using CsmForAsml.Models;
 using CsmForAsml.Tools;
 using CsmForAsml.Hubs;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CsmForAsml.Controllers
 {
+    [Authorize]
     public class CalHistoryController : Controller
     {
         private readonly CsmForAsml2Context _context;

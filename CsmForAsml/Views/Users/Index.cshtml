@@ -1,0 +1,35 @@
+﻿@model IEnumerable<CsmForAsml.Models.User>
+
+@{
+    ViewData["Title"] = "User";
+}
+
+<h1>User</h1>
+
+
+<p>
+    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>UseName</th>
+            <th>Roles</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>@item.Email</td>
+                <td>@item.UserName</td>
+                <td>@item.Roles</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { @item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { @item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { @item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

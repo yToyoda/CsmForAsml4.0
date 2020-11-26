@@ -8,9 +8,9 @@
    Move to InCal のデバッグのため
    　Inventory.js     $('#fnkey4').click(function ()  の本来の処理コメントアウトし、テスト用シリアルを送るよう改造
    　ToolInventoriesController.cs  
-		MoveToIncal の中で　RegistorToInCal(stat.SerialNumber)　の呼び出しをコメントアウトしている (2箇所)
+		MoveToIncal の中で　RegisterToInCal(stat.SerialNumber)　の呼び出しをコメントアウトしている (2箇所)
 
-	テスト終了時に上記を元に戻すこと
+	テスト終了時に上記を元に戻すこと　(戻した 11/2)
 
 SignalR は、ここまでの所は必須ではないが、後に使うため、例とし残した。
 　　CalHistoryController.cs    LatestCalCert からの結果通知
@@ -26,3 +26,19 @@ InCal - save changes 完成
 LogIn / LogIn権限の設定
 UserRole による機能制限
 
+2020/11/2
+InCal  resultList が帰ってくるところまでデバッグ
+返り値による更新、アラームを用 coding
+
+updateComplete = function (ret) {
+        let resultList = ret.responseJSON;
+        //let y = ret;
+        //
+        // resultList に基づき、予定出荷日を Update
+        // もしエラーがあれば表示
+    }
+
+    CalInProcessController.cs
+      public async Task<ActionResult> SaveChanges
+      の line 349  デバッグのためコメントアウト中
+         // _calInProRepo.UpdateRecord(entry);

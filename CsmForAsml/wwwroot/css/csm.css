@@ -341,10 +341,15 @@ input[name="tab_item"] {
 }
 
 .customdiag-aqua {
-    background: aquamarine;
-    
+    background: aquamarine;    
     font-size: medium;
 }
+
+.customdiag-ygreen {
+    background-color: rgb(245, 245, 220);
+    font-size: large;
+}
+
 
 .dialog-panel__message {
     padding-left: 20px;
@@ -391,6 +396,9 @@ h1 {
     background-color: #FFA;
 }
 
+.hiddenBlock {
+    display: none;
+}
 
 * {
     font-family: arial;
