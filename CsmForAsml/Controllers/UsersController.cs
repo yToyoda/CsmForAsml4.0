@@ -50,7 +50,8 @@ namespace CsmForAsml.Controllers {
             if (roles.Count() <5) {
                await AddRole();
             }
-            var dbusers = _userManager.Users.ToList();
+            var dbusers = _userManager.Users.ToList().OrderBy(u => u.Email);
+            
             foreach (var dbuser in dbusers) {
                 User user = new User();
                 user.Id = dbuser.Id;

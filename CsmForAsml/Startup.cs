@@ -30,8 +30,8 @@ namespace CsmForAsml {
         public void ConfigureServices(IServiceCollection services) {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("aspnet-Asml")));
-            //Configuration.GetConnectionString("DefaultConnection")));
+                    //Configuration.GetConnectionString("aspnet-Asml")));
+                Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
