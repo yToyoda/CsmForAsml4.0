@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.Extensions.Logging;
 using SysIO = System.IO;
-
 using CsmForAsml.Models;
 using CsmForAsml.Tools;
 using CsmForAsml.Hubs;
@@ -18,16 +18,18 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CsmForAsml.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class CalHistoryController : Controller
     {
+        private readonly ILogger<CalHistoryController> _logger;
         private readonly CsmForAsml2Context _context;
-        private readonly IHubContext<CsmHub> _hubContext;
+        //private readonly IHubContext<CsmHub> _hubContext;
 
-        public CalHistoryController(CsmForAsml2Context context, IHubContext<CsmHub> hubContext)
-        {
+        //public CalHistoryController(ILogger<CalHistoryController> logger, CsmForAsml2Context context, IHubContext<CsmHub> hubContext)
+        public CalHistoryController(ILogger<CalHistoryController> logger, CsmForAsml2Context context) {
+            _logger = logger;
             _context = context;
-            _hubContext = hubContext;
+            //_hubContext = hubContext;
         }
 
         // GET: CalHistory
@@ -37,6 +39,7 @@ namespace CsmForAsml.Controllers
         }
         public async Task<IActionResult> History(string id ) {
             string ser = id;
+            // _logger.Log("History of " + ser + " requested");
             //string ser = "J0251";
             ViewData["Serial"] = ser;
             string prefix = Startup.AppSettings["AzureUrlPrefix"];
@@ -63,7 +66,7 @@ namespace CsmForAsml.Controllers
             var e = _context.CalDateRepository.GetRecords(r => r.Serial == ser).FirstOrDefault();
             string filename = e.PdfFileName ?? "";
 
-            await _hubContext.Clients.Client(ConId).SendAsync("LatestCalCert",filename);
+            //await _hubContext.Clients.Client(ConId).SendAsync("LatestCalCert",filename);
 
             return new EmptyResult();
 

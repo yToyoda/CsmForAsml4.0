@@ -57,4 +57,13 @@
     <ApplicationDefinition Include="bundleconfig.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\js\InCal.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\js\Inventory.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
