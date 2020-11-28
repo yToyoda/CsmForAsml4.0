@@ -31,6 +31,7 @@ $(function () {  //main of slickgrid
     let selectListReloadLevel = 0;
     let headerRowInputIds = [];
     let host = window.location.protocol + "//" + window.location.host;
+    let hosturl = host;
     let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
     let this_connectionId;
     let serialList;
@@ -589,7 +590,8 @@ $(function () {  //main of slickgrid
         let arow;
         if (currentSelectedRow != null) {
             arow = grid.getDataItem(currentSelectedRow);
-            window.open(host + "/CalHistory/History/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            //window.open(host + "/CalHistory/History/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            window.open(host + "/CalHistory/History/" + arow.SerialNumber );
         }
     });
 

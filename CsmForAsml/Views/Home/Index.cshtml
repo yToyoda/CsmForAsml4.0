@@ -5,4 +5,24 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <h4>Calibration Status Manager for ASML Japan - Version 4</a>.</h4>
+
+    <div class="col-md-6 fsl">
+        HostAddress :
+        <label id="HostAdd" class="fsm"> nnn </label>
+        HostAddress fix :
+        <label id="HostAddFix" class="fsm"> nnn </label>
+    </div>
 </div>
+
+<script src="~/js/site.min.js"></script>
+<script>
+
+    $(function () {
+        let host = window.location.protocol + "//" + window.location.host;
+        let azurehost = "https://csmforasml-test.azurewebsites.net/";
+        let y = host;
+        let z = azurehost;
+        $('#HostAdd').text(y);
+        $('#HostAddFix').text(z);
+    })
+</script>

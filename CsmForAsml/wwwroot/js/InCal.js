@@ -36,6 +36,9 @@ $(function () {
     let selectListReloadLevel = 0;
     let headerRowInputIds = [];
     let host = window.location.protocol + "//" + window.location.host;
+    let hosturl = host;
+    //let host = "https://csmforasml-test.azurewebsites.net/";
+    let azurehost = "https://csmforasml-test.azurewebsites.net/";
     let connection = new signalR.HubConnectionBuilder().withUrl("/csmhub").build();
     let this_connectionId;
     let serialList;
@@ -438,6 +441,10 @@ $(function () {
         let showing = dataView.getLength();
         $('#NumShowing').text(showing);
         $('#NumTotal').text(totalNumber);
+        $('#HostUrl').text(hosturl+"-"+host);
+        if (!hosturl) {
+            alert("hosturl が異常です"　+ hosturl.toString());
+        }
     }
 
     const setDropdownList = function (cssSelector, list) {
@@ -737,7 +744,8 @@ $(function () {
         if (currentSelectedRow != null) {
             currentRow = grid.getDataItem(currentSelectedRow);
             currentRowIndex = dataView.getIdxById(currentRow.Id);
-            window.open(host + "/CalHistory/History/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
+            //window.open(host + "/CalHistory/History/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
+            window.open(host + "/CalHistory/History/" + currentRow.SerialNumber );
         }
     });
 
@@ -842,7 +850,7 @@ $(function () {
         updateList = [];  // initialize updateList
         if (n === 0) {
             // warning for nothing is selected
-            alert("変更したい行をチェックしてから、このボタンを押してください"); // or confirm (OK, Cancel)
+            alert("変更したい行をチェックしてから、このボタンを押してください"+hosturl); // or confirm (OK, Cancel)
             return;
         } else if (n === 1) {
             // initiateDialog();
