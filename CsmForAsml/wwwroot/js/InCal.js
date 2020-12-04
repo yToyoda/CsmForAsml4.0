@@ -754,12 +754,22 @@ $(function () {
             currentRow = grid.getDataItem(currentSelectedRow);
             currentRowIndex = dataView.getIdxById(currentRow.Id);
             //stat = window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-            $.get(host + "/CalHistory/LatestCalCert/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
+            //$.get(host + "/CalHistory/LatestCalCert/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
+            postToHost(host + "/CalHistory/LatestCalCert/", currentRow.SerialNumber, LatestCalCertComplete);
             return;
         }
         return;
     });
 
+    const LatestCalCertComplete = function (res) {
+        let filename = res.responseJSON;
+        if (filename === null || filename === "") {
+            alert("保存されている校正証明書はありませんでした");
+        } else {
+            window.open(host + "/CalHistory/ShowPdf/" + filename);
+        }
+
+    }
 
     const postToHost = function (urlto, post_data, completeFunction) {
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換

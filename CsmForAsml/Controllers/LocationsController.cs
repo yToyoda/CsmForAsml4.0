@@ -7,22 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace CsmForAsml.Controllers
 {
     [Authorize]
     public class LocationsController : Controller
     {
+        private readonly ILogger<LocationsController> _logger;
         private readonly CsmForAsml2Context _context;
 
-        public LocationsController(CsmForAsml2Context context)
+        public LocationsController(ILogger<LocationsController> logger, CsmForAsml2Context context)
         {
+            _logger = logger;
             _context = context;
         }
 
         // GET: Locations
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Location - Index");
             return View(await _context.Location.ToListAsync());
         }
 

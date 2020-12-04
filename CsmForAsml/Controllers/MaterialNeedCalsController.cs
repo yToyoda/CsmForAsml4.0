@@ -10,17 +10,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace CsmForAsml.Controllers
 {
     [Authorize]
     public class MaterialNeedCalsController : Controller
     {
+        private readonly ILogger<MaterialNeedCalsController> _logger;
         private readonly CsmForAsml2Context _context;
         private readonly MaterialNeedCalRepository _mncRepo;
 
-        public MaterialNeedCalsController(CsmForAsml2Context context)
+        public MaterialNeedCalsController(ILogger<MaterialNeedCalsController> logger, 
+                                                CsmForAsml2Context context)
         {
+            _logger = logger;
             _context = context;
             _mncRepo = context.MaterialNeedCalRepository;
         }
@@ -41,6 +45,7 @@ namespace CsmForAsml.Controllers
                 }
             }
             */
+            _logger.LogInformation("Material Need Cal - Index");
             return View(list);
         }
 

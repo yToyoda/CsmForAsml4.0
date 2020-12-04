@@ -7,22 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace CsmForAsml.Controllers 
 { 
 [Authorize]
     public class HolidaysController : Controller
     {
+        private readonly ILogger<HolidaysController> _logger;
         private readonly CsmForAsml2Context _context;
 
-        public HolidaysController(CsmForAsml2Context context)
+        public HolidaysController(ILogger<HolidaysController> logger, CsmForAsml2Context context)
         {
+            _logger = logger;
             _context = context;
         }
 
         // GET: Holidays
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Holidays - Index");
             return View(await _context.Holidays.ToListAsync());
         }
 

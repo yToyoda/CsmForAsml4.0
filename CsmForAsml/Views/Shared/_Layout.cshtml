@@ -38,15 +38,28 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
-                        <!--
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                        -->
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="History">History</a>
+                        
+                        <li class="dropdown">
+                            <a class="dropdown-toggle text-dark" data-toggle="dropdown" href="#" role="button">
+                                Help
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="History">Version History</a>
+                                </li>
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Documents">Documents</a>                                    
+                                </li>
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+                                </li>                                
+                            </ul>
                         </li>
+
                         @if (SignInManager.IsSignedIn(User)) {
+
+
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="MaterialNeedCals" asp-action="Index">MaterialNeedCal</a>
                             </li>
@@ -68,8 +81,8 @@
                                 </li>
                             }
                         }
-                    </ul>
-                </div>
+                        </li>
+</div>
             </div>
         </nav>
     </header>

@@ -117,7 +117,7 @@ $(function () {  //main of slickgrid
 
 
     connection.start().then(function () {
-        console.log('Now connected, connection ID=' + connection.connectionId);
+       // console.log('Now connected, connection ID=' + connection.connectionId);
         this_connectionId = connection.connectionId
     }).catch(function (err) {
         return console.error(err.toString());
@@ -602,18 +602,26 @@ $(function () {  //main of slickgrid
         if (currentSelectedRow != null) {
             arow = grid.getDataItem(currentSelectedRow);
             //window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-            $.get(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            //$.get(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
+            postToHost(host + "/CalHistory/LatestCalCert/", arow.SerialNumber, LatestCalCertComplete);
         }
     });
 
+    const LatestCalCertComplete = function (res) {
+        let filename = res.responseJSON;
+        if (filename === null || filename === "") {
+            alert("保存されている校正証明書はありませんでした");
+        } else {
+            window.open(host + "/CalHistory/ShowPdf/" + filename);
+        }
+    }
     // fnkey4  Move to Incal
     $('#fnkey4').click(function () {
-        //let totalNumber = data.length;
-        //let arow;
+        let totalNumber = data.length;
+        let arow;
         let serialNumberList = [];
         let nocheckflaglist = [];
-
-        /*  skip this sectio for test
+        
         copyselection();
         for (let i = 0; i < totalNumber; i += 1) {
             arow = dataView.getItemByIdx(i);
@@ -622,11 +630,12 @@ $(function () {  //main of slickgrid
                 nocheckflaglist.push(false);
             }
         };
-        */
+        
+        //* Dummy Serial Numberslist for test 
         //serialNumberList = ["1000319532", "1000056385", "1000010007", "1000018095", "1000065080", "H03487", "U0940448","1000034387"];
         //nocheckflaglist = [false, false, false, false, false, false, false, false];
-        serialNumberList = ["1000091806", "1000010007", "H03487","1000228961", "U0940448", "1000034387"];
-        nocheckflaglist = [false, false, false, false, false, false];
+        //serialNumberList = ["1000091806", "1000010007", "H03487","1000228961", "U0940448", "1000034387"];
+        //nocheckflaglist = [false, false, false, false, false, false];
         
 
         let postData = {
@@ -898,7 +907,7 @@ $(function () {  //main of slickgrid
 
     $.get(host + "/ToolInventories/GetData").then(
         function (ans) {
-            console.log("Data received ");
+            // console.log("Data received ");
             let length = ans.length;
 
             data = ans;

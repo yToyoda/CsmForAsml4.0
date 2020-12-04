@@ -9,6 +9,7 @@
    　Inventory.js     $('#fnkey4').click(function ()  の本来の処理コメントアウトし、テスト用シリアルを送るよう改造
    　ToolInventoriesController.cs  
 		MoveToIncal の中で　RegisterToInCal(stat.SerialNumber)　の呼び出しをコメントアウトしている (2箇所)
+     2020/11/30 戻した    　RegisterToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
 
 	テスト終了時に上記を元に戻すこと　(戻した 11/2)
 
@@ -42,3 +43,24 @@ updateComplete = function (ret) {
       public async Task<ActionResult> SaveChanges
       の line 349  デバッグのためコメントアウト中
          // _calInProRepo.UpdateRecord(entry);
+
+継続的Deploy で Program.cs に付け加えられたコード
+   /*
+        .ConfigureAppConfiguration((context, config) =>
+        {
+        var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+        config.AddAzureKeyVault(
+        keyVaultEndpoint,
+        new DefaultAzureCredential());
+        })  
+  */
+
+  2020/11/29
+    Trial Release にあたり、以下の変更
+    - Controller 各ルーチンに LogInformation を追加
+    - スキャフォールドで作成された CRUD 機能のうち、以下の不要なコードをコントローラーから削除　(Viewは残してある)
+        CalInProcesses    Create, Edit, Details, Delete
+        ToolInventories   Create, Edit, Details, Delete
+    　　
+ 2020/11/30
+    テスト公開のため、Material Need Cal の Details と Edit 画面から価格情報を削除した
