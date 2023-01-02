@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace CsmForAsml.Models
 {
@@ -12,6 +13,7 @@ namespace CsmForAsml.Models
         public int? CalInterval { get; set; }
         public string Instruction { get; set; }
         public string AddRemove { get; set; }
+        [DisplayFormat(DataFormatString="yyyy/MM/dd")]
         public DateTime? ChangeDate { get; set; }
         public bool? NeedCal { get; set; }
         public bool? NeedSafety { get; set; }

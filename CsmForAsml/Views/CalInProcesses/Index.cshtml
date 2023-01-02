@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<CsmForAsml.Models.CalInProcess>
 @{
-    ViewData["Title"] = "Cals in Process";
+    ViewData["Title"] = "Cal in Process";
 }
-<h1>Cals in Process</h1>
+<h1>Cal in Process</h1>
 <div class="filterPannel">
     <div class="flex">
         <div id="b1">
@@ -12,7 +12,7 @@
                     <label>Plant</label>
                 </div>
                 <div class="col-md-3">
-                    <label>CalPlaace</label>
+                    <label>CalPlace</label>
                 </div>
                 <div class="col-md-3">
                     <label>Material</label>
@@ -150,8 +150,7 @@
             <label id="NumShowing" class="fsm"> nnn </label>
             of Total
             <label id="NumTotal" class="fsm"> mmm </label>
-            rows data.  HostURL: 
-            <label id="HostUrl" class="fsm"> Host </label>            
+            rows data.  
         </div>
     </div>
     <div class="row" style="margin-left: 20px;">
@@ -172,7 +171,9 @@
             <button id="fnkey5">Set Event Dates</button>
         </div>
         <div class="col-md-2 pad2">
-            <button id="fnkey6">完了設定</button>
+            <!--
+    <button id="fnkey6">完了設定</button>
+        -->
         </div>
 
     </div>
@@ -321,18 +322,17 @@
     </div>
 </div>
 <!--  end of "dp-productInfo" -->
-
 <!--  modal input pannl "dp-SaveStatus" start from here -->
 <div id="SaveStatus" title="Saved to Database" class="fsl">
     <br>
-    <p class="dialog-panel__message fsl" >
+    <p class="dialog-panel__message fsl">
         以下の変更をデータベースに保存しました
     </p>
     <div class="row">
         <ul id="messagesList" class="fsl"></ul>
     </div>
-    <div id="FailP"　class="hiddenBlock">
-        <p id ="FailM" class="dialog-panel__message fsl hiddenBlock">
+    <div id="FailP" 　class="hiddenBlock">
+        <p id="FailM" class="dialog-panel__message fsl hiddenBlock">
             以下の変更はエラーにより保存されませんでした
         </p>
         <div class="row">
@@ -359,6 +359,7 @@
         //　all of js files, listed above were bundled to "slick.min.js"
     -->
     <script src="~/js/slick.min.js"></script>
-    <script src="~/js/InCal.js"></script>
+    <script src="~/js/Slick.formatters.js"></script>
+    <script src="~/js/InCal20230101.js"></script>
 
 }

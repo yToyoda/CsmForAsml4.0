@@ -280,10 +280,12 @@ $(function () {
         if (args.dateUndef) {
             if (datestr !== undefined && datestr !== null && datestr !== "") { return false; }
         } else {
-            if (args.dateFrom !== null && (!(datestr) || moment(datestr, "YYYY/MM/DD").isBefore(args.dateFrom, "day"))) {
+            //if (args.dateFrom !== null && (!(datestr) || moment(datestr, "YYYY/MM/DD").isBefore(args.dateFrom, "day"))) {
+            if (args.dateFrom !== null && (!(datestr) || moment(datestr).isBefore(args.dateFrom, "day"))) {
                 return false;
             }
-            if (args.dateTo !== null && (!(datestr) || moment(datestr, "YYYY/MM/DD").isAfter(args.dateTo, "day"))) {
+            //if (args.dateTo !== null && (!(datestr) || moment(datestr, "YYYY/MM/DD").isAfter(args.dateTo, "day"))) {
+            if (args.dateTo !== null && (!(datestr) || moment(datestr).isAfter(args.dateTo, "day"))) {
                 return false;
             }
         }
@@ -358,10 +360,11 @@ $(function () {
         if (args.dateUndef) {
             if (datestr !== undefined && datestr !== null && datestr !== "") { return false; }
         } else {
-            if (args.dateFrom !== null && ((!datestr) || moment(datestr, "YYYY/MM/DD").isBefore(args.dateFrom, "day"))) {
+            //if (args.dateFrom !== null && ((!datestr) || moment(datestr, "YYYY/MM/DD").isBefore(args.dateFrom, "day"))) {
+            if (args.dateFrom !== null && ((!datestr) || moment(datestr ).isBefore(args.dateFrom, "day"))) {
                 return false;
             }
-            if (args.dateTo !== null && ((!datestr) || moment(datestr, "YYYY/MM/DD").isAfter(args.dateTo, "day"))) {
+            if (args.dateTo !== null && ((!datestr) || moment(datestr).isAfter(args.dateTo, "day"))) {
                 return false;
             }
         }
@@ -754,12 +757,22 @@ $(function () {
             currentRow = grid.getDataItem(currentSelectedRow);
             currentRowIndex = dataView.getIdxById(currentRow.Id);
             //stat = window.open(host + "/CalHistory/LatestCalCert/" + arow.SerialNumber + "?ConId=" + this_connectionId);
-            $.get(host + "/CalHistory/LatestCalCert/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
+            //$.get(host + "/CalHistory/LatestCalCert/" + currentRow.SerialNumber + "?ConId=" + this_connectionId);
+            postToHost(host + "/CalHistory/LatestCalCert/", currentRow.SerialNumber, LatestCalCertComplete);
             return;
         }
         return;
     });
 
+    const LatestCalCertComplete = function (res) {
+        let filename = res.responseJSON;
+        if (filename === null || filename === "") {
+            alert("保存されている校正証明書はありませんでした");
+        } else {
+            window.open(host + "/CalHistory/ShowPdf/" + filename);
+        }
+
+    }
 
     const postToHost = function (urlto, post_data, completeFunction) {
         let jsonstring = JSON.stringify(post_data); // JSONの文字列に変換
@@ -1111,17 +1124,17 @@ $(function () {
     columns.push({ id: "Description", name: "Description", field: "Description", width: 250, resizable: true, sortable: true });
     //    {id: "CalInt", name: "Cal Interval", field: "CalInt"},
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", resizable: true, sortable: true });
-    columns.push({ id: "Date0", name: "登録日", field: "RegisteredDate", resizable: true, sortable: true });
-    columns.push({ id: "Date1", name: "ASML発送日", field: "UserShipDate", resizable: true, sortable: true });
-    columns.push({ id: "Date2", name: "受領日", field: "VenReceiveDate", resizable: true, sortable: true });
-    columns.push({ id: "Date3", name: "校正実施日", field: "CalDate", resizable: true, sortable: true });
+    columns.push({ id: "Date0", name: "登録日", field: "RegisteredDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date1", name: "ASML発送日", field: "UserShipDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date2", name: "受領日", field: "VenReceiveDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date3", name: "校正実施日", field: "CalDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
     columns.push({ id: "CalResult", name: "校正結果", field: "CalResultString", width: 60, resizable: true, sortable: true });
-    columns.push({ id: "VenComment", name: "コメント", field: "VenComment", width: 120, resizable: true, sortable: true });
-    columns.push({ id: "Date4", name: "予定出荷日", field: "PlanedShipDate", resizable: true, sortable: true });
-    columns.push({ id: "Date5", name: "返送出荷日", field: "VenShipDate", resizable: true, sortable: true });
-    columns.push({ id: "Date6", name: "ASML受領日", field: "UserReceiveDate", resizable: true, sortable: true });
-    columns.push({ id: "Date7", name: "証明書受領日", field: "CcReceiveDate", resizable: true, sortable: true });
-    columns.push({ id: "Date8", name: "証明書登録日", field: "CcUploadDate", resizable: true, sortable: true });
+    columns.push({ id: "VenComment", name: "コメント", field: "VenComment", width: 120, resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date4", name: "予定出荷日", field: "PlanedShipDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date5", name: "返送出荷日", field: "VenShipDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date6", name: "ASML受領日", field: "UserReceiveDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date7", name: "証明書受領日", field: "CcReceiveDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "Date8", name: "証明書登録日", field: "CcUploadDate", resizable: true, formatter: Slick.Formatters.Date, sortable: true });
     columns.push({ id: "Tat", name: "TAT", field: "Tat", resizable: true, sortable: true });
     columns.push({ id: "CalInterval", name: "Cal-Interval", field: "CalInterval", resizable: true, sortable: true });
     columns.push({ id: "PMaker", name: "P.Maker", field: "PMaker", resizable: true, sortable: true });

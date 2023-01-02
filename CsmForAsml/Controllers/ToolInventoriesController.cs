@@ -20,129 +20,30 @@ using System.Runtime.CompilerServices;
 using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
+using Microsoft.Extensions.Logging;
 
 namespace CsmForAsml.Controllers {
     [Authorize]
     public class ToolInventoriesController : Controller {
+        private readonly ILogger<ToolInventoriesController> _logger;
         private readonly CsmForAsml2Context _context;
         private readonly ToolInventoryRepository _toolRepo;
-        //private readonly IHubContext<CsmHub> _hubContext;
         private readonly ICreateExcelFile<ToolInventory> _crExcel;
-
-        //public ToolInventoriesController(CsmForAsml2Context context,
-        //                                 IHubContext<CsmHub> hubcontext,
-        //                                 ICreateExcelFile<ToolInventory> crExcel) {
-        public ToolInventoriesController(CsmForAsml2Context context,
+        public ToolInventoriesController(ILogger<ToolInventoriesController> logger,
+                                         CsmForAsml2Context context,
                                          ICreateExcelFile<ToolInventory> crExcel) {
+            _logger = logger;
             _context = context;
             _toolRepo = context.ToolInventoryRepository;
-            //_hubContext = hubcontext;
             _crExcel = crExcel;
         }
 
         // GET: ToolInventories
         public async Task<IActionResult> Index() {
+            _logger.LogInformation("ToolInventories - Index");
             return View(await _context.ToolInventory.ToListAsync());
         }
 
-        // GET: ToolInventories/Details/5
-        public async Task<IActionResult> Details(string id) {
-            if (id == null) {
-                return NotFound();
-            }
-
-            var toolInventory = await _context.ToolInventory
-                .FirstOrDefaultAsync(m => m.SerialNumber == id);
-            if (toolInventory == null) {
-                return NotFound();
-            }
-
-            return View(toolInventory);
-        }
-
-        // GET: ToolInventories/Create
-        public IActionResult Create() {
-            return View();
-        }
-
-        // POST: ToolInventories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SerialNumber,Plant,StoreLocation,Material,Description,LatestCalDate,CalStatus,Comment,CalDue,SystemStatus,UserStatus,Room,SuperordEquip,SortField,Machine,ToolkitMachine,ToolkitSloc,LatestSafetyDate,SafetyDue,NeedCal,NeedSafety,RemovedDate,UpdatedDate,InCal,PSN")] ToolInventory toolInventory) {
-            if (ModelState.IsValid) {
-                _context.Add(toolInventory);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(toolInventory);
-        }
-
-        // GET: ToolInventories/Edit/5
-        public async Task<IActionResult> Edit(string id) {
-            if (id == null) {
-                return NotFound();
-            }
-
-            var toolInventory = await _context.ToolInventory.FindAsync(id);
-            if (toolInventory == null) {
-                return NotFound();
-            }
-            return View(toolInventory);
-        }
-
-        // POST: ToolInventories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("SerialNumber,Plant,StoreLocation,Material,Description,LatestCalDate,CalStatus,Comment,CalDue,SystemStatus,UserStatus,Room,SuperordEquip,SortField,Machine,ToolkitMachine,ToolkitSloc,LatestSafetyDate,SafetyDue,NeedCal,NeedSafety,RemovedDate,UpdatedDate,InCal,PSN")] ToolInventory toolInventory) {
-            if (id != toolInventory.SerialNumber) {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid) {
-                try {
-                    _context.Update(toolInventory);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException) {
-                    if (!ToolInventoryExists(toolInventory.SerialNumber)) {
-                        return NotFound();
-                    } else {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(toolInventory);
-        }
-
-        // GET: ToolInventories/Delete/5
-        public async Task<IActionResult> Delete(string id) {
-            if (id == null) {
-                return NotFound();
-            }
-
-            var toolInventory = await _context.ToolInventory
-                .FirstOrDefaultAsync(m => m.SerialNumber == id);
-            if (toolInventory == null) {
-                return NotFound();
-            }
-
-            return View(toolInventory);
-        }
-
-        // POST: ToolInventories/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id) {
-            var toolInventory = await _context.ToolInventory.FindAsync(id);
-            _context.ToolInventory.Remove(toolInventory);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
         private bool ToolInventoryExists(string id) {
             return _context.ToolInventory.Any(e => e.SerialNumber == id);
@@ -175,6 +76,7 @@ namespace CsmForAsml.Controllers {
         public ActionResult MoveToIncal([FromBody] SerialAndFlagList serial) {
             const double warningLevel = 0.5;
             const double daysInYear = 365.25;
+            _logger.LogInformation("ToolInventories - MoveToIncal");
             ToolInventoryRepository tir = _context.ToolInventoryRepository;
             MaterialNeedCalRepository mncr = _context.MaterialNeedCalRepository;
             CalInProcessRepository cipr = _context.CalInProcessRepository;
@@ -189,7 +91,6 @@ namespace CsmForAsml.Controllers {
                 CalStat stat = new CalStat();
                 stat.SerialNumber = serial.SerialNums[i];
                 calstatlist.Add(stat);
-                //calstatlist.ResultList.Add(stat);
 
                 if (serial.NoCheckFlags[i]) {
                     RegisterToInCal(stat.SerialNumber);
@@ -221,7 +122,7 @@ namespace CsmForAsml.Controllers {
                             continue;
                         }
                     }
-                    // RegisterToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
+                    RegisterToInCal(stat.SerialNumber);    //disabled for debugging front end (2020/10/01)
                     stat.MoveToIncal = true;
                 } else {
                     stat.MoveToIncal = false;
@@ -241,18 +142,24 @@ namespace CsmForAsml.Controllers {
 
         private void RegisterToInCal(string serialNumber) {
             CalInProcessRepository cipr = _context.CalInProcessRepository;
-            CalInProcess entry = new CalInProcess();
-            entry.SerialNumber = serialNumber;
-            entry.RegisteredDate = AppResources.JSTNow;
-            cipr.AddRecord(entry);
+            ToolInventory toolInventoryEntry = _context.ToolInventory.Find(serialNumber);
+            if (toolInventoryEntry != null) {
+                CalInProcess entry = new CalInProcess();
+                entry.SerialNumber = serialNumber;
+                entry.RegisteredDate = AppResources.JSTNow;
+                entry.Plant = toolInventoryEntry.Plant;
+                //cipr.AddRecord(entry);
+                _context.CalInProcess.Add(entry);
+                _context.SaveChanges();
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult> Download([FromBody] SerialNumList serial) {
 
 
-
             // string clientId = serial.connectionId;
+            _logger.LogInformation("ToolInventories - Download to Excel");
             HttpContext.Session.SetString("ExcelFilename", "");
 
             var allToolInv = await _toolRepo.GetAllRecordsAsync();

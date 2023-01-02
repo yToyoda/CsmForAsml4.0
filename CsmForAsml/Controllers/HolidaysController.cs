@@ -7,22 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace CsmForAsml.Controllers 
 { 
 [Authorize]
     public class HolidaysController : Controller
     {
+        private readonly ILogger<HolidaysController> _logger;
         private readonly CsmForAsml2Context _context;
 
-        public HolidaysController(CsmForAsml2Context context)
+        public HolidaysController(ILogger<HolidaysController> logger, CsmForAsml2Context context)
         {
+            _logger = logger;
             _context = context;
         }
 
         // GET: Holidays
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Holidays - Index");
             return View(await _context.Holidays.ToListAsync());
         }
 
@@ -33,9 +37,9 @@ namespace CsmForAsml.Controllers
             {
                 return NotFound();
             }
-
+            DateTime iddate = (DateTime)id;
             var holidayEntry = await _context.Holidays
-                .FirstOrDefaultAsync(m => m.Date == id);
+                .FirstOrDefaultAsync(m => m.Date.Date == iddate.Date);
             if (holidayEntry == null)
             {
                 return NotFound();
@@ -59,6 +63,7 @@ namespace CsmForAsml.Controllers
         {
             if (ModelState.IsValid)
             {
+                holidayEntry.Date = holidayEntry.Date.Date;
                 _context.Add(holidayEntry);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -89,7 +94,7 @@ namespace CsmForAsml.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DateTime id, [Bind("Date,HolidayName")] HolidayEntry holidayEntry)
         {
-            if (id != holidayEntry.Date)
+            if (id != holidayEntry.Date.Date)
             {
                 return NotFound();
             }
@@ -98,8 +103,12 @@ namespace CsmForAsml.Controllers
             {
                 try
                 {
-                    _context.Update(holidayEntry);
-                    await _context.SaveChangesAsync();
+                    var holidayEntryDB = await _context.Holidays.FindAsync(id);
+                    if (holidayEntryDB != null) {
+                        copyHoliday(holidayEntry, ref holidayEntryDB);
+                        _context.Update(holidayEntryDB);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -126,7 +135,7 @@ namespace CsmForAsml.Controllers
             }
 
             var holidayEntry = await _context.Holidays
-                .FirstOrDefaultAsync(m => m.Date == id);
+                .FirstOrDefaultAsync(m => m.Date.Date == id);
             if (holidayEntry == null)
             {
                 return NotFound();
@@ -140,7 +149,7 @@ namespace CsmForAsml.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(DateTime id)
         {
-            var holidayEntry = await _context.Holidays.FindAsync(id);
+            var holidayEntry = await _context.Holidays.FirstOrDefaultAsync(m => m.Date.Date == id.Date );
             _context.Holidays.Remove(holidayEntry);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -148,7 +157,12 @@ namespace CsmForAsml.Controllers
 
         private bool HolidayEntryExists(DateTime id)
         {
-            return _context.Holidays.Any(e => e.Date == id);
+            return _context.Holidays.Any(e => e.Date.Date == id);
+        }
+
+        private void copyHoliday(HolidayEntry holidayFrom, ref HolidayEntry  holidayTo) {
+            //holidayTo.Date = holidayFrom.Date;
+            holidayTo.HolidayName = holidayFrom.HolidayName;
         }
     }
 }

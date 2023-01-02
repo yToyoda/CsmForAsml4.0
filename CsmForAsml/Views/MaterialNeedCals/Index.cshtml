@@ -1,4 +1,8 @@
-﻿@model IEnumerable<CsmForAsml.Models.MaterialNeedCal>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@model IEnumerable<CsmForAsml.Models.MaterialNeedCal>
 
 @{
     ViewData["Title"] = "Material-Index";
@@ -12,7 +16,7 @@
         <div id="b1">
             <div class="row" id="filter-row1">
                 <div class="col-md-4">
-                    <label>CalPlaace</label>
+                    <label>CalPlace</label>
                 </div>
                 <div class="col-md-4">
                     <label>Need Cal</label>
@@ -113,14 +117,19 @@
     </div>
     <div class="row" style="margin-left: 20px;">
         <div class="col-md-2" style="padding:2px 2px 2px 2px">
-            <button id="fnkey1">Product Info</button>
+            <button id="fnkey1" class="bgyellow">Product Info</button>
         </div>
         <div class="col-md-2" style="padding:2px 2px 2px 2px">
-            <button id="fnkey2">Details</button>
+            <button id="fnkey2" class="bgyellow">Details</button>
         </div>
-        <div class="col-md-offset-2 col-md-2" style="padding:2px 2px 2px 2px">
-            <button id="fnkey3">Edit</button>
-        </div>
+
+        @if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "KyosaiUser") 
+            || await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Administrator"))
+        {
+            <div class="col-md-offset-2 col-md-2" style="padding:2px 2px 2px 2px">
+                <button id="fnkey3" class="bgyellow">Edit</button>
+            </div>
+        }
     </div>
 </div>
 
@@ -153,5 +162,7 @@
         <script src="~/lib/slickgrid/controls/slick.columnpicker.js"></script>
     -->
     <script src="~/js/slick.min.js"></script>
-    <script src="~/js/Material.js"></script>
+    <script src="~/js/moment.js"></script>
+    <script src="~/js/Slick.formatters.js"></script>
+    <script src="~/js/Material20230101.js?20230101"></script>
 }

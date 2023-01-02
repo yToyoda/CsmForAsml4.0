@@ -293,6 +293,13 @@ input[name="tab_item"] {
     color: #fff;
 }
 
+/*選択されているタブのスタイルを変える*/
+.tabs input:checked + .tab_item-4 {
+    background-color: #5ab4bd;
+    color: #fff;
+}
+
+
 #filter-row1, #filter-row2 {
     padding: 3px;
 }

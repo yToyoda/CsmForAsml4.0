@@ -11,8 +11,12 @@ jQuery.browser = {};
 })();
 
 $(function () {
-    $(".datepicker").datepicker();
+    $(".datepicker").datepicker({
+        dateFormat: "yy/mm/dd",
+        dayNamesMin: ['日', '月', '火', '水', '木', '金', '土']
+    });
 });
+
 
 $(function () {  //main of slickgrid 
     "use strict";
@@ -107,11 +111,13 @@ $(function () {  //main of slickgrid
 
         if (args.dateFrom !== null) {
             tgt = item['ChangeDate'];
-            if (!(tgt) || moment(tgt, "YYYY/MM/DD").isBefore(args.dateFrom, "day")) return false;
+            //if (!(tgt) || moment(tgt, "YYYY/MM/DD").isBefore(args.dateFrom, "day")) return false;
+            if (!(tgt) || moment(tgt).isBefore(args.dateFrom, "day")) return false;
         }
         if (args.dateTo !== null) {
             tgt = item['ChangeDate'];
-            if (!(tgt) || moment(tgt, "YYYY/MM/DD").isAfter(args.dateTo, "day")) return false;
+            //if (!(tgt) || moment(tgt, "YYYY/MM/DD").isAfter(args.dateTo, "day")) return false;
+            if (!(tgt) || moment(tgt).isAfter(args.dateTo, "day")) return false;
         }
         return true;
     }
@@ -354,7 +360,8 @@ $(function () {  //main of slickgrid
 
     $('#din0From').on('change', function () {
         let dateinput = $(this).val()
-        filterValues.dateFrom = moment(dateinput, "YYYY/MM/DD");
+        //filterValues.dateFrom = moment(dateinput, "YYYY/MM/DD");
+        filterValues.dateFrom = moment(dateinput);
         $('input[name="rdCalDue"]:radio').val([4]);
         $("#din0From").css('background-color', 'aquamarine');
         $('#din0To').datepicker('option', 'minDate', new Date(dateinput));
@@ -364,7 +371,8 @@ $(function () {  //main of slickgrid
 
     $("#din0To").on("change", function () {
         let dateinput = $(this).val();
-        filterValues.dateTo = moment(dateinput, "YYYY/MM/DD");
+        //filterValues.dateTo = moment(dateinput, "YYYY/MM/DD");
+        filterValues.dateTo = moment(dateinput);
         $('input[name="rdCalDue"]:radio').val([4]);
         $("#din0To").css('background-color', 'aquamarine');
         $('#din0From').datepicker('option', 'maxDate', new Date(dateinput));
@@ -466,7 +474,7 @@ $(function () {  //main of slickgrid
     columns.push({ id: "PModel", name: "P.Model", field: "PModel", sortable: true });
     columns.push({ id: "PName", name: "P.Name", field: "PName", sortable: true });
     columns.push({ id: "Status", name: "Status", field: "Status", sortable: true });
-    columns.push({ id: "ChangeDate", name: "ChangeDate", field: "ChangeDate", sortable: true });
+    columns.push({ id: "ChangeDate", name: "ChangeDate", field: "ChangeDate", formatter: Slick.Formatters.Date, sortable: true });
 
     options = {
         columnPicker: {
@@ -504,7 +512,8 @@ $(function () {  //main of slickgrid
         let cell = $(args.node);
         //if (columnId === "Plant") return;
         if (columnId === "id") return;
-        if (columnId === "NeedCal" || columnId === "NeedSafety" || columnId === "CalInterval") return;
+        //if (columnId === "NeedCal" || columnId === "NeedSafety" || columnId === "CalInterval") return;
+        if (columnId === "NeedCal" || columnId === "NeedSafety" || columnId ==="ChangeDate") return;
 
         cell.empty();
         if (columnId === "_checkbox_selector") {

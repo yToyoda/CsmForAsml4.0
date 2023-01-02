@@ -6,6 +6,8 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <!--<meta property="og:locale" content="ja_JP" "en_US"> -->
+    <meta property="og:locale" content="ja_JP">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - CsmForAsml</title>
     <style>
@@ -38,15 +40,26 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
                     <ul class="navbar-nav flex-grow-1">
-                        <!--
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                        -->
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="History">History</a>
+                        
+                        <li class="dropdown">
+                            <a class="dropdown-toggle text-dark" data-toggle="dropdown" href="#" role="button">
+                                Help
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="History">Version History</a>
+                                </li>
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Documents">Documents</a>                                    
+                                </li>
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+                                </li>                                
+                            </ul>
                         </li>
-                        @if (SignInManager.IsSignedIn(User)) {
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="MaterialNeedCals" asp-action="Index">MaterialNeedCal</a>
                             </li>
@@ -56,13 +69,16 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="CalInProcesses" asp-action="Index">Cal-In-Process</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Locations" asp-action="Index">Locations</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Holidays" asp-action="Index">Holidays</a>
-                            </li>
-                            @if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Administrator")) {
+
+                            @if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "KyosaiUser") || await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Administrator")) {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Locations" asp-action="Index">Locations</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Holidays" asp-action="Index">Holidays</a>
+                                </li>                                
+                            }
+                            @if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Administrator")){
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                                 </li>

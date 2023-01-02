@@ -10,25 +10,32 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CsmForAsml.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace CsmForAsml.Controllers
 {
     [Authorize]
     public class MaterialNeedCalsController : Controller
     {
+        private readonly ILogger<MaterialNeedCalsController> _logger;
         private readonly CsmForAsml2Context _context;
         private readonly MaterialNeedCalRepository _mncRepo;
 
-        public MaterialNeedCalsController(CsmForAsml2Context context)
+        public MaterialNeedCalsController(ILogger<MaterialNeedCalsController> logger, 
+                                                CsmForAsml2Context context)
         {
+            _logger = logger;
             _context = context;
             _mncRepo = context.MaterialNeedCalRepository;
+            CultureInfo.CurrentUICulture = new CultureInfo("ja-JP", false);
         }
 
         // GET: MaterialNeedCals
         public async Task<IActionResult> Index()
         {
             //MaterialNeedCalRepository _mncRep = _context.MaterialNeedCalRepository;
+            CultureInfo.CurrentUICulture = new CultureInfo("ja-JP", false);
             IEnumerable<MaterialNeedCal> list = await _mncRepo.GetAllRecordsAsync();
             /*
             List<Tat> TatList = _context.Tat.ToList();
@@ -41,6 +48,7 @@ namespace CsmForAsml.Controllers
                 }
             }
             */
+            _logger.LogInformation("Material Need Cal - Index");
             return View(list);
         }
 
@@ -107,16 +115,19 @@ namespace CsmForAsml.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Material,MaterialDescription,CalPlace,CalVendor,CalInterval,Instruction,AddRemove,ChangeDate,NeedCal,NeedSafety,SafetyInterval,PMaker,PName,PModel")] MaterialNeedCal materialNeedCal)
         {
-            if (id != materialNeedCal.Material)
-            {
-                return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(materialNeedCal);
+                    var materialNeedCalDB = await _context.MaterialNeedCal.FindAsync(id);
+                    if (materialNeedCalDB == null || materialNeedCalDB.Material != id) {
+                        // Can not Edit Field "Material"
+                        return NotFound();
+                    }
+
+                    copyMaterial(materialNeedCal, ref materialNeedCalDB);
+                    _context.Update(materialNeedCalDB);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -214,6 +225,26 @@ namespace CsmForAsml.Controllers
             entry.PName = PInfoData.PName;
             matrep.UpdateRecord(entry);
             return Json("Ok");
+        }
+
+        private void copyMaterial(MaterialNeedCal mncFrom, ref MaterialNeedCal mncTo) {
+            mncTo.MaterialDescription = mncFrom.MaterialDescription; ;
+            mncTo.CalPlace= mncFrom.CalPlace;
+            mncTo.CalVendor= mncFrom.CalVendor;
+            mncTo.CalInterval = mncFrom.CalInterval;
+            mncTo.Instruction = mncFrom.Instruction;
+            mncTo.AddRemove = mncFrom.AddRemove;
+            mncTo.ChangeDate= mncFrom.ChangeDate;
+            mncTo.NeedCal= mncFrom.NeedCal;
+            mncTo.NeedSafety = mncFrom.NeedSafety;
+            mncTo.SafetyInterval = mncFrom.SafetyInterval;
+            mncTo.PMaker= mncFrom.PMaker;
+            mncTo.PName= mncFrom.PName;
+            mncTo.PModel= mncFrom.PModel;
+            mncTo.PriceFromVendor= mncFrom.PriceFromVendor;
+            mncTo.PriceToUser= mncFrom.PriceToUser;
+            mncTo.Std_TAT= mncFrom.Std_TAT;
+            mncTo.ChangeDate= mncFrom.ChangeDate;                        
         }
 
     }

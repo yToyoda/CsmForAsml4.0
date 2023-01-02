@@ -1,28 +1,32 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@{
     ViewData["Title"] = "Home Page";
 }
+<style>
+    p {
+        font-size: 18px;
+    }
+</style>
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <h4>Calibration Status Manager for ASML Japan - Version 4</a>.</h4>
+    <h4>Calibration Status Manager for ASML Japan - Version 4 (Trial)</h4>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <p>
+        ver 4.00 : 2020-11-30 This version runs on Edge and Chrome (Silverlight plug-in and IE aren't necessary)
+    </p>
+    @if (SignInManager.IsSignedIn(User)) {
 
-    <div class="col-md-6 fsl">
-        HostAddress :
-        <label id="HostAdd" class="fsm"> nnn </label>
-        HostAddress fix :
-        <label id="HostAddFix" class="fsm"> nnn </label>
-    </div>
-</div>
-
-<script src="~/js/site.min.js"></script>
-<script>
-
-    $(function () {
-        let host = window.location.protocol + "//" + window.location.host;
-        let azurehost = "https://csmforasml-test.azurewebsites.net/";
-        let y = host;
-        let z = azurehost;
-        $('#HostAdd').text(y);
-        $('#HostAddFix').text(z);
-    })
-</script>
+        <p><a href="https://csmfasml.blob.core.windows.net/manual/CSMfASML40.pdf" rel="external" target="_blank" class="col-lg-offset-1 fsl">操作マニュアル</a></p>
+    }

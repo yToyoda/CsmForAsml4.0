@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
@@ -60,15 +61,18 @@ namespace CsmForAsml.Controllers
             //await _hubContext.Clients.Client(ConId).SendAsync("HistoryFinished");
             return View(history);
         }
-
-        public async Task<IActionResult> LatestCalCert(string id, string ConId) {
+        [HttpPost]
+        public async Task<IActionResult> LatestCalCert([FromBody] string id) {
             string ser = id;
             var e = _context.CalDateRepository.GetRecords(r => r.Serial == ser).FirstOrDefault();
             string filename = e.PdfFileName ?? "";
 
             //await _hubContext.Clients.Client(ConId).SendAsync("LatestCalCert",filename);
-
-            return new EmptyResult();
+            var serializeOptions = new JsonSerializerOptions {
+                PropertyNamingPolicy = null,
+                WriteIndented = true
+            };
+            return Json(filename, serializeOptions); ;
 
         }
 

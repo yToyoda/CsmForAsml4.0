@@ -10,6 +10,8 @@ namespace CsmForAsml.Models
     {
         public int Id { get; set; }
         public string Serial { get; set; }
+
+        [DisplayName("Cal Date")]
         public DateTime CalDate1 { get; set; }
         public string CalStatus { get; set; }
         

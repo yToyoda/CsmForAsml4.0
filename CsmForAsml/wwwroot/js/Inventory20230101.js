@@ -1,4 +1,3 @@
-// inventory.js 20221230
 if (!jQuery) { throw new Error("csm4.0 script requires jQuery") }
 
 jQuery.browser = {};
@@ -160,11 +159,13 @@ $(function () {  //main of slickgrid
         for (let i = 0; i < 4; i++) {
             if (args.dateFrom[i] !== null) {
                 tgt = item[datenames[i]];
-                if (!(tgt) || moment(tgt, "YYYY/MM/DD").isBefore(args.dateFrom[i], "day")) return false;
+                //if (!(tgt) || moment(tgt, "YYYY/MM/DD").isBefore(args.dateFrom[i], "day")) return false;
+                if (!(tgt) || moment(tgt).isBefore(args.dateFrom[i], "day")) return false;
             }
             if (args.dateTo[i] !== null) {
                 tgt = item[datenames[i]];
-                if (!(tgt) || moment(tgt, "YYYY/MM/DD").isAfter(args.dateTo[i], "day")) return false;
+                //if (!(tgt) || moment(tgt, "YYYY/MM/DD").isAfter(args.dateTo[i], "day")) return false;
+                if (!(tgt) || moment(tgt ).isAfter(args.dateTo[i], "day")) return false;
             }
         }
         return true;
@@ -792,17 +793,17 @@ $(function () {  //main of slickgrid
 
     columns.push(checkboxSelector.getColumnDefinition());
 
-    // id !== field
+    // id !== field 2023/01/01
     columns.push({ id: "Plant", name: "Plant", field: "Plant", sortable: true, editor: Slick.Editors.TextNC });
     columns.push({ id: "SerialNumber", name: "Serial", field: "SerialNumber", sortable: true });
     columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
     columns.push({ id: "Description", name: "Description", field: "Description", width: 260, sortable: true });
-    columns.push({ id: "CalDue", name: "CalDue", field: "CalDue", sortable: true });
+    columns.push({ id: "CalDue", name: "CalDue", field: "CalDue", formatter: Slick.Formatters.Date, sortable: true });
     columns.push({ id: "CalDueStatus", name: "Status", field: "CalDueStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
     columns.push({ id: "Comment", name: "Comment", field: "Comment", width: 60, sortable: true },);
-    columns.push({ id: "LatestCalDate", name: "Latest CalDate", field: "LatestCalDate", sortable: true });
-    columns.push({ id: "SafetyDue", name: "SafetyDue", field: "SafetyDue", sortable: true });
-    columns.push({ id: "LatestSafetyDate", name: "Latest SafetyDate", field: "LatestSafetyDate", sortable: true });
+    columns.push({ id: "LatestCalDate", name: "Latest CalDate", field: "LatestCalDate", formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "SafetyDue", name: "SafetyDue", field: "SafetyDue", formatter: Slick.Formatters.Date, sortable: true });
+    columns.push({ id: "LatestSafetyDate", name: "Latest SafetyDate", field: "LatestSafetyDate", formatter: Slick.Formatters.Date, sortable: true });
     columns.push({ id: "CalInterval", name: "Cal Interval", field: "CalInterval", sortable: true });
     columns.push({ id: "CalPlace", name: "Cal Place", field: "CalPlace", sortable: true });
     columns.push({ id: "StoreLocation", name: "Store Location", field: "StoreLocation", sortable: true });

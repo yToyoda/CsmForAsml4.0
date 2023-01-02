@@ -27,38 +27,28 @@ using Microsoft.AspNetCore.Authorization;
 namespace CsmForAsml.Controllers {
     [Authorize]
     public class CalInProcessesController : Controller {
+        private readonly ILogger<CalInProcessesController> _logger;
         private readonly CsmForAsml2Context _context;
-        private readonly CalInProcessRepository _calInProRepo;
+        //private readonly CalInProcessRepository _calInProRepo;
         private readonly IHubContext<CsmHub> _hubContext;
         private Dictionary<DateTime, string> _holidayDic; 
 
         [TempData] string ExcelFilename { get; set; }
-        public CalInProcessesController(CsmForAsml2Context context, IHubContext<CsmHub> hubContext) {
+        public CalInProcessesController(ILogger<CalInProcessesController> logger, 
+                                        CsmForAsml2Context context, IHubContext<CsmHub> hubContext) {
+            _logger = logger;
             _context = context;
-            _calInProRepo = context.CalInProcessRepository;
+            //_calInProRepo = context.CalInProcessRepository;
             _hubContext = hubContext;
         }
       
 
         // GET: CalInProcesses
         public async Task<IActionResult> Index() {
+            _logger.LogInformation("CalInProcesses - Index");
             return View(await _context.CalInProcess.ToListAsync());
         }
-
-        // GET: CalInProcesses/Details/5
-        public async Task<IActionResult> Details(int? id) {
-            if (id == null) {
-                return NotFound();
-            }
-
-            var calInProcess = await _context.CalInProcess
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (calInProcess == null) {
-                return NotFound();
-            }
-
-            return View(calInProcess);
-        }
+                
         public Dictionary<DateTime, string> HolidayDic {
             get {
                 if (_holidayDic == null) {
@@ -70,90 +60,6 @@ namespace CsmForAsml.Controllers {
                 }
                 return _holidayDic;
             }
-        }
-
-        // GET: CalInProcesses/Create
-        public IActionResult Create() {
-            return View();
-        }
-
-        // POST: CalInProcesses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SerialNumber,RegisteredDate,UserShipDate,VenReceiveDate,CalDate,CalResult,VenComment,PlanedShipDate,VenShipDate,UserReceiveDate,CcReceiveDate,CcUploadDate,Tat,Finished,Plant,StdTat,TatStatus")] CalInProcess calInProcess) {
-            if (ModelState.IsValid) {
-                _context.Add(calInProcess);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(calInProcess);
-        }
-
-        // GET: CalInProcesses/Edit/5
-        public async Task<IActionResult> Edit(int? id) {
-            if (id == null) {
-                return NotFound();
-            }
-
-            var calInProcess = await _context.CalInProcess.FindAsync(id);
-            if (calInProcess == null) {
-                return NotFound();
-            }
-            return View(calInProcess);
-        }
-
-        // POST: CalInProcesses/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SerialNumber,RegisteredDate,UserShipDate,VenReceiveDate,CalDate,CalResult,VenComment,PlanedShipDate,VenShipDate,UserReceiveDate,CcReceiveDate,CcUploadDate,Tat,Finished,Plant,StdTat,TatStatus")] CalInProcess calInProcess) {
-            if (id != calInProcess.Id) {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid) {
-                try {
-                    _context.Update(calInProcess);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException) {
-                    if (!CalInProcessExists(calInProcess.Id)) {
-                        return NotFound();
-                    } else {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(calInProcess);
-        }
-
-        // GET: CalInProcesses/Delete/5
-        public async Task<IActionResult> Delete(int? id) {
-            if (id == null) {
-                return NotFound();
-            }
-
-            var calInProcess = await _context.CalInProcess
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (calInProcess == null) {
-                return NotFound();
-            }
-
-            return View(calInProcess);
-        }
-
-        // POST: CalInProcesses/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id) {
-            var calInProcess = await _context.CalInProcess.FindAsync(id);
-            _context.CalInProcess.Remove(calInProcess);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
 
@@ -168,7 +74,8 @@ namespace CsmForAsml.Controllers {
         /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetData() {
-            var cals = await _calInProRepo.GetAllRecordsAsync();
+            //var cals = await _calInProRepo.GetAllRecordsAsync();
+            var cals = await _context.CalInProcess.ToListAsync();
             List<CalInProcess> ans = new List<CalInProcess>();
             await GetNotMappedFields(cals, ans);
             var serializeOptions = new JsonSerializerOptions {
@@ -220,11 +127,12 @@ namespace CsmForAsml.Controllers {
         [HttpPost]
         public async Task<IActionResult> Download([FromBody] IdNumList idlist) {
             // download excel file
+            _logger.LogInformation("CalInProcesses - Download To Excel");
 
             string clientId = idlist.connectionId;
             HttpContext.Session.SetString("ExcelFilename", "");
 
-            var allCalInP = await _calInProRepo.GetAllRecordsAsync();
+            var allCalInP = await _context.CalInProcess.ToListAsync();
 
             var cals = from e in allCalInP
                        join n in idlist.IdNums
@@ -297,7 +205,7 @@ namespace CsmForAsml.Controllers {
 
         [HttpPost]
         public async Task<ActionResult> SaveChanges([FromBody] Updates Updates) {
-            
+            _logger.LogInformation("CalInProcesses - Save Changes");
             MaterialNeedCalRepository mrep = _context.MaterialNeedCalRepository;
             UpdateResultList resultList =  new UpdateResultList();
             foreach (var UpdateData in Updates.UpdateList) {
@@ -310,7 +218,8 @@ namespace CsmForAsml.Controllers {
 
                 bool res = (UpdateData.EventDate != null) && DateTime.TryParse(UpdateData.EventDate, out eventDate);
                 if (res) {
-                    var entry = _calInProRepo.GetRecord(Id);
+                    //var entry = _context.CalInProcess.FirstOrDefault(Id);
+                    var entry = _context.CalInProcess.Find(Id);
                     switch (stage) {
                         case 1:  //ASML 発送日
                             entry.UserShipDate = eventDate;
@@ -349,7 +258,8 @@ namespace CsmForAsml.Controllers {
                         default:
                             break;
                     }
-                    // _calInProRepo.UpdateRecord(entry);
+                    _context.Update(entry);
+                    _context.SaveChanges();
                     result.Status = "OK";
                 } else {
                     result.Status = "DateFormatError";
@@ -367,20 +277,29 @@ namespace CsmForAsml.Controllers {
 
         [HttpPost]
         public async Task<ActionResult> SavePInfo([FromBody] PInfo PInfoData) {
+            _logger.LogInformation("CalInProcesses - Save P.Info");
             string clientId = PInfoData.connectionId;
             if (PInfoData.ChangedP) {
-                MaterialNeedCalRepository matrep = _context.MaterialNeedCalRepository;
-                var materialEntry = matrep.GetRecord(PInfoData.Material);
-                materialEntry.PMaker = PInfoData.PMaker;
-                materialEntry.PModel = PInfoData.PModel;
-                materialEntry.PName = PInfoData.PName;
-                matrep.UpdateRecord(materialEntry);
+
+                //MaterialNeedCalRepository matrep = _context.MaterialNeedCalRepository;
+                //var materialEntry = matrep.GetRecord(PInfoData.Material);
+                MaterialNeedCal materialEntry = _context.MaterialNeedCal.Find(PInfoData.Material);
+                if (materialEntry != null) {
+                    materialEntry.PMaker = PInfoData.PMaker;
+                    materialEntry.PModel = PInfoData.PModel;
+                    materialEntry.PName = PInfoData.PName;
+                    _context.Update(materialEntry);
+                    _context.SaveChanges();
+                }
             }
             if (PInfoData.ChangedS) {
-                ToolInventoryRepository toolrep = _context.ToolInventoryRepository;
-                ToolInventory toolInvEntry = toolrep.GetRecord(PInfoData.Serial);
+                //ToolInventoryRepository toolrep = _context.ToolInventoryRepository;
+                //ToolInventory toolInvEntry = toolrep.GetRecord(PInfoData.Serial);
+                ToolInventory toolInvEntry = _context.ToolInventory.Find(PInfoData.Serial);
                 toolInvEntry.PSN = PInfoData.PSerial;
-                toolrep.UpdateRecord(toolInvEntry);
+                //toolrep.UpdateRecord(toolInvEntry);
+                _context.Update(toolInvEntry);
+                _context.SaveChanges();
             }
             await _hubContext.Clients.Client(clientId).SendAsync("PInfoSaved");
             return new EmptyResult();
