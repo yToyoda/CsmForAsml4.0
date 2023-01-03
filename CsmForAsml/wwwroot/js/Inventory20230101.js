@@ -455,7 +455,7 @@ $(function () {  //main of slickgrid
 
     $('#din0From').on('change', function () {
         let dateinput = $(this).val()
-        filterValues.dateFrom[0] = moment(dateinput, "YYYY/MM/DD");
+        filterValues.dateFrom[0] = moment(dateinput);
         $('input[name="rdCalDue"]:radio').val([4]);
         $("#din0From").css('background-color', 'aquamarine');
         $('#din0To').datepicker('option', 'minDate', new Date(dateinput));
@@ -465,7 +465,7 @@ $(function () {  //main of slickgrid
 
     $("#din0To").on("change", function () {
         let dateinput = $(this).val();
-        filterValues.dateTo[0] = moment(dateinput, "YYYY/MM/DD");
+        filterValues.dateTo[0] = moment(dateinput);
         $('input[name="rdCalDue"]:radio').val([4]);
         $("#din0To").css('background-color', 'aquamarine');
         $('#din0From').datepicker('option', 'maxDate', new Date(dateinput));
@@ -681,7 +681,8 @@ $(function () {  //main of slickgrid
         // check cal due and generate CalDueStatus
         for (let i = 0; i < ardata.length; i += 1) {
             let status = "";
-            caldue = moment(ardata[i].CalDue, "YYYY/MM/DD");
+            //caldue = moment(ardata[i].CalDue, "YYYY/MM/DD");
+            caldue = moment(ardata[i].CalDue);
             if (caldue.isBefore(d0, "day")) {
                 status = "OverDue";
             } else if (caldue.isBefore(d1, "day")) {
@@ -799,8 +800,8 @@ $(function () {  //main of slickgrid
     columns.push({ id: "Material", name: "Material", field: "Material", width: 120, sortable: true });
     columns.push({ id: "Description", name: "Description", field: "Description", width: 260, sortable: true });
     columns.push({ id: "CalDue", name: "CalDue", field: "CalDue", formatter: Slick.Formatters.Date, sortable: true });
-    columns.push({ id: "CalDueStatus", name: "Status", field: "CalDueStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true },);
-    columns.push({ id: "Comment", name: "Comment", field: "Comment", width: 60, sortable: true },);
+    columns.push({ id: "CalDueStatus", name: "CalDueStatus", field: "CalDueStatus", width: 60, formatter: Slick.Formatters.CalDue, sortable: true });
+    columns.push({ id: "Comment", name: "Comment", field: "Comment", width: 60, sortable: true });
     columns.push({ id: "LatestCalDate", name: "Latest CalDate", field: "LatestCalDate", formatter: Slick.Formatters.Date, sortable: true });
     columns.push({ id: "SafetyDue", name: "SafetyDue", field: "SafetyDue", formatter: Slick.Formatters.Date, sortable: true });
     columns.push({ id: "LatestSafetyDate", name: "Latest SafetyDate", field: "LatestSafetyDate", formatter: Slick.Formatters.Date, sortable: true });
@@ -859,8 +860,9 @@ $(function () {  //main of slickgrid
         let cell = $(args.node);
         //if (columnId === "Plant") return;
         if (columnId === "id") return;
-        if (columnId === "CalDue") return;
+        if (columnId === "CalDue" || columnId === "CalDueStatus" || columnId === "Comment") return;
         if (columnId === "LatestCalDate") return;
+        if (columnId === "SafetyDue" || columnId === "LatestSafetyDate" ) return;
         cell.empty();
         if (columnId === "_checkbox_selector") {
             // let lb = $(document.createTextNode("C"));
@@ -924,7 +926,7 @@ $(function () {  //main of slickgrid
 
             // execute following code after setup
             // initialize the model after all the events have been hooked up
-            checkDuedate(data);
+            //checkDuedate(data);
             dataView.beginUpdate();
             dataView.setItems(data, "id");
             dataView.setFilterArgs(filterValues);

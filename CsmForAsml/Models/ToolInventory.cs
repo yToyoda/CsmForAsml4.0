@@ -47,6 +47,9 @@ namespace CsmForAsml.Models
         public int? SafetyInterval { get; set; }
         [NotMapped]
         public string Location { get; set; }
+
+        [NotMapped]
+        public string CalDueStatus { get; set; }
     }
     
 }

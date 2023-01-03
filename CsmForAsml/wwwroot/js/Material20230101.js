@@ -40,6 +40,7 @@ $(function () {  //main of slickgrid
         texts: {},
         needCal: null,
         needSafety: null,
+        calInterval: null,
         selection: null,
         dateFrom: null,
         dateTo: null
@@ -94,7 +95,9 @@ $(function () {  //main of slickgrid
                 return false;
             }
         }
-
+        if (args.calInterval !== null) {
+            if ( !item.CalInterval || item.CalInterval != args.calInterval) return false
+        }
         // text filters        
         for (let columnId in args.texts) {
             if ((columnId) && (args.texts[columnId])) {
@@ -167,6 +170,8 @@ $(function () {  //main of slickgrid
     const updateDropdownList = function () {
         let calPlaceList = {};
         let calPlaceA = [];
+        let calIntervalList = {};
+        let calInterval = [];
         let nShowing = dataView.getLength();
         let aRow;
 
@@ -174,12 +179,19 @@ $(function () {  //main of slickgrid
             for (let i = 0; i < nShowing; i += 1) {
                 aRow = dataView.getItem(i);
                 calPlaceList[aRow.CalPlace] = true;
+                if (aRow.CalInterval) calIntervalList[aRow.CalInterval] = true;
             }
             for (let c in calPlaceList) {
                 calPlaceA.push(c);
             }
             calPlaceA.sort();
             setDropdownList("#selectCalPlace", calPlaceA);
+
+            for (let interval in calIntervalList) {
+                calInterval.push(interval);
+            }
+            //calInterval.sort();
+            setDropdownList("#calinterval", calInterval);
         }
 
         let list = ["True", "False"]
@@ -308,6 +320,16 @@ $(function () {  //main of slickgrid
         updateFilter();
     });
 
+    $("#calinterval").on("change", function () {
+        let sel = $(this).val();
+        if (sel) {
+            filterValues.calInterval = sel;
+        } else {
+            filterValues.calInterval = null;
+        }
+        selectListReloadLevel = 1;
+        updateFilter();
+    });
 
     $('#clrSelBtn').click(function () {
         let selectedrows = [];
@@ -466,8 +488,8 @@ $(function () {  //main of slickgrid
     columns.push({ id: "CalVendor", name: "Cal Vendor", field: "CalVendor", sortable: true });
     columns.push({ id: "Instruction", name: "Instruction", field: "Instruction", sortable: true });
     columns.push({ id: "NeedCal", name: "NeedCal", field: "NeedCal", sortable: true });
-    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "NeedSafety", sortable: true });
     columns.push({ id: "CalInterval", name: "Cal Interval", field: "CalInterval", sortable: true });
+    columns.push({ id: "NeedSafety", name: "NeedSafety", field: "NeedSafety", sortable: true });
     columns.push({ id: "SafetyInterval", name: "Safety Interval", field: "SafetyInterval", sortable: true });
     columns.push({ id: "PMaker", name: "P.Maker", field: "PMaker", sortable: true });
 
@@ -510,10 +532,9 @@ $(function () {  //main of slickgrid
     grid.onHeaderRowCellRendered.subscribe(function (e, args) {
         let columnId = args.column.id;
         let cell = $(args.node);
-        //if (columnId === "Plant") return;
         if (columnId === "id") return;
-        //if (columnId === "NeedCal" || columnId === "NeedSafety" || columnId === "CalInterval") return;
-        if (columnId === "NeedCal" || columnId === "NeedSafety" || columnId ==="ChangeDate") return;
+        if (columnId === "NeedCal" || columnId === "NeedSafety" || columnId === "ChangeDate") return;
+        if (columnId === "CalInterval" || columnId === "SafetyInterval") return;
 
         cell.empty();
         if (columnId === "_checkbox_selector") {

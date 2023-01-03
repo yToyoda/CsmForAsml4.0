@@ -21,6 +21,7 @@ using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.Extensions.Logging;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace CsmForAsml.Controllers {
     [Authorize]
@@ -39,9 +40,25 @@ namespace CsmForAsml.Controllers {
         }
 
         // GET: ToolInventories
-        public async Task<IActionResult> Index() {
+        public ViewResult Index() {
             _logger.LogInformation("ToolInventories - Index");
-            return View(await _context.ToolInventory.ToListAsync());
+            List<ToolInventory> inventories = new List<ToolInventory>();
+            DateTime today = DateTime.Today;
+            foreach (var inventory in _context.ToolInventory) {
+                if (inventory.CalDue != null) {
+                    if (inventory.CalDue < today) {
+                        inventory.CalDueStatus = "Over";
+                    } else if (inventory.CalDue < AppResources.FirstDayOfNMonth(today, 1)) {
+                        inventory.CalDueStatus = "TM";
+                    } else if (inventory.CalDue < AppResources.FirstDayOfNMonth(today, 2)) {
+                        inventory.CalDueStatus = "NM";
+                    }
+                } else {
+                    inventory.CalDueStatus = "";
+                }
+                inventories.Add(inventory);
+            }
+            return View(inventories);
         }
 
 
