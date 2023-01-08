@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace CsmForAsml.Controllers {
     [Authorize]
@@ -31,15 +32,22 @@ namespace CsmForAsml.Controllers {
         private readonly CsmForAsml2Context _context;
         //private readonly CalInProcessRepository _calInProRepo;
         private readonly IHubContext<CsmHub> _hubContext;
-        private Dictionary<DateTime, string> _holidayDic; 
+        private Dictionary<DateTime, string> _holidayDic;
+        private UserManager<IdentityUser> _userManager;
+        private SignInManager<IdentityUser> _signInManager;
 
-        [TempData] string ExcelFilename { get; set; }
+       [TempData] string ExcelFilename { get; set; }
         public CalInProcessesController(ILogger<CalInProcessesController> logger, 
-                                        CsmForAsml2Context context, IHubContext<CsmHub> hubContext) {
+                                        CsmForAsml2Context context, IHubContext<CsmHub> hubContext,
+                                         SignInManager<IdentityUser> signinmanager,
+                                        UserManager<IdentityUser> usermanager) {
             _logger = logger;
             _context = context;
             //_calInProRepo = context.CalInProcessRepository;
             _hubContext = hubContext;
+            _signInManager = signinmanager;
+            _userManager = usermanager;
+
         }
       
 
@@ -86,7 +94,22 @@ namespace CsmForAsml.Controllers {
             serializeOptions.Converters.Add(new DateTimeConverter());
             return Json(ans, serializeOptions);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetUser() {
+            string ans = "";
+            var cuser = await _userManager.GetUserAsync(User);
+            if (await _userManager.IsInRoleAsync(cuser, "KyosaiUser")){
+                ans += "k";
+            }
+            if (await _userManager.IsInRoleAsync(cuser, "Supplier")) {
+                ans += "s";
+            }
+            if (await _userManager.IsInRoleAsync(cuser, "Administrator")) {
+                ans += "a";  
+            }
 
+            return Json(ans);
+        }
         private async Task GetNotMappedFields(IEnumerable<CalInProcess> cals, List<CalInProcess> ans) {
 
             var locations = await _context.LocationRepository.GetAllRecordsAsync();

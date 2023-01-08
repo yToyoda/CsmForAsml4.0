@@ -1,4 +1,8 @@
-﻿@model IEnumerable<CsmForAsml.Models.CalInProcess>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@model IEnumerable<CsmForAsml.Models.CalInProcess>
 @{
     ViewData["Title"] = "Cal in Process";
 }
@@ -160,10 +164,14 @@
         <div class="col-md-2 pad2">
             <button id="fnkey3" class="bgyellow">Latest Cal Cert</button>
         </div>
-
-        <div class="col-md-2 pad2">
-            <button id="fnkey4" class="bgyellow">P.Info</button>
-        </div>
+        @if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "KyosaiUser")
+              || await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Supplier")
+              || await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Administrator"))
+        {
+            <div class="col-md-2 pad2">
+                <button id="fnkey4" class="bgyellow">P.Info</button>
+            </div>
+        }
         <div class="col-md-2 pad2">
             <button id="fnkey1">Download</button>
         </div>
@@ -182,11 +190,11 @@
 <div id="dialog-pannel" title="日付・結果入力" style="display:none">
     <br>
     <p id="d-message" class="dialog-panel__message fsm" role="document">
-        イベントを選んでください
+        イベントを選んでください dialog-pannel
     </p>
-
+    
     <div class="fsm mglw">
-        <input type="radio" id="r0" name="dlprd1" value="1" checked="checked">ASML発送日<br>
+        <input type="radio" id="r0" name="dlprd1" value="1">ASML発送日<br>
         <input type="radio" id="r1" name="dlprd1" value="2">受領日<br>
         <input type="radio" id="r2" name="dlprd1" value="3">校正実施日<br>
         <input type="radio" id="r3" name="dlprd1" value="5">返送出荷日<br>
@@ -202,6 +210,12 @@
     <input type="text" id="dlpdi1" width="160" class="datepicker fsl" />
 
     <br />
+    @if (await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "KyosaiUser")
+              || await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Supplier")
+             || await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Administrator")) {
+        <!-- area for enable, disable switch -->
+    }
+
 </div>
 
 <!--  modal input pannl "dp-calResult" start from here -->
@@ -231,7 +245,7 @@
     <div id="dlpSerial" class="col-md-12 fsl"></div>
     <br>
     <div class="col-md-12 fsl">
-        日付をセットするイベントを選んでください
+        日付をセットするイベントを選んでください dp2
     </div>
 
     <div class="row">
@@ -360,6 +374,6 @@
     -->
     <script src="~/js/slick.min.js"></script>
     <script src="~/js/Slick.formatters.js"></script>
-    <script src="~/js/InCal20230101.js?01"></script>
+    <script src="~/js/InCal20230101.js?0105"></script>
 
 }

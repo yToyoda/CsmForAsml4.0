@@ -46,6 +46,7 @@ $(function () {
     let dateFieldNames = ["RegisteredDate", "UserShipDate", "VenReceiveDate", "CalDate", "PlanedShipDate",
         "VenShipDate", "UserReceiveDate", "CcReceiveDate", "CcUploadDate"];
     let dateFieldNamesJP = ["登録日", "ASML発送日", "受領日", "校正実施日", "予定出荷日", "返送出荷日", "ASML受領日", "証明書受領日", "証明書登録日"];
+    let stageToField = [1, 2, 3, 5, 6, 7];
     let dlprIndex, dlprDate;       //return value from dialog pannel
     let dlprCalResult, dlprComment; //return value from dialog pannel
     let filterValues = {
@@ -126,6 +127,8 @@ $(function () {
             }
         },
     ]
+
+    let userRole = "";   // "s:supplier", "k:kyosaiUser" "a:adminstrator"
 
     const validateAndSave = function () {
         let changed = false;
@@ -247,10 +250,24 @@ $(function () {
                     if (inPat[i + 1] !== stageDates[st][i]) match = false;
             }
             if (match) {
-                return st;
+                break;
             }
         }
-        return 5;
+        if (userRole.indexOf('a') >= 0 || userRole.indexOf('k') >= 0) {
+            // do nothing
+        } else if (userRole.indexOf('s') >= 0) { // st must be 1, 2 or 3
+            if (st == 0) {
+                st = 1;
+            }
+            if (st > 3) {
+                st = 3;
+            }
+         } else { // st must be 0 or  4
+            if (st >= 1) {
+                st = 4;
+            }
+        }
+        return st;
     }
 
 
@@ -351,29 +368,9 @@ $(function () {
         return rows;
     }
 
-    const testFilter = function (item, args) {
-        // date filters
-        let datenames = ['RegisteredDate', 'UserShipDate', 'VenReceiveDate', 'CalDate', 'PlanedShipDate',
-            'VenShipDate', 'UserReceiveDate', 'CcReceiveDate', 'CcUploadDate'];
-
-        let datestr = item[datenames[args.dateIndex]];
-        if (args.dateUndef) {
-            if (datestr !== undefined && datestr !== null && datestr !== "") { return false; }
-        } else {
-            //if (args.dateFrom !== null && ((!datestr) || moment(datestr, "YYYY/MM/DD").isBefore(args.dateFrom, "day"))) {
-            if (args.dateFrom !== null && ((!datestr) || moment(datestr ).isBefore(args.dateFrom, "day"))) {
-                return false;
-            }
-            if (args.dateTo !== null && ((!datestr) || moment(datestr).isAfter(args.dateTo, "day"))) {
-                return false;
-            }
-        }
-
-    }
 
     const updateFilter = function () {
         copyselection();
-        //testFilter(dataView.getItem(0), filterValues)
         dataView.setFilterArgs(filterValues);
         dataView.refresh();
         restoreSelection();
@@ -862,24 +859,20 @@ $(function () {
             // warning for nothing is selected
             alert("変更したい行をチェックしてから、このボタンを押してください"); // or confirm (OK, Cancel)
             return;
-        } else if (n === 1) {
-            // initiateDialog();
-            currentRowIndex = copiedSelected.shift();
-            showDiag2(currentRowIndex);
         } else {
-            if (allSameStage()) {
-                // apply entered to all selected equipment
-                selectChecked();
-                stage = judgeStage(oData[selected[0]]);
-                dlprIndex = prepareDialog(stage);
-                $('#dlpDateLabel1').text(dateFieldNamesJP[dlprIndex]);;
-                $('#dateInput').val("");
-                dialogObj.dialog('open');
-                // save entered data
-            } else {
-                //initiateDialog();
+            if (n === 1) {
+                // initiateDialog();
                 currentRowIndex = copiedSelected.shift();
-                showDiag2(currentRowIndex);
+                showDiag2(currentRowIndex);                
+            } else {
+                if (allSameStage()) {
+                    // apply entered to all selected equipment                    
+                    showDiag1();
+                } else {
+                    //initiateDialog();
+                    currentRowIndex = copiedSelected.shift();
+                    showDiag2(currentRowIndex);
+                }
             }
         }
         // dialogObj2.dialog('open');
@@ -888,6 +881,36 @@ $(function () {
     $('#fnkey6').click(function () {
         //<button id="fnkey6">完了設定</button>
     });
+
+    const enableRadioButtons = function () {
+        if (userRole.indexOf('a') >= 0 || userRole.indexOf('k') >= 0) { // admin or Kyosai User
+            for (let i = 0; i < 6; i += 1) {
+                $(`#r${i}`).prop('disabled', false);
+                $(`#rr${i}`).prop('disabled', false);
+            }
+            // no button to disable
+        } else if (userRole.indexOf('s') >= 0) {  // supplier
+            disableRadio(0);
+            disableRadio(4);
+            disableRadio(5);
+        } else {  //  user = ASML User
+            disableRadio(1);
+            disableRadio(2);
+            disableRadio(3);            
+            disableRadio(5);
+        }
+
+    };
+
+    const disableRadio = function(number){
+        $(`#r${number}`).prop('disabled', true);
+        $(`#rr${number}`).prop('disabled', true);
+    }
+
+    const checkRadio = function (number, yesNo) {
+        $(`#r${number}`).prop('checked', yesNo); 
+        $(`#rr${number}`).prop('checked', yesNo);
+    }
 
 
     const initiateDialog = function () {
@@ -903,33 +926,39 @@ $(function () {
         }
     }
 
+    const showDiag1 = function () {
+        //selectChecked();
+        stage = judgeStage(oData[selected[0]]);
+        dlprIndex = stageToField[stage];
+
+        $('#dlpDateLabel1').text(dateFieldNamesJP[dlprIndex]);
+        $('#dateInput').val("");
+        checkRadio(stage, true);
+        enableRadioButtons();
+        dialogObj.dialog('open');
+    };
+
+
     const showDiag2 = function (index) {
         currentRow = oData[index];
         stage = judgeStage(currentRow);
-        let ind = prepareDialog(stage);
-        // if (stage === 2) { $('#calRes2').css('display','block')}
+        dlprIndex = stageToField[stage];
         $('#dlpSerial').text("Serial : " + currentRow.SerialNumber);
-        for (let i = 1; i <= 3; ++i) {
-            $('#dlpdl' + i).text(currentRow[dateFieldNames[i]] || "");
+        for (let i = 0; i <= 5; ++i) {
+            $('#dlpdl' + (i+1)).text(currentRow[dateFieldNames[stageToField[i]]] || "");
         }
-        for (let i = 4; i <= 6; ++i) {
-            $('#dlpdl' + i).text(currentRow[dateFieldNames[i + 1]] || "");
-        }
-        $('#dlpdi2').val(currentRow[dateFieldNames[ind]] || "")
-
-        dlprIndex = ind;
+        $('#dlpdi2').val(currentRow[dateFieldNames[dlprIndex]] || "")
         $('input[name="dlprd1"]:radio').val(dlprIndex);
-
-        // if (ind === 2) { $('#calRes2').css('display', 'block') }
         $('#dlpDateLabel2').text(dateFieldNamesJP[dlprIndex]);
-        if (dlprIndex == 3) { // 校正実施日
+        if (stage == 2) { // 校正実施日
             showCalResult2();
             $('#calRes2').css('display', 'block');
         } else {
             $('#calRes2').css('display', 'none');
         }
-
-        $('#dlpDateLabel').text(dateFieldNamesJP[ind]);
+        $('#dlpDateLabel').text(dateFieldNamesJP[dlprIndex]);
+        enableRadioButtons(); 
+        checkRadio(stage, true);
         dialogObj2.dialog('open');
     };
 
@@ -1066,7 +1095,7 @@ $(function () {
         if (returnvalue === "OK") {
             // store entered result into updateList
             // currentRow is set at showDiag2
-            let eventDate = $('#dlpdi2').val();
+            let eventDate = $('#dlpdi2').val();          
             currentRow[dateFieldNames[dlprIndex]] = eventDate;
             if (dlprIndex === 3) {
                 currentRow.VenComment = $('#dlpcci2').text;
@@ -1268,6 +1297,19 @@ $(function () {
             // $("#gridContainer").resizable();
         },
 
+        function (jqXHR, textStatus, err) {
+            console.error("Error Hapened");
+            $('#NumShowing').text("Error");
+            $('#NumTotal').text(textStatus);
+        }
+    );
+
+    $.get(host + "/CalInProcesses/GetUser").then(
+        function (ans) {
+            userRole = ans;
+            console.log("User Data received ", userRole);            
+            // ans contains  a:adminstrator, s:suppler, k:kyosaiUser
+        },
         function (jqXHR, textStatus, err) {
             console.error("Error Hapened");
             $('#NumShowing').text("Error");

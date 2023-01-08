@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using CsmForAsml.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 
 
 namespace CsmForAsml.Controllers {
