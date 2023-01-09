@@ -168,8 +168,6 @@ namespace CsmForAsml.Controllers {
             userToEdit.KyosaiUser = await _userManager.IsInRoleAsync(duser, Roles.KyosaiUser);
             userToEdit.Supplier = await _userManager.IsInRoleAsync(duser, Roles.Supplier);
             return View(userToEdit);
-
-            return View();
         }
 
         // POST: UserController/Delete/5

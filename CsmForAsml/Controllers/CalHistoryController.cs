@@ -38,8 +38,10 @@ namespace CsmForAsml.Controllers
         {
             return View(await _context.CalDate.ToListAsync());
         }
-        public async Task<IActionResult> History(string id ) {
-            string ser = id;
+        //public async Task<IActionResult> History(string id ) {
+        public ViewResult History(string id)
+            {
+                string ser = id;
             // _logger.Log("History of " + ser + " requested");
             //string ser = "J0251";
             ViewData["Serial"] = ser;
@@ -58,6 +60,7 @@ namespace CsmForAsml.Controllers
                     entry.PdfFileName = "";
                 }
             }
+
             //await _hubContext.Clients.Client(ConId).SendAsync("HistoryFinished");
             return View(history);
         }
