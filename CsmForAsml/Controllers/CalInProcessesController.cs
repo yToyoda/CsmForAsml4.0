@@ -32,11 +32,12 @@ namespace CsmForAsml.Controllers {
         private UserManager<IdentityUser> _userManager;
         private SignInManager<IdentityUser> _signInManager;
 
-       [TempData] string ExcelFilename { get; set; }
-        public CalInProcessesController(ILogger<CalInProcessesController> logger, 
-                                        CsmForAsml2Context context, IHubContext<CsmHub> hubContext,
-                                         SignInManager<IdentityUser> signinmanager,
-                                        UserManager<IdentityUser> usermanager) {
+        [TempData] string ExcelFilename { get; set; }
+
+        public CalInProcessesController(ILogger<CalInProcessesController> logger,
+                                         CsmForAsml2Context context, IHubContext<CsmHub> hubContext,
+                                          SignInManager<IdentityUser> signinmanager,
+                                         UserManager<IdentityUser> usermanager) {
             _logger = logger;
             _context = context;
             //_calInProRepo = context.CalInProcessRepository;
@@ -45,7 +46,6 @@ namespace CsmForAsml.Controllers {
             _userManager = usermanager;
 
         }
-      
 
         // GET: CalInProcesses
         public async Task<IActionResult> Index() {
