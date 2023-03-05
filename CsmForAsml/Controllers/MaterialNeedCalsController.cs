@@ -36,7 +36,8 @@ namespace CsmForAsml.Controllers
         {
             //MaterialNeedCalRepository _mncRep = _context.MaterialNeedCalRepository;
             CultureInfo.CurrentUICulture = new CultureInfo("ja-JP", false);
-            IEnumerable<MaterialNeedCal> list = await _mncRepo.GetAllRecordsAsync();
+            //IEnumerable<MaterialNeedCal> list = await _mncRepo.GetAllRecordsAsync();
+            IEnumerable<MaterialNeedCal> list = await _context.MaterialNeedCal.ToListAsync();
             /*
             List<Tat> TatList = _context.Tat.ToList();
             foreach (MaterialNeedCal mncal in list) {
@@ -186,8 +187,8 @@ namespace CsmForAsml.Controllers
         /// <returns>Json フォーマットでシリアライズされた全Equipment の情報</returns>
         [HttpGet]
         public async Task<IActionResult> GetData() {
-            var equipments = await _mncRepo.GetAllRecordsAsync();
-          
+            //var equipments = await _mncRepo.GetAllRecordsAsync();
+            var equipments = await _context.MaterialNeedCal.ToListAsync();
             var serializeOptions = new JsonSerializerOptions {
 //                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNamingPolicy = null,

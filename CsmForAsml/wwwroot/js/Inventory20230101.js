@@ -46,6 +46,7 @@ $(function () {  //main of slickgrid
     let dpMovedToInCal = $('#dpMovedToInCal');
     let dpRefusedToMove = $('#dpRefusedToMove');
     let dpDoYouMove = $('#dpDoYouMove');
+    let dpWait = $('#dpWait');
 
     let buttonsYesNo = [
         {
@@ -107,6 +108,14 @@ $(function () {  //main of slickgrid
         width: 400,
     });
 
+    dpWait.dialog({
+        dialogClass: "customdiag-ygreen",
+        buttons: buttonOk,
+        modal: true,
+        show: { effect: "blind", duration: 100 },
+        autoOpen: false,
+        width: 400,
+    })
 
     let filterValues = {
         texts: {},
@@ -205,12 +214,14 @@ $(function () {  //main of slickgrid
     };
 
     const updateFilter = function () {
+        //dpWait.dialog('open');
         copyselection();
         dataView.setFilterArgs(filterValues);
         dataView.refresh();
         restoreSelection();
         showNumber();
         updateDropdownList();
+        $('#dpWait').dialog("close");
     };
 
     const updateDropdownList = function () {
@@ -405,6 +416,7 @@ $(function () {  //main of slickgrid
     // events from ".filterPannel #b2"
 
     $('#clrAllFil').click(function () {
+        dpWait.dialog('open');
         clrDateFilters();
         delete filterValues.texts;
         filterValues.texts = {}; // re new texts 
@@ -413,8 +425,11 @@ $(function () {  //main of slickgrid
         selectListReloadLevel = 0;
         for (var i of headerRowInputIds) {
             $(`input#${i}`).val("");
-            //$(i).val("");
         }
+        $('#selectPlant')[0].selectedIndex = 0;
+        $('#selectCalPlace')[0].selectedIndex = 0;
+        $('#selectMaterial')[0].selectedIndex = 0;
+        $('#selectSerial')[0].selectedIndex = 0;
         updateFilter();
     });
 

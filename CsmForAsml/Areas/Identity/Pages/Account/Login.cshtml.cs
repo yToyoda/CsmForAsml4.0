@@ -28,6 +28,7 @@ namespace CsmForAsml.Areas.Identity.Pages.Account
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            //var options = _signInManager.Options.SignIn;
         }
 
         [BindProperty]

@@ -32,12 +32,25 @@ namespace CsmForAsml {
                 options.UseSqlServer(
                     //Configuration.GetConnectionString("aspnet-Asml")));
                 Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            AppSettings = Configuration.GetSection("ConnectionStrings").GetChildren().ToDictionary(x => x.Key, x => x.Value);
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Default Password settings.  //added 0111,2023
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 1;
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedAccount = false;
+            });
 
+            AppSettings = Configuration.GetSection("ConnectionStrings").GetChildren().ToDictionary(x => x.Key, x => x.Value);
             services.AddScoped<IExcelUtil, ExcelUtility>();
             services.AddSingleton<CsmForAsml2Context, CsmForAsml2Context>();
             services.AddScoped<ICreateExcelFile<ToolInventory>, CreateToolInventoryExcel>();

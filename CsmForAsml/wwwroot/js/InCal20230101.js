@@ -181,15 +181,6 @@ $(function () {
         5: [true, true, true, , , , false, ,],      // 5 CC 受領日
     }
 
-    //  stage 毎に　Dialog の入力を enable する Mask 
-    let enArray = {
-        0: [1, 0, 0, 0, 0, 0, 0, 1],
-        1: [0, 1, 1, 1, 0, 0, 1, 2],
-        2: [0, 1, 1, 1, 0, 0, 2, 3],
-        3: [0, 1, 1, 1, 0, 0, 3, 5],
-        4: [1, 0, 0, 0, 1, 0, 4, 6],
-        5: [1, 1, 1, 1, 1, 1, 5, 7],
-    }
 
     dialogPInfo.dialog({
         dialogClass: "customdiag-aqua",
@@ -494,20 +485,7 @@ $(function () {
         selectListReloadLevel = 0;
         updateFilter();
     }
-
-    const prepareDialog = function (stg) {
-        let sw = enArray[`${stg}`];
-        for (let i = 0; i < 6; i += 1) {
-            let yesno = false;
-            if (sw[i] === 1) yesno = true;
-            $(`#r${i}`).prop('disabled', !yesno);
-            $(`#rr${i}`).prop('disabled', !yesno);
-        }
-        $(`#r${sw[6]}`).prop('checked', true);
-        $(`#rr${sw[6]}`).prop('checked', true);
-        returnId = sw[6];
-        return sw[7];
-    }
+    
 
 
     $(window).on('resize', function () {
@@ -580,8 +558,12 @@ $(function () {
         selectListReloadLevel = 0;
         for (var i of headerRowInputIds) {
             $(`input#${i}`).val("");
-            //$(i).val("");
         }
+        $('#selectPlant')[0].selectedIndex = 0;
+        $('#selectCalPlace')[0].selectedIndex = 0;
+        $('#selectMaterial')[0].selectedIndex = 0;
+        $('#selectSerial')[0].selectedIndex = 0;
+
         updateFilter();
     });
 

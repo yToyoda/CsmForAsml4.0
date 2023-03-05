@@ -13,7 +13,8 @@ namespace CsmForAsml.Models
         public int? CalInterval { get; set; }
         public string Instruction { get; set; }
         public string AddRemove { get; set; }
-        [DisplayFormat(DataFormatString="yyyy/MM/dd")]
+
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
         public DateTime? ChangeDate { get; set; }
         public bool? NeedCal { get; set; }
         public bool? NeedSafety { get; set; }

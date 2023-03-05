@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.AzureAppServices;
 using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 
 namespace CsmForAsml {
     public class Program {
@@ -27,7 +28,7 @@ namespace CsmForAsml {
                     keyVaultEndpoint,
                     new DefaultAzureCredential());
                 })
-               */
+               */               
                 .ConfigureServices(serviceCollection => serviceCollection
                     .Configure<AzureFileLoggerOptions>(options => {
                         options.FileName = "azure-diagnostics-";

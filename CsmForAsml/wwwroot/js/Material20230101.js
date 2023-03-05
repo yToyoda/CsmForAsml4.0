@@ -364,12 +364,21 @@ $(function () {  //main of slickgrid
         delete filterValues.texts;
         filterValues.texts = {}; // re new texts 
         filterValues.selection = null;
-        $('input[name="filBySel"]:radio').val([0]);
+        filterValues.needCal = null;
+        filterValues.needSafety = null;
+        filterValues.calInterval = null;
+
         selectListReloadLevel = 0;
         for (var i of headerRowInputIds) {
             $(`input#${i}`).val("");
             //$(i).val("");
         }
+        $('input[name="filBySel"]:radio').val([0]);
+
+        $('#selectCalPlace')[0].selectedIndex = 0;
+        $('#selectNeedCal')[0].selectedIndex = 0;
+        $('#calinterval')[0].selectedIndex = 0;
+        $('#selectSafety')[0].selectedIndex = 0; 
         updateFilter();
     });
 
