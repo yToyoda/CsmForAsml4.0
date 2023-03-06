@@ -21,14 +21,16 @@ namespace CsmForAsml {
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(logging => logging.AddAzureWebAppDiagnostics())
                 
-               /* .ConfigureAppConfiguration((context, config) =>
+                .ConfigureAppConfiguration((context, config) =>
                 {
-                    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
-                    config.AddAzureKeyVault(
-                    keyVaultEndpoint,
-                    new DefaultAzureCredential());
+                    if (context.HostingEnvironment.IsProduction()) {
+                        var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+                        config.AddAzureKeyVault(
+                        keyVaultEndpoint,
+                        new DefaultAzureCredential());
+                    }
                 })
-               */               
+                              
                 .ConfigureServices(serviceCollection => serviceCollection
                     .Configure<AzureFileLoggerOptions>(options => {
                         options.FileName = "azure-diagnostics-";
